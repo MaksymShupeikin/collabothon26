@@ -1,9 +1,10 @@
 "use client";
-import { useEffect, useRef } from "react";
-import { CandlestickSeries, createChart, createSeriesMarkers, type IChartApi, type ISeriesApi, type ISeriesMarkersPluginApi, type Time } from "lightweight-charts";
+import { useEffect, useRef, useState } from "react";
+import { CandlestickSeries, LineSeries, createChart, createSeriesMarkers, type IChartApi, type ISeriesApi, type ISeriesMarkersPluginApi, type Time } from "lightweight-charts";
 import { rng } from "@/lib/rng";
 
 export type TradeMark = { i: number; side: "buy" | "sell"; label: string };
+type Mode = "line" | "candles";
 
 // The engine simulates daily closes; candles are built from them: open = previous close,
 // wicks = a small seeded random overshoot, so the same market always draws the same candles.
@@ -17,40 +18,57 @@ function toCandles(sym: string, prices: number[], times: string[]) {
   });
 }
 
-const css = (name: string) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+// Read tokens from the chart's own element, so a scoped theme (e.g. the dark trading screen) applies.
+const css = (el: Element, name: string) => getComputedStyle(el).getPropertyValue(name).trim();
 
-/** Candlestick chart (TradingView Lightweight Charts) in the app's palette. */
+/** Price chart (TradingView Lightweight Charts). Default: one calm line; candles on demand. */
 export default function CandleChart({ sym, prices, times, trades }: { sym: string; prices: number[]; times: string[]; trades: TradeMark[] }) {
   const box = useRef<HTMLDivElement>(null);
   const chart = useRef<IChartApi | null>(null);
-  const series = useRef<ISeriesApi<"Candlestick"> | null>(null);
+  const series = useRef<ISeriesApi<"Candlestick"> | ISeriesApi<"Line"> | null>(null);
   const marks = useRef<ISeriesMarkersPluginApi<Time> | null>(null);
+  const [mode, setMode] = useState<Mode>("line");
 
   useEffect(() => {
-    const c = createChart(box.current!, {
+    const el = box.current!;
+    const c = createChart(el, {
       autoSize: true,
-      layout: { background: { color: "transparent" }, textColor: css("--color-ink-2"), fontFamily: css("--font"), attributionLogo: false },
-      grid: { vertLines: { visible: false }, horzLines: { color: css("--color-bg-light") } },
+      layout: { background: { color: "transparent" }, textColor: css(el, "--color-ink-2"), fontFamily: css(el, "--font"), attributionLogo: false },
+      grid: { vertLines: { visible: false }, horzLines: { visible: false } },
       rightPriceScale: { borderVisible: false },
       timeScale: { borderVisible: false, fixLeftEdge: true, fixRightEdge: true },
-      crosshair: { vertLine: { labelBackgroundColor: css("--color-ink") }, horzLine: { labelBackgroundColor: css("--color-ink") } },
+      crosshair: { vertLine: { labelBackgroundColor: css(el, "--color-bg-light") }, horzLine: { labelBackgroundColor: css(el, "--color-bg-light") } },
     });
-    const up = css("--color-gain"), down = css("--color-loss");
-    series.current = c.addSeries(CandlestickSeries, { upColor: up, downColor: down, wickUpColor: up, wickDownColor: down, borderVisible: false });
-    marks.current = createSeriesMarkers(series.current, []);
+    const up = css(el, "--color-gain"), down = css(el, "--color-loss");
+    series.current = mode === "line"
+      ? c.addSeries(LineSeries, { color: css(el, "--color-accent"), lineWidth: 2, priceLineVisible: false, crosshairMarkerBorderColor: css(el, "--color-accent") })
+      : c.addSeries(CandlestickSeries, { upColor: up, downColor: down, wickUpColor: up, wickDownColor: down, borderVisible: false });
+    marks.current = createSeriesMarkers(series.current as ISeriesApi<"Line">, []);
     chart.current = c;
-    return () => { c.remove(); chart.current = null; };
-  }, []);
+    return () => { c.remove(); chart.current = null; series.current = null; };
+  }, [mode]);
 
   useEffect(() => {
-    if (!series.current) return;
-    series.current.setData(toCandles(sym, prices, times));
+    if (!series.current || !box.current) return;
+    if (mode === "line") (series.current as ISeriesApi<"Line">).setData(prices.map((v, i) => ({ time: times[i] as Time, value: v })));
+    else (series.current as ISeriesApi<"Candlestick">).setData(toCandles(sym, prices, times));
+    const ink = css(box.current, "--color-ink");
     marks.current!.setMarkers(trades.filter((t) => t.i < prices.length).map((t) => ({
       time: times[t.i] as Time, position: t.side === "buy" ? "belowBar" : "aboveBar", shape: t.side === "buy" ? "arrowUp" : "arrowDown",
-      color: css("--color-ink"), text: t.label,
+      color: ink, text: t.label,
     })));
     chart.current!.timeScale().fitContent();
-  }, [sym, prices, times, trades]);
+  }, [sym, prices, times, trades, mode]);
 
-  return <div ref={box} className="candle-chart" />;
+  return (
+    <>
+      <div className="chart-tools">
+        <div className="seg" role="group" aria-label="Chart type">
+          <button aria-pressed={mode === "line"} onClick={() => setMode("line")}>Line</button>
+          <button aria-pressed={mode === "candles"} onClick={() => setMode("candles")}>Candles</button>
+        </div>
+      </div>
+      <div ref={box} className="candle-chart" />
+    </>
+  );
 }

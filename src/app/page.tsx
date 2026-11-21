@@ -36,12 +36,13 @@ export default function Home() {
       </section>
 
       <section className="modes">
-        {MODES.map((m) => (
-          <Link key={m.href} href={m.href} className="card mode">
-            <Icon name={m.icon} size={64} round />
+        {/* One primary action per screen: only the tour gets the yellow button. */}
+        {MODES.map((m, i) => (
+          <Link key={m.href} href={m.href} className="mode">
+            <Icon name={m.icon} size={48} round />
             <h2>{m.title}</h2>
             <p className="small muted">{m.text}</p>
-            <span className="btn btn-dark btn-sm">{m.cta} →</span>
+            <span className={i === 0 ? "btn btn-primary" : "mode-link"}>{m.cta} →</span>
           </Link>
         ))}
       </section>
