@@ -9,6 +9,7 @@ import {
 } from "@/lib/market";
 import { tourDone, useProgress } from "@/lib/progress";
 import CoachMark, { type CoachStep } from "./CoachMark";
+import Glyph from "./Glyph";
 import Icon from "./Icon";
 import CandleChart from "./CandleChart";
 import LineChart from "./LineChart";
@@ -169,7 +170,8 @@ export default function Simulator({ tour = false }: { tour?: boolean }) {
             </button>
             <div className="clock-date">
               <strong>{fmtDate(today, { weekday: "short", day: "numeric", month: "short" })}</strong>
-              <span className="xs muted num">Week {Math.floor(m.day / 5) + 1} of {Math.ceil(m.days / 5)}</span>
+              <span className="xs muted num">Day {m.day} of {m.days}</span>
+              <span className="day-bar" role="progressbar" aria-label="Market progress" aria-valuemin={0} aria-valuemax={m.days} aria-valuenow={m.day}><span style={{ width: `${(m.day / m.days) * 100}%` }} /></span>
             </div>
             <div className="seg" role="group" aria-label="Speed">
               {[1, 2].map((i) => (
@@ -236,14 +238,14 @@ export default function Simulator({ tour = false }: { tour?: boolean }) {
                           {!c.result && c.guess === undefined && (
                             <div className="row">
                               <span className="xs">Will this work?</span>
-                              <button className="btn btn-outline btn-sm" onClick={() => setM(guessCall(m, c.id, true))}>✓ Yes</button>
-                              <button className="btn btn-outline btn-sm" onClick={() => setM(guessCall(m, c.id, false))}>✗ No</button>
+                              <button className="btn btn-outline btn-sm" onClick={() => setM(guessCall(m, c.id, true))}><Glyph name="check" /> Yes</button>
+                              <button className="btn btn-outline btn-sm" onClick={() => setM(guessCall(m, c.id, false))}><Glyph name="cross" /> No</button>
                             </div>
                           )}
                           {!c.result && c.guess !== undefined && <div className="xs muted">Result in {c.day + 10 - m.day} days</div>}
                           {c.result && (
                             <div className="small">
-                              <strong className={c.result.right ? "up" : "down"}>{c.result.right ? "✓ Worked" : "✗ Failed"}</strong> · {eur(c.result.price)}
+                              <strong className={c.result.right ? "up" : "down"}><Glyph name={c.result.right ? "check" : "cross"} /> {c.result.right ? "Worked" : "Failed"}</strong> · {eur(c.result.price)}
                               {c.guess === c.result.right && <span className="badge" style={{ marginLeft: "var(--space-3)" }}>+10 XP</span>}
                               {news && <p className="xs muted">{news.explain}</p>}
                               {concept && <Link className="xs" href={`/learn/${concept.id}`}>{concept.title} →</Link>}
@@ -321,7 +323,11 @@ export default function Simulator({ tour = false }: { tour?: boolean }) {
               </div>
               <div className="order-grid">
                 <label className="field" data-tour="qty">Quantity
-                  <input type="number" min={1} step={1} value={qty || ""} onChange={(e) => setQty(Math.floor(Number(e.target.value)))} />
+                  <span className="stepper">
+                    <button type="button" aria-label="One share less" onClick={() => setQty(Math.max(1, (qty || 1) - 1))} disabled={(qty || 1) <= 1}><Glyph name="minus" /></button>
+                    <input type="number" min={1} step={1} value={qty || ""} onChange={(e) => setQty(Math.floor(Number(e.target.value)))} />
+                    <button type="button" aria-label="One share more" onClick={() => setQty((qty || 0) + 1)}><Glyph name="plus" /></button>
+                  </span>
                 </label>
                 <label className="field" data-tour="ordertype">Order type
                   <select value={type} onChange={(e) => setType(e.target.value as OrderType)}>

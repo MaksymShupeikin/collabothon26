@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { CONCEPTS, WORLDS } from "@/lib/data/concepts";
 import { useProgress } from "@/lib/progress";
+import Glyph from "./Glyph";
 
 /** Topics with concept chips and material stats; shown on the home page and the Learning tab. */
 export default function LearningMaterial() {
@@ -30,7 +31,7 @@ export default function LearningMaterial() {
               const state = complete ? "done" : w.n === currentTopic ? "current" : unlocked(w.n) ? "open" : "locked";
               return (
                 <li key={w.n} className={`path-step ${state}`} aria-current={state === "current" ? "step" : undefined}>
-                  <span className="path-dot" aria-hidden>{state === "done" ? "✓" : state === "locked" ? "" : w.n}</span>
+                  <span className="path-dot" aria-hidden>{state === "done" ? <Glyph name="check" size={14} /> : state === "locked" ? <Glyph name="lock" size={14} /> : w.n}</span>
                   <span className="path-label">{w.title}</span>
                 </li>
               );
@@ -46,7 +47,7 @@ export default function LearningMaterial() {
               const current = open && !complete && w.n === currentTopic;
               return (
                 <div key={w.n} className={`world ${open ? "" : "locked"} ${current ? "current" : ""}`}>
-                  <span className="part-num num" aria-hidden>{complete ? "✓" : w.n}</span>
+                  <span className="part-num num" aria-hidden>{complete ? <Glyph name="check" size={14} /> : w.n}</span>
                   <div className="stack" style={{ gap: "var(--space-3)" }}>
                     <h2>{w.title}</h2>
                     <div className="chips">

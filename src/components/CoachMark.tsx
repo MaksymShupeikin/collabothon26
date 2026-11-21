@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import Glyph from "./Glyph";
 
 /** place "side": bubble next to the target instead of below, e.g. so it doesn't cover a dropdown. */
 export type CoachStep = { target?: string; title: string; text: string; task?: string; place?: "side" };
@@ -52,7 +53,7 @@ export default function CoachMark({ step, index, total, canNext, onNext, onSkip 
         </div>
         <h3>{step.title}</h3>
         <p className="small">{step.text}</p>
-        {step.task && <p className="small"><strong>Your turn:</strong> {step.task} {canNext ? "✓" : ""}</p>}
+        {step.task && <p className="small"><strong>Your turn:</strong> {step.task} {canNext && <span className="up"><Glyph name="check" label="Done" /></span>}</p>}
         <div className="row" style={{ justifyContent: "space-between" }}>
           <button className="btn btn-ghost btn-sm" onClick={onSkip}>Skip tour</button>
           <button className="btn btn-primary" onClick={onNext} disabled={!canNext}>{index + 1 === total ? "Finish" : "Next"}</button>

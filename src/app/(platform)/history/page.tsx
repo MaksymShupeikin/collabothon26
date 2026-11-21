@@ -4,8 +4,9 @@ import { useState } from "react";
 import { conceptById } from "@/lib/data/concepts";
 import { HISTORY, type Direction } from "@/lib/data/history";
 import { useProgress } from "@/lib/progress";
+import Glyph from "@/components/Glyph";
 
-const DIRS: { d: Direction; label: string }[] = [{ d: "up", label: "↑ Up" }, { d: "flat", label: "→ Flat" }, { d: "down", label: "↓ Down" }];
+const DIRS: { d: Direction; label: string }[] = [{ d: "up", label: "Up" }, { d: "flat", label: "Flat" }, { d: "down", label: "Down" }];
 const CONF = [50, 70, 90];
 type Result = { right: boolean; conf: number };
 
@@ -50,7 +51,7 @@ export default function HistoryPage() {
         <h2>{round.question}</h2>
         <div className="row" role="group" aria-label="Your prediction">
           {DIRS.map(({ d, label }) => (
-            <button key={d} className="btn btn-outline dir" aria-pressed={dir === d} disabled={revealed} onClick={() => setDir(d)}>{label}</button>
+            <button key={d} className="btn btn-outline dir" aria-pressed={dir === d} disabled={revealed} onClick={() => setDir(d)}><Glyph name={d} size={20} /> {label}</button>
           ))}
         </div>
         <div className="row">
@@ -62,7 +63,7 @@ export default function HistoryPage() {
         {!revealed && <button className="btn btn-primary" disabled={!dir} onClick={reveal}>Reveal</button>}
         {revealed && (
           <div className="stack" style={{ gap: "var(--space-3)" }}>
-            <h3 className={dir === round.answer ? "up" : "down"}>{dir === round.answer ? "✓ Right" : "✗ Wrong"}</h3>
+            <h3 className={dir === round.answer ? "up" : "down"}><Glyph name={dir === round.answer ? "check" : "cross"} size={20} /> {dir === round.answer ? "Right" : "Wrong"}</h3>
             <p className="small">{round.outcome}</p>
             <p className="small"><strong>{round.lesson}</strong></p>
             {concept && <Link className="small" href={`/learn/${concept.id}`}>{concept.title} →</Link>}
