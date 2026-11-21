@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 
-export type CoachStep = { target?: string; title: string; text: string; task?: string };
+/** place "side": bubble next to the target instead of below, e.g. so it doesn't cover a dropdown. */
+export type CoachStep = { target?: string; title: string; text: string; task?: string; place?: "side" };
 
 /** Dims the page, spotlights [data-tour=target] and explains it. `canNext` gates action steps. */
 export default function CoachMark({ step, index, total, canNext, onNext, onSkip }: {
@@ -13,7 +14,11 @@ export default function CoachMark({ step, index, total, canNext, onNext, onSkip 
     if (!el) { setRect(null); return; }
     el.scrollIntoView({ block: "center", behavior: "smooth" });
     el.classList.add("coach-target");
-    const update = () => setRect(el.getBoundingClientRect());
+    // Include an open dropdown (e.g. search results) so it isn't dimmed outside the spotlight.
+    const update = () => {
+      const r = el.getBoundingClientRect(), list = el.querySelector('[role="listbox"]')?.getBoundingClientRect();
+      setRect(list ? new DOMRect(Math.min(r.left, list.left), r.top, Math.max(r.right, list.right) - Math.min(r.left, list.left), Math.max(r.bottom, list.bottom) - r.top) : r);
+    };
     update();
     const id = window.setInterval(update, 200); // follows smooth scroll and layout changes
     window.addEventListener("resize", update);
@@ -21,12 +26,17 @@ export default function CoachMark({ step, index, total, canNext, onNext, onSkip 
   }, [step.target]);
 
   const pad = 6;
-  const BUBBLE_H = 240;
-  const left = rect ? Math.min(Math.max(16, rect.left), window.innerWidth - 376) : 0;
-  // Below the target if it fits, else above, else pinned to the bottom (targets taller than the screen).
+  const BUBBLE_H = 240, BUBBLE_W = 360, GAP = 16;
+  const left = rect ? Math.min(Math.max(GAP, rect.left), window.innerWidth - BUBBLE_W - GAP) : 0;
+  const sideLeft = rect && step.place === "side"
+    ? rect.left - BUBBLE_W - 2 * GAP >= 0 ? rect.left - BUBBLE_W - GAP
+    : rect.right + BUBBLE_W + 2 * GAP <= window.innerWidth ? rect.right + GAP : null
+    : null;
+  // Beside the target if asked and it fits; else below, else above, else pinned to the bottom (targets taller than the screen).
   const bubbleStyle = !rect
     ? { top: "50%", left: "50%", transform: "translate(-50%, -50%)" }
-    : rect.bottom + BUBBLE_H < window.innerHeight ? { top: rect.bottom + 16, left }
+    : sideLeft !== null ? { top: Math.max(GAP, rect.top), left: sideLeft }
+    : rect.bottom + BUBBLE_H < window.innerHeight ? { top: rect.bottom + GAP, left }
     : rect.top > BUBBLE_H ? { top: rect.top - 16, left, transform: "translateY(-100%)" }
     : { bottom: 16, right: 16 };
 
