@@ -36,7 +36,7 @@ export const REPLAY_COMPANIES: Company[] = [
   { sym: "WDI", name: "Wirecard AG Inhaber-Aktien o.N.", short: "Wirecard", wkn: "747206", isin: "DE0007472060", type: "Aktie", sector: "Payments", price: 0, vol: 0.02, drift: 0 },
   { sym: "GME", name: "GameStop Corp. Registered Shares Class A DL-,001", short: "GameStop", wkn: "A0HGDX", isin: "US36467W1094", type: "Aktie", sector: "Retail", price: 0, vol: 0.03, drift: 0 },
   { sym: "LHA", name: "Deutsche Lufthansa AG vink. Namens-Aktien o.N.", short: "Lufthansa", wkn: "823212", isin: "DE0008232125", type: "Aktie", sector: "Travel", price: 0, vol: 0.02, drift: 0 },
-  { sym: DAX_ETF, name: "iShares Core DAX UCITS ETF (DE)", short: "DAX ETF", wkn: "593393", isin: "DE0005933931", type: "ETF", sector: "ETF", price: 0, vol: 0.012, drift: 0 },
+  { sym: DAX_ETF, name: "iShares Core DAX UCITS ETF (DE)", short: "DAX ETF", wkn: "593393", isin: "DE0005933931", type: "ETF", sector: "ETF", price: 110, vol: 0.011, drift: 0.0002 },
 ];
 
 export const ALL_COMPANIES = [...COMPANIES, ...REPLAY_COMPANIES];
