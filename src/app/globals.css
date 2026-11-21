@@ -492,3 +492,8 @@ a { text-underline-offset: 3px; }
 .watch-search input { width: 100%; border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: var(--space-3) var(--space-5); font-size: var(--text-sm); background: var(--color-white); }
 .watch-search input:focus-visible { border-color: var(--color-ink); }
 .p-watch .panel-body:has(> .empty-state) { display: flex; flex-direction: column; }
+
+/* Left column split 50/50 top to bottom: watchlist and news/rivals get equal height (desktop grid only). */
+@media (min-width: 1101px) {
+  .trade-col > .p-watch, .trade-col > .p-feed { flex: 1 1 0; min-height: 0; }
+}
