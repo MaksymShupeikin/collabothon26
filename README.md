@@ -18,7 +18,7 @@ A training sandbox inside comdirect. It looks like the real comdirect screens, r
 <table>
   <tr>
     <td width="50%"><img src="docs/screenshots/start-page.webp" alt="Mocked comdirect start page with the 'Practice first, then invest' banner"><br><sub><b>Entry:</b> one banner on the comdirect start page, no sign-up</sub></td>
-    <td width="50%"><img src="docs/screenshots/learning-hub.webp" alt="Learning hub with rank ring, XP, stars, cards and the learning path"><br><sub><b>Learning hub:</b> rank, XP, stars, cards and the four worlds</sub></td>
+    <td width="50%"><img src="docs/screenshots/learning-hub.webp" alt="Learning hub with rank ring, XP, stars, cards and the learning path"><br><sub><b>Learning hub:</b> rank, XP, stars, cards and the four tutorials</sub></td>
   </tr>
   <tr>
     <td width="50%"><img src="docs/screenshots/web-cabinet.webp" alt="Web cabinet sandbox with play money and the sandbox bar"><br><sub><b>Web cabinet:</b> the comdirect customer area 1:1, on play money</sub></td>
@@ -51,7 +51,7 @@ comdirect already has the pieces, but they live apart:
 | **ProTrader** | An exact replica of the comdirect ProTrader layout, so you are fluent in the real workspace before you buy your first stock |
 | **History mode** | Replay real market moments and see how your decisions would have played out |
 | **Investor simulator** | A life-long savings run: income, events and choices, decade by decade |
-| **Learning map** | Worlds, concept cards, mini games, quick-check quizzes and bosses |
+| **Learning map** | Tutorials, concept cards, mini games, quick-check quizzes and bosses |
 
 ### One path, three life stages
 
@@ -72,10 +72,9 @@ Three onboarding questions pick a persona, and everything is tailored to it: exa
 | **Missions** | The coach steps back and you do it alone. 1–3 stars: done, done without hints, done with the smart choice (for example a limit order at night) |
 | **XP and ranks** | XP for tour steps, missions, right concept answers and good decisions. Ranks: Saver → Beginner → Investor → Strategist → Market Reader |
 | **Concept cards** | 12 to collect. Front: one sentence. Back: an example and a quiz question |
-| **Rival bots** | AI traders on the same market, each with one bad habit: **FOMO Max** buys every hype, **Panic Paula** sells every dip, **All-in Alex** bets everything on one stock, **Steady Sam** runs a monthly ETF plan and is the benchmark |
 | **Spot the habit** | When a bot trades you name the risk behind it, not whether the price will go up. XP for the right concept, whatever the outcome |
 | **Mistake Cam** | After the outcome, a short replay of what the bot did, what really happened and the concept behind it |
-| **Boss rounds** | Worlds 2–4 each end against one bot: FOMO Max, All-in Alex, Panic Paula. In History mode the same bosses return on real events with the date hidden (GameStop 2021, Wirecard 2020, the COVID crash 2020), revealed at the end |
+| **Boss rounds** | Tutorials 2–4 each end against one bot: FOMO Max, All-in Alex, Panic Paula. In History mode the same bosses return on real events with the date hidden (GameStop 2021, Wirecard 2020, the COVID crash 2020), revealed at the end |
 | **Leaderboard** | You vs. the bots by risk-adjusted score (return − ½ × worst drawdown), so all-in gambling rarely wins |
 
 ## Fit with the Finance Quest challenge
@@ -83,7 +82,7 @@ Three onboarding questions pick a persona, and everything is tailored to it: exa
 | The challenge card asks for | What comdirect edu does |
 |---|---|
 | Bridge the gap between financial knowledge and action | You buy your first stock yourself, on the real comdirect screens, before you ever risk real money |
-| A demonstrable prototype with a complete learning mission | World 1 mission **"Your first stock"**: move your money to the trading account, buy with a limit order, jump one week ahead, find your profit and loss. Checked against the sandbox state, not a quiz |
+| A demonstrable prototype with a complete learning mission | Tutorial 1 mission **"Your first stock"**: move your money to the trading account, buy with a limit order, jump one week ahead, find your profit and loss. Checked against the sandbox state, not a quiz |
 | The target learner and learning objective | **Learner:** self-directed savers who have never bought a stock. **Objective:** place a first trade with confidence and understand market vs. limit orders, fees and profit & loss |
 | How the experience supports understanding and engagement | Spotlight tour where you do every step, concept cards, missions, rival bots, boss rounds, and History mode replays of real events |
 | Fit with "Innovations for all generations" | Three onboarding questions pick a persona (22, 34 or 58), which changes the amounts, examples, missions and bosses |
@@ -137,4 +136,4 @@ The full concept is in [`idea.md`](idea.md).
 
 ## Disclaimer
 
-comdirect edu is a prototype built for Collabothon 2026. It is not an official comdirect or Commerzbank product. Everything runs on play money: no real accounts, orders or payments. Prices are mock data. Historical replays retell real events in short headlines of our own, and free play uses only simulated macro and sector news, labelled "Simulated". We never invent news about a real company.
+comdirect edu is a prototype built for Collabothon 2026. It is not an official comdirect or Commerzbank product. Everything runs on play money: no real accounts, orders or payments. Historical replays retell real events in short headlines of our own, and free play uses only simulated macro and sector news, labelled "Simulated". We never invent news about a real company.
