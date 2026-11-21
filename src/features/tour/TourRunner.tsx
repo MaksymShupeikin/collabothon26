@@ -119,7 +119,7 @@ export function ChapterDone({ ch, extra, skipCard }: { ch: Chapter; extra?: Reac
   const nextLink = next && next.id !== ch.id ? (
     <Link className={`btn btn-primary ${history ? `btn-lg ${hm.go}` : "btn-sm"}`} href={surfaceHref(next)} onClick={() => { if (next.id === "w1") actions.resetSandbox(); actions.start(next.id); setUi({}); }}>
       {history
-        ? <>{save.done.includes(next.id) ? "Replay" : "Start"}<span className={hm.goSub}>{next.title.replace(/^Boss: /, "vs. ")}</span><Arrow /></>
+        ? <>{save.done.includes(next.id) ? "Replay" : "Start"}<span className="btn-context">{next.title.replace(/^Boss: /, "vs. ")}</span><Arrow /></>
         : <>{next.kind === "boss" ? next.title : `Start ${next.kind === "mission" ? "mission" : next.n}: ${next.title}`} →</>}
     </Link>
   ) : null;

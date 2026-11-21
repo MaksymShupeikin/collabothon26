@@ -40,7 +40,7 @@ export default function HistoryMode() {
           <h1 id="hist-h">Real crashes,<br />hidden dates</h1>
           <button className={`btn btn-primary btn-lg ${s.go}`} onClick={() => launch(next)}>
             {save.done.includes(next.id) ? "Replay" : "Start"}
-            <span className={s.goSub}>{next.title.replace(/^Boss: /, "vs. ")}</span>
+            <span className="btn-context">{next.title.replace(/^Boss: /, "vs. ")}</span>
             <Arrow />
           </button>
         </div>
