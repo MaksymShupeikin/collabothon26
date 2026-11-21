@@ -98,7 +98,7 @@
 .nodeLocked { border-color: var(--color-border); color: var(--color-ink-2); background: var(--color-white); cursor: default; }
 .nodeLocked > span, .nodeLocked > .glyph { opacity: 0.6; }
 .locked .nodeLocked { background: var(--color-bg-light); }
-.nodeBoss { width: 34px; height: 34px; border: 0; background: none; }
+.nodeBoss { width: 34px; height: 34px; border: 0; } /* keeps the node's opaque fill so the rail never shows through a faded boss */
 .nodeBoss > svg { width: 34px; height: 34px; }
 .nodeBoss.nodeLocked > svg { opacity: 0.35; filter: grayscale(1); }
 .nodeBoss.nodeDone { box-shadow: 0 0 0 2px var(--color-accent); }
