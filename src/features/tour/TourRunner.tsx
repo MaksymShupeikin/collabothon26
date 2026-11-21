@@ -1,7 +1,9 @@
 "use client";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { chapterById, nextChapter, surfaceHref, type Chapter, type Ctx, type Step } from "@/features/tour/chapters";
+import { Arrow } from "@/features/learn/LearningMap";
+import hm from "@/features/learn/LearningMap.module.css";
+import { chapterById, HISTORY, isHistory, nextChapter, surfaceHref, type Chapter, type Ctx, type Step } from "@/features/tour/chapters";
 import { PERSONAS } from "@/features/game/personas";
 import { actions, useGame } from "@/features/game/store";
 import { priceNow } from "@/features/market/engine";
@@ -45,6 +47,9 @@ function ChapterTour({ ch, ctx }: { ch: Chapter; ctx: Ctx }) {
       actions.finish(ch.id);
     } else setI(i + 1);
   }
+
+  // replays reveal the company name once the last (reveal) step is on screen
+  useEffect(() => { if (steps.length && i === steps.length - 1) setUi({ tourFinished: ch.id }); }, [i, steps.length, ch.id]);
 
   // Action steps continue by themselves once the action is done: no "Next" button for things the player can do.
   const nextRef = useRef(next);
@@ -106,15 +111,22 @@ const NextArrow = () => <svg className="btn-arrow" viewBox="0 0 16 16" aria-hidd
 /** End of a chapter: the concept card drops into the collection. */
 export function ChapterDone({ ch, extra, skipCard }: { ch: Chapter; extra?: React.ReactNode; skipCard?: boolean }) {
   const save = useGame();
-  const next = nextChapter(save);
+  // finishing a history story leads to the next history story, not the learning path
+  const history = isHistory(ch);
+  const next = history ? HISTORY.find((c) => c.id !== ch.id && !save.done.includes(c.id)) : nextChapter(save);
   const [stay, setStay] = useState(!!skipCard);
+  // History stories get the same button as History mode's "Start": reused classes, glyph and hover motion
   const nextLink = next && next.id !== ch.id ? (
-    <Link className="btn btn-primary btn-sm" href={surfaceHref(next)} onClick={() => { if (next.id === "w1") actions.resetSandbox(); actions.start(next.id); setUi({}); }}>
-      {next.kind === "boss" ? next.title : `Start ${next.kind === "mission" ? "mission" : next.n}: ${next.title}`} →
+    <Link className={`btn btn-primary ${history ? `btn-lg ${hm.go}` : "btn-sm"}`} href={surfaceHref(next)} onClick={() => { if (next.id === "w1") actions.resetSandbox(); actions.start(next.id); setUi({}); }}>
+      {history
+        ? <>{save.done.includes(next.id) ? "Replay" : "Start"}<span className={hm.goSub}>{next.title.replace(/^Boss: /, "vs. ")}</span><Arrow /></>
+        : <>{next.kind === "boss" ? next.title : `Start ${next.kind === "mission" ? "mission" : next.n}: ${next.title}`} →</>}
     </Link>
   ) : null;
-  const label = ch.kind === "mission" ? "Mission" : `Chapter ${ch.n}`;
-  if (stay) return <SandboxBar label={`${label} complete`} next={nextLink} />;
+  const label = ch.kind === "mission" ? "Mission" : history ? "Story" : `Chapter ${ch.n}`;
+  // replay stories live in History mode, so that's where "back" goes
+  const home = history ? { href: "/history", name: "History mode" } : { href: "/", name: "Learning map" };
+  if (stay) return <SandboxBar label={`${label} complete`} next={nextLink} home={home} />;
   const cards = ch.card ?? [];
   return (
     <div className="overlay" role="dialog" aria-modal="true" aria-label="Chapter complete">
@@ -133,7 +145,7 @@ export function ChapterDone({ ch, extra, skipCard }: { ch: Chapter; extra?: Reac
         )}
         <div className="row done-foot">
           <div className="row">
-            <Link className="btn btn-ghost btn-sm" href="/" onClick={() => actions.start(null)}>Back to learning map</Link>
+            <Link className="btn btn-ghost btn-sm" href={home.href} onClick={() => actions.start(null)}>Back to {home.name}</Link>
             <button className="btn btn-ghost btn-sm" onClick={() => setStay(true)}>Keep exploring here</button>
           </div>
           {nextLink}
@@ -144,7 +156,7 @@ export function ChapterDone({ ch, extra, skipCard }: { ch: Chapter; extra?: Reac
 }
 
 /** After "Keep exploring here": free play, with the way out (or on) docked at the bottom. */
-function SandboxBar({ label, next }: { label: string; next: React.ReactNode }) {
+function SandboxBar({ label, next, home = { href: "/", name: "Learning map" } }: { label: string; next: React.ReactNode; home?: { href: string; name: string } }) {
   return (
     <aside className="sandbox-bar" aria-label="Lesson complete">
       <span className="sandbox-check" aria-hidden="true">
@@ -155,7 +167,7 @@ function SandboxBar({ label, next }: { label: string; next: React.ReactNode }) {
         <span>Free play: click around, nothing is scored.</span>
       </div>
       <div className="sandbox-actions">
-        <Link className="btn btn-ghost btn-sm" href="/" onClick={() => actions.start(null)}>Learning map</Link>
+        <Link className="btn btn-ghost btn-sm" href={home.href} onClick={() => actions.start(null)}>{home.name}</Link>
         {next}
       </div>
     </aside>
@@ -173,20 +185,7 @@ function MissionCard({ ch, ctx }: { ch: Chapter; ctx: Ctx }) {
   const stars = mine?.stars ?? 0;
   const setPhase = (p: "week" | "find" | "done") => setUi({ mission: { id: ch.id, phase: p, stars } });
   const [open, setOpen] = useState(true);
-  const last = useRef(0);
   useEffect(() => { setUi({ mission: undefined }); }, []);
-
-  // A hint appears after ~20 s without any input, or on request.
-  useEffect(() => {
-    last.current = Date.now();
-    const poke = () => { last.current = Date.now(); };
-    window.addEventListener("pointerdown", poke);
-    window.addEventListener("keydown", poke);
-    const id = window.setInterval(() => {
-      if (phase === "play" && Date.now() - last.current > 20000) { setHint(true); setUsedHint(true); }
-    }, 1000);
-    return () => { window.removeEventListener("pointerdown", poke); window.removeEventListener("keydown", poke); window.clearInterval(id); };
-  }, [phase]);
 
   const ok = phase === "play" && m.check(ctx);
   const smart = m.smart(ctx);
@@ -206,14 +205,14 @@ function MissionCard({ ch, ctx }: { ch: Chapter; ctx: Ctx }) {
     setPhase("done");
   }
 
-  // One week later, in the depot: point at the profit or loss before the big moment.
+  // One week later, in the portfolio: point at the profit or loss before the big moment.
   if (phase === "find" && ctx.ui.view === "depot") {
-    const s = ctx.save.sim, h = s.acct.holdings[persona(ctx).w1.sym];
-    const pl = h ? h.qty * priceNow(s, persona(ctx).w1.sym) - h.cost : 0;
+    const s = ctx.save.sim;
+    const pl = Object.entries(s.acct.holdings).reduce((sum, [sym, h]) => sum + h.qty * priceNow(s, sym) - h.cost, 0);
     return (
       <CoachMark target="depot-pnl" title="One week later" progress={1} step="Mission · found it"
         footer={<div className="row coach-foot"><span /><button className="btn btn-primary btn-sm" onClick={found}>Continue</button></div>}>
-        <p className="small">Your position is worth <strong className={pl >= 0 ? "up" : "down"}>{pl >= 0 ? "+" : "−"}{Math.abs(pl).toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €</strong> {pl >= 0 ? "more" : "less"} than you paid, costs included. That&apos;s your profit or loss, on paper until you sell.</p>
+        <p className="small">Your stocks are worth <strong className={pl >= 0 ? "up" : "down"}>{pl >= 0 ? "+" : "−"}{Math.abs(pl).toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €</strong> {pl >= 0 ? "more" : "less"} than you paid, costs included. That&apos;s your profit or loss, on paper until you sell.</p>
       </CoachMark>
     );
   }
@@ -226,19 +225,19 @@ function MissionCard({ ch, ctx }: { ch: Chapter; ctx: Ctx }) {
   return (
     <aside className={`mission-card ${open ? "" : "mini"}`} aria-label="Mission">
       <button className="mission-head" onClick={() => setOpen(!open)} aria-expanded={open}>
-        <span className="badge badge-accent">Mission</span> <strong>{ch.title}</strong> <span className="xs muted">{open ? "▾" : "▸"}</span>
+        <span className="badge badge-accent">Mission</span> <strong>{ch.title}</strong>
+        <svg className="mission-chev" viewBox="0 0 12 8" width="12" height="8" aria-hidden><path d="M1 1.5l5 5 5-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
       </button>
       {open && (
         <div className="stack-sm">
           {phase === "play" && (
             <>
               <p className="small">{m.goal(ctx)}</p>
-              <p className="xs muted">No spotlight this time. You’ve got this.</p>
-              {hint ? <p className="small hint"><strong>Hint:</strong> {m.hint(ctx)}</p> : (
-                <button className="btn btn-ghost btn-sm" onClick={() => { setHint(true); setUsedHint(true); }}>Show a hint (fewer stars)</button>
-              )}
-              <ul className="xs muted star-rules">
-                <li>★ Done</li><li>★ Without a hint {usedHint ? "✗" : ""}</li><li>★ {m.smartLabel} {smart ? "✓" : ""}</li>
+              {hint && <p className="small hint"><strong>Hint:</strong> {m.hint(ctx)}</p>}
+              <ul className="xs star-rules" aria-label="Stars to earn">
+                <li>Done</li>
+                <li className={usedHint ? "lost" : ""}>No hint</li>
+                <li className={smart ? "on" : ""}>{m.smartLabel}</li>
               </ul>
             </>
           )}
@@ -251,11 +250,14 @@ function MissionCard({ ch, ctx }: { ch: Chapter; ctx: Ctx }) {
           )}
           {phase === "find" && (
             <>
-              <p className="small"><strong>One week later.</strong> Find your position and its profit or loss in the depot.</p>
-              {ctx.ui.view !== "depot" && <p className="xs muted">Tip: “Depot” in the menu.</p>}
+              <p className="small"><strong>One week later.</strong> Find your position and its profit or loss in the portfolio.</p>
+              {ctx.ui.view !== "depot" && <p className="xs muted">Tip: “Portfolio” in the menu.</p>}
             </>
           )}
-          <button className="btn btn-ghost btn-sm" onClick={() => actions.start(null)}>Leave mission</button>
+          <div className="mission-foot">
+            {phase === "play" && !hint && <button className="btn btn-ghost btn-sm" onClick={() => { setHint(true); setUsedHint(true); }}>Need a hint?</button>}
+            <button className="btn btn-ghost btn-sm mission-leave" onClick={() => actions.start(null)}>Leave</button>
+          </div>
         </div>
       )}
     </aside>
@@ -284,7 +286,6 @@ function ProUnlocked({ stars }: { stars: number }) {
         <Stars n={stars} />
         <p className="unlock-kicker">Mission complete · Profit &amp; loss card collected</p>
         <h1>You just did what most people never dare to do.</h1>
-        <p className="unlock-sub">Trading area unlocked: one screen with live news, rival bots and time that moves. ProTrader follows after Module 2.</p>
         <div className="card-row"><ConceptCard id="pnl" /></div>
         <div className="row" style={{ justifyContent: "center" }}>
           <button className="btn btn-outline-light" onClick={() => { actions.celebratePro(); setStay(true); }}>Keep exploring here</button>

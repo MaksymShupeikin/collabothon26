@@ -36,7 +36,7 @@ export type Chapter = {
   steps?: Step[];
   mission?: Mission;
   start?: { view: string; sym?: string }; // web cabinet screen the chapter starts on
-  replay?: string; // historical replay id
+  replay?: string; // bot round: a historical replay (History mode) or a simulated boss round
   lesson?: string; // simulated lesson universe
 };
 export type World = { n: number; title: string; surface: string; blurb: string };
@@ -48,7 +48,6 @@ export const WORLDS: World[] = [
   { n: 4, title: "Time", surface: "ProTrader + years", blurb: "Let time and a savings plan do the work." },
 ];
 
-const hasPos = (c: Ctx, sym: string, qty = 1) => (c.save.sim.acct.holdings[sym]?.qty ?? 0) >= qty;
 const persona = (c: Ctx) => PERSONAS[c.save.persona ?? "starter"];
 
 // ── Module 1 · web cabinet ─────────────────────────────────────────────────
@@ -56,14 +55,14 @@ const persona = (c: Ctx) => PERSONAS[c.save.persona ?? "starter"];
 const W1: Chapter[] = [
   {
     id: "1.1", world: 1, n: "1.1", kind: "chapter", title: "Your cabinet", surface: "cabinet",
-    blurb: "Girokonto, trading account and depot: what each one is for.",
+    blurb: "Current account, trading account and portfolio: what each one is for.",
     steps: [
       { title: "Welcome to your sandbox", text: "This is the comdirect overview, copied 1:1. Everything here runs on play money." },
-      { target: "acc-giro", title: "Girokonto", text: (c) => `Your current account. Your ${PERSONAS[c.save.persona ?? "starter"].start} € of play money starts here.` },
+      { target: "acc-giro", title: "Current account", text: (c) => `Your current account. Your ${PERSONAS[c.save.persona ?? "starter"].start} € of play money starts here.` },
       { target: "acc-verrechnung", title: "Trading account", text: "This is your cash for trading. It's separate from your current account, and it's empty for now." },
-      { target: "acc-depot", title: "Depot", text: "Your depot holds the stocks and ETFs you own. Nothing yet." },
-      { target: "nav-depot", title: "Look inside", text: "Every account has its own page.", task: "Open your depot.", done: (c) => c.ui.view === "depot" },
-      { target: "depot-empty", title: "Empty depot", text: "This is where your first stock will show up, with its profit or loss." },
+      { target: "acc-depot", title: "Portfolio", text: "Your portfolio holds the stocks and ETFs you own. Nothing yet." },
+      { target: "nav-depot", title: "Look inside", text: "Every account has its own page.", task: "Open your portfolio.", done: (c) => c.ui.view === "depot" },
+      { target: "depot-empty", title: "Empty portfolio", text: "This is where your first stock will show up, with its profit or loss." },
       { target: "nav-home", title: "Back to the overview", text: "The overview is always one click away.", task: "Go back to the overview.", done: (c) => c.ui.view === "home" },
       { target: "add-play-money", title: "Sandbox button", text: "Need more play money later? This adds some. It's a sandbox control, not a real comdirect function." },
     ],
@@ -72,13 +71,13 @@ const W1: Chapter[] = [
     id: "1.2", world: 1, n: "1.2", kind: "chapter", title: "Top up", surface: "cabinet",
     blurb: "Move money to your trading account and confirm with photoTAN.",
     steps: [
-      { target: "btn-transfer", title: "Money first", text: "To buy a stock, your money has to be on the trading account.", task: "Click \"Transfer\" next to the Girokonto.", done: (c) => c.ui.view === "transfer" },
-      { target: "tr-to", title: "From and to", text: "From your Girokonto to your trading account (Verrechnungskonto). Both are already filled in." },
+      { target: "btn-transfer", title: "Money first", text: "To buy a stock, your money has to be on the trading account.", task: "Click \"Transfer\" next to the current account.", done: (c) => c.ui.view === "transfer" },
+      { target: "tr-to", title: "From and to", text: "From your current account to your trading account. Both are already filled in." },
       { target: "tr-amount", title: "Amount", text: "Let's try a small amount first.", task: "Enter 20 €.", done: (c) => c.ui.trAmount === 20 },
       { target: "tr-submit", title: "Check and send", text: "Every transfer is confirmed with a TAN, a one-time code.", task: "Click \"Next\".", done: (c) => !!c.ui.tanOpen || (c.ui.transferDone ?? 0) > 0 },
       { target: "tan-box", title: "photoTAN", text: "In real life you scan this mosaic with the photoTAN app. Here, the phone next to it is simulated.", task: "Type the TAN shown on the phone and confirm.", done: (c) => (c.ui.transferDone ?? 0) > 0 },
       { target: "nav-umsaetze", title: "Did it work?", text: "Every movement of money is listed in your transactions.", task: "Open \"Transactions\".", done: (c) => c.ui.view === "umsaetze" },
-      { target: "umsatz-list", title: "Here it is", text: "20 € left the Girokonto and arrived on your trading account." },
+      { target: "umsatz-list", title: "Here it is", text: "20 € left the current account and arrived on your trading account." },
     ],
   },
   {
@@ -128,8 +127,8 @@ const W1: Chapter[] = [
     mission: {
       goal: (c) => persona(c).w1.text,
       hint: (c) => persona(c).w1.hint + " On the order form choose \"Limit\" and set the limit at or a bit above the current price.",
-      check: (c) => hasPos(c, persona(c).w1.sym, persona(c).w1.qty),
-      smart: (c) => c.save.sim.acct.trades.some((t) => t.sym === persona(c).w1.sym && t.type === "limit"),
+      check: (c) => Object.values(c.save.sim.acct.holdings).some((h) => h.qty > 0), // sandbox is reset on start, so any position is theirs
+      smart: (c) => c.save.sim.acct.trades.some((t) => t.type === "limit"),
       smartLabel: "Used a limit order",
       after: "week",
     },
@@ -143,7 +142,7 @@ const W2: Chapter[] = [
     id: "2.1", world: 2, n: "2.1", kind: "chapter", title: "Your trading area", surface: "pro",
     blurb: "A guided tour of the trading screen: everything on one screen.",
     steps: [
-      { title: "The trading area", text: "Everything on one screen, and time that moves. It's the same depot as in the web cabinet. After Module 2 you move on to ProTrader." },
+      { title: "The trading area", text: "Everything on one screen, and time that moves. It's the same portfolio as in the web cabinet. After Module 2 you move on to ProTrader." },
       { target: "w-account", title: "Your account", text: "Total value, cash and profit or loss. Low on cash? Top up here." },
       { target: "w-search", title: "Find a stock", text: "Type a name, ticker or WKN, then pick the stock from the list.", task: "Search for SAP and pick it.", done: (c) => c.ui.sym === "SAP" },
       { target: "w-chart", title: "Chart", text: "Candles: each one is one day. Green closed higher, red lower. Your trades show up as arrows." },
@@ -154,20 +153,21 @@ const W2: Chapter[] = [
     ],
   },
   {
-    id: "2.2", world: 2, n: "2.2", kind: "chapter", title: "Not every headline matters", surface: "pro", card: ["signal-noise"], replay: "vw",
-    blurb: "A historical replay: which headlines were signal, which were noise?",
+    id: "2.2", world: 2, n: "2.2", kind: "chapter", title: "Signal or noise?", surface: "pro", card: ["signal-noise"], lesson: "chips",
+    blurb: "A simulated week: three headlines, and one that hits a company it never names.",
     steps: [
-      { title: "A real story, date hidden", text: "This really happened. You see the company type, not the name or the date. Watch the headlines and the price." },
+      { title: "A simulated week", text: "Made-up headlines, real lessons. Watch the news and the car stocks." },
+      { target: "w-search", title: "Follow a carmaker", text: "Pick a car stock to follow.", task: "Search for Volkswagen and pick it.", done: (c) => c.ui.sym === "VOW3" },
       { target: "time-machine", title: "Play", text: "Headlines arrive as time moves. Big ones pause the game.", task: "Press Play.", done: (c) => (c.ui.day as number ?? 0) >= 1 },
       { target: "w-news", title: "",
-        quiz: { q: "Is \"Motor show opens with record crowds\" a signal for one carmaker's share?", options: ["Signal: new information about the company", "Noise: nothing about the business changed"], answer: 1, why: "Nice for Frankfurt, nothing new about any carmaker's profits." } },
-      { target: "time-machine", title: "Keep going", text: "Something bigger is coming.", task: "Press Play until the US agency headline appears.", done: (c) => (c.ui.day as number ?? 0) >= 4 },
-      { target: "w-chart", title: "",
-        quiz: { q: "\"US agency: carmaker cheated on emission tests\". Signal or noise?", options: ["Signal: fines, recalls, lost trust", "Noise: just a headline"], answer: 0, why: "Real, new and serious information about this company's future." } },
-      { target: "time-machine", title: "Two days later", text: "Watch what the TV analyst says.", task: "Press Play until the TV analyst's headline appears. Another big headline stops the clock on the way, so press it twice.", done: (c) => (c.ui.day as number ?? 0) >= 6 },
+        quiz: { q: "A star investor says \"Telecom stocks are boring, I sold them all\". Signal or noise?", options: ["Signal: new information about telecom companies", "Noise: one person's opinion"], answer: 1, why: "Nothing about any telecom business changed. An opinion is not news." } },
+      { target: "time-machine", title: "Keep going", text: "Something real is coming.", task: "Press Play until the chip supplier headline appears.", done: (c) => (c.ui.day as number ?? 0) >= 3 },
       { target: "w-news", title: "",
-        quiz: { q: "\"The whole auto sector is finished\", says an analyst on TV. Signal or noise?", options: ["Signal", "Noise: a dramatic opinion"], answer: 1, why: "Other carmakers fell much less. The problem was at one company." } },
-      { title: "The reveal: Volkswagen, September 2015", text: "\"Dieselgate\". The share lost about a third in a few days. Other carmakers fell much less: the signal was about one company, the TV drama was noise." },
+        quiz: { q: "A fire stops a chip supplier's deliveries. Whose shares are hit hardest?", options: ["Carmakers: no chips, no cars", "Telecom companies", "Nobody: it's only one factory"], answer: 0, why: "News can hit companies it doesn't name. Modern cars need hundreds of chips." } },
+      { target: "time-machine", title: "Two days later", text: "Watch the next headline.", task: "Press Play until the viral post appears.", done: (c) => (c.ui.day as number ?? 0) >= 5 },
+      { target: "w-chart", title: "",
+        quiz: { q: "\"Carmakers will all be bankrupt by Christmas!\" goes viral. Signal or noise?", options: ["Signal: everyone is sharing it", "Noise: a loud claim without facts"], answer: 1, why: "Being shared a lot doesn't make it true. Nothing new happened to the business." } },
+      { title: "The takeaway", text: "Ask two questions about every headline: is it new information, and whose business does it really change? The fire was signal, and it hit the carmakers. The podcast and the viral post were noise." },
     ],
   },
   {
@@ -206,23 +206,25 @@ const W2: Chapter[] = [
       smartLabel: "All three right",
     },
   },
-  { id: "b2", world: 2, n: "👾", kind: "boss", title: "Boss: FOMO Max", surface: "pro", replay: "gamestop", card: ["rumor"], blurb: "A historical replay. Don't buy the hype." },
+  { id: "b2", world: 2, n: "👾", kind: "boss", title: "Boss: FOMO Max", surface: "pro", replay: "hype", card: ["rumor"], blurb: "A simulated tech hype. Don't buy it once it's running." },
 ];
 
 // ── Module 3 · Risk ────────────────────────────────────────────────────────
 
 const W3: Chapter[] = [
   {
-    id: "3.1", world: 3, n: "3.1", kind: "chapter", title: "Ups and downs", surface: "pro", card: ["volatility"], replay: "nvidia",
-    blurb: "A replay where a bad habit wins. Luck or skill?",
+    id: "3.1", world: 3, n: "3.1", kind: "chapter", title: "Ups and downs", surface: "pro", card: ["volatility"], lesson: "swing",
+    blurb: "A simulated year: a wild stock next to a calm ETF.",
     steps: [
-      { title: "One year, one chipmaker", text: "A real year, date hidden. All-in Alex puts everything in one stock. Watch how wild the ride is." },
-      { target: "time-machine", title: "Fast-forward", text: "Use the jumps to move a month at a time.", task: "Jump +1 month three times.", done: (c) => (c.ui.day as number ?? 0) >= 60 },
-      { target: "w-chart", title: "Swings", text: "Big moves both ways. That's volatility." },
-      { target: "time-machine", title: "Keep going", text: "Let's see the rest of the year.", task: "Play until the end of the replay.", done: (c) => !!c.ui.ended },
-      { title: "Alex won", text: "Alex's one stock more than tripled.",
-        quiz: { q: "Alex won with an all-in bet. Was it a good decision?", options: ["Yes, he made the most money", "It worked in spite of the strategy, not because of it", "Yes, AI always wins"], answer: 1, why: "Same habit, same risk as with Wirecard. A bad habit can win in the short run." } },
-      { target: "reveal-banner", title: "The reveal: NVIDIA, 2023", text: "The share more than tripled, with drops of 15–20 % on the way. Big swings in both directions: that's volatility, and the drawdowns are what you have to sit through." },
+      { title: "One year, two rides", text: "A simulated year. Follow a wild stock, then compare it with a calm ETF." },
+      { target: "w-search", title: "The wild one", text: "Electric-car stocks are known for big swings.", task: "Search for Tesla and pick it.", done: (c) => c.ui.sym === "TSLA" },
+      { target: "time-machine", title: "Fast-forward", text: "Use the jumps to move a month at a time.", task: "Jump +1 month four times.", done: (c) => (c.ui.day as number ?? 0) >= 84 },
+      { target: "w-chart", title: "Swings", text: "Big moves both ways, sometimes 10 % in a week. That's volatility." },
+      { target: "time-machine", title: "Keep going", text: "Let's see the rest of the year.", task: "Play until the end of the year.", done: (c) => !!c.ui.ended },
+      { target: "w-watchlist", title: "The calm one", text: "Now look at the ETF over the same year.", task: "Click the MSCI World ETF.", done: (c) => c.ui.sym === ETF_SYM },
+      { target: "w-chart", title: "",
+        quiz: { q: "What does volatility tell you about a stock?", options: ["How much its price swings, up and down", "Whether the company is good", "How much the price will rise"], answer: 0, why: "It says how bumpy the ride is, not where it ends. Big swings can win big or lose big." } },
+      { title: "The takeaway", text: "The wild stock jumped on the subsidies and fell just as fast in the price war. The ETF moved far less. The bigger the swings, the deeper the drops you have to sit through." },
     ],
   },
   {
@@ -230,9 +232,9 @@ const W3: Chapter[] = [
     blurb: "Why one bad company shouldn't be able to ruin you.",
     steps: [
       { title: "Eggs and baskets", text: "Drop a few years and watch what happens to one basket versus ten.", game: "eggs" },
-      { target: "w-depot", title: "Your depot", text: "Look at the weight of each position: how much of your depot is in one stock?" },
-      { title: "The rule of thumb", text: "Many investors keep any single stock below 10–30 % of their depot.",
-        quiz: { q: "Your depot is 80 % one stock. If it falls 50 %, your depot falls about…", options: ["5 %", "40 %", "80 %"], answer: 1, why: "80 % × 50 % = 40 %. Concentration multiplies one company's problem." } },
+      { target: "w-depot", title: "Your portfolio", text: "Look at the weight of each position: how much of your portfolio is in one stock?" },
+      { title: "The rule of thumb", text: "Many investors keep any single stock below 10–30 % of their portfolio.",
+        quiz: { q: "Your portfolio is 80 % one stock. If it falls 50 %, your portfolio falls about…", options: ["5 %", "40 %", "80 %"], answer: 1, why: "80 % × 50 % = 40 %. Concentration multiplies one company's problem." } },
     ],
   },
   {
@@ -250,7 +252,7 @@ const W3: Chapter[] = [
     id: "w3", world: 3, n: "★", kind: "mission", title: "Don't put all eggs in one basket", surface: "pro",
     blurb: "Spread your money so no single stock is above 30 %.",
     mission: {
-      goal: () => "Invest at least half of your money so that no single stock is above 30 % of your depot. An ETF counts as diversified. Watch the fees.",
+      goal: () => "Invest at least half of your money so that no single stock is above 30 % of your portfolio. An ETF counts as diversified. Watch the fees.",
       hint: () => "One ETF order is the cheapest way: Order → MSCI World ETF (A0RPWH). Not enough money for one share? The sandbox \"+ Play money\" button tops up your trading account. Selling a single stock also frees money.",
       check: (c) => {
         const s = c.save.sim, total = totalValue(s), dep = depotValue(s);
@@ -261,7 +263,7 @@ const W3: Chapter[] = [
       smartLabel: "Few orders, low fees",
     },
   },
-  { id: "b3", world: 3, n: "👾", kind: "boss", title: "Boss: All-in Alex", surface: "pro", replay: "wirecard", card: ["diversification"], blurb: "A historical replay. Keep a diversified depot." },
+  { id: "b3", world: 3, n: "👾", kind: "boss", title: "Boss: All-in Alex", surface: "pro", replay: "sneakers", card: ["diversification"], blurb: "A simulated summer. Keep a diversified portfolio." },
 ];
 
 // ── Module 4 · Time ────────────────────────────────────────────────────────
@@ -299,17 +301,61 @@ const W4: Chapter[] = [
       smartLabel: "Never sold",
     },
   },
-  { id: "b4", world: 4, n: "👾", kind: "boss", title: "Boss: Panic Paula", surface: "pro", replay: "covid", card: ["volatility"], blurb: "A historical replay, fast-forwarded. Stay calm." },
+  { id: "b4", world: 4, n: "👾", kind: "boss", title: "Boss: Panic Paula", surface: "pro", replay: "scare", card: ["volatility"], blurb: "A simulated crash, fast-forwarded. Stay calm." },
+];
+
+// ── History mode · historical replays, outside the learning path ───────────
+
+/** world 0: not part of any module, always open, played from History mode only. */
+export const HISTORY: Chapter[] = [
+  {
+    id: "h-vw", world: 0, n: "Story", kind: "chapter", title: "Not every headline matters", surface: "pro", card: ["signal-noise"], replay: "vw",
+    blurb: "A historical replay: which headlines were signal, which were noise?",
+    steps: [
+      { title: "A real story, date hidden", text: "This really happened. You see the company type, not the name or the date. Watch the headlines and the price." },
+      { target: "time-machine", title: "Play", text: "Headlines arrive as time moves. Big ones pause the game.", task: "Press Play.", done: (c) => (c.ui.day as number ?? 0) >= 1 },
+      { target: "w-news", title: "",
+        quiz: { q: "Is \"Motor show opens with record crowds\" a signal for one carmaker's share?", options: ["Signal: new information about the company", "Noise: nothing about the business changed"], answer: 1, why: "Nice for Frankfurt, nothing new about any carmaker's profits." } },
+      { target: "time-machine", title: "Keep going", text: "Something bigger is coming.", task: "Press Play until the US agency headline appears.", done: (c) => (c.ui.day as number ?? 0) >= 4 },
+      { target: "w-chart", title: "",
+        quiz: { q: "\"US agency: carmaker cheated on emission tests\". Signal or noise?", options: ["Signal: fines, recalls, lost trust", "Noise: just a headline"], answer: 0, why: "Real, new and serious information about this company's future." } },
+      { target: "time-machine", title: "Two days later", text: "Watch what the TV analyst says.", task: "Press Play until the TV analyst's headline appears. Another big headline stops the clock on the way, so press it twice.", done: (c) => (c.ui.day as number ?? 0) >= 6 },
+      { target: "w-news", title: "",
+        quiz: { q: "\"The whole auto sector is finished\", says an analyst on TV. Signal or noise?", options: ["Signal", "Noise: a dramatic opinion"], answer: 1, why: "Other carmakers fell much less. The problem was at one company." } },
+      { title: "The reveal: Volkswagen, September 2015", text: "\"Dieselgate\". The share lost about a third in a few days. Other carmakers fell much less: the signal was about one company, the TV drama was noise." },
+    ],
+  },
+
+  { id: "h-gamestop", world: 0, n: "Story", kind: "boss", title: "Boss: FOMO Max", surface: "pro", replay: "gamestop", card: ["rumor"], blurb: "A historical replay. Don't buy the hype." },
+
+  {
+    id: "h-nvidia", world: 0, n: "Story", kind: "chapter", title: "Ups and downs", surface: "pro", card: ["volatility"], replay: "nvidia",
+    blurb: "A replay where a bad habit wins. Luck or skill?",
+    steps: [
+      { title: "One year, one chipmaker", text: "A real year, date hidden. All-in Alex puts everything in one stock. Watch how wild the ride is." },
+      { target: "time-machine", title: "Fast-forward", text: "Use the jumps to move a month at a time.", task: "Jump +1 month three times.", done: (c) => (c.ui.day as number ?? 0) >= 60 },
+      { target: "w-chart", title: "Swings", text: "Big moves both ways. That's volatility." },
+      { target: "time-machine", title: "Keep going", text: "Let's see the rest of the year.", task: "Play until the end of the replay.", done: (c) => !!c.ui.ended },
+      { title: "Alex won", text: "Alex's one stock more than tripled.",
+        quiz: { q: "Alex won with an all-in bet. Was it a good decision?", options: ["Yes, he made the most money", "It worked in spite of the strategy, not because of it", "Yes, AI always wins"], answer: 1, why: "Same habit, same risk as with Wirecard. A bad habit can win in the short run." } },
+      { target: "reveal-banner", title: "The reveal: NVIDIA, 2023", text: "The share more than tripled, with drops of 15–20 % on the way. Big swings in both directions: that's volatility, and the drawdowns are what you have to sit through." },
+    ],
+  },
+
+  { id: "h-wirecard", world: 0, n: "Story", kind: "boss", title: "Boss: All-in Alex", surface: "pro", replay: "wirecard", card: ["diversification"], blurb: "A historical replay. Keep a diversified portfolio." },
+
+  { id: "h-covid", world: 0, n: "Story", kind: "boss", title: "Boss: Panic Paula", surface: "pro", replay: "covid", card: ["volatility"], blurb: "A historical replay, fast-forwarded. Stay calm." },
 ];
 
 export const CHAPTERS: Chapter[] = [...W1, ...W2, ...W3, ...W4];
-export const chapterById = (id: string) => CHAPTERS.find((c) => c.id === id);
+export const isHistory = (ch: Chapter) => ch.world === 0;
+export const chapterById = (id: string) => CHAPTERS.find((c) => c.id === id) ?? HISTORY.find((c) => c.id === id);
 /** A world unlocks when the previous world's mission is done (idea.md §4.3). */
 export const worldOpen = (save: Save, n: number) => save.allUnlocked || n === 1 || save.done.includes(`w${n - 1}`);
 
 /** Inside a world: chapters in any order; the mission needs the chapters; the boss needs the mission. */
 export function isOpen(save: Save, ch: Chapter): boolean {
-  if (save.allUnlocked) return true;
+  if (save.allUnlocked || isHistory(ch)) return true;
   if (!worldOpen(save, ch.world)) return false;
   const list = CHAPTERS.filter((c) => c.world === ch.world);
   if (ch.kind === "chapter") return true;

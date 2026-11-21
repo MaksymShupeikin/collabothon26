@@ -44,14 +44,14 @@ function CabinetInner({ initial }: { initial?: { view: View; sym?: string } }) {
 
   const go = (v: View, s?: string) => { if (s) setSym(s); setView(v); };
   const nav = (main: string, sub?: string) => {
-    if (sub === "Depot" || (main === "Depot" && !sub)) return go("depot");
+    if (sub === "Portfolio" || (main === "Portfolio" && !sub)) return go("depot");
     if (sub === "Order" || main === "Trading") return go("order");
     if (sub === "Account & card" || main === "Current account") return go("umsaetze");
     if (main === "Informer") return go("finder");
     go("home");
   };
-  const current = view === "finder" ? "Informer" : view === "depot" ? "Depot" : view === "order" ? "Trading" : view === "umsaetze" ? "Current account" : "Personal area";
-  const sub = view === "depot" ? "Depot" : view === "order" ? "Order" : view === "umsaetze" ? "Account & card" : undefined;
+  const current = view === "finder" ? "Informer" : view === "depot" ? "Portfolio" : view === "order" ? "Trading" : view === "umsaetze" ? "Current account" : "Personal area";
+  const sub = view === "depot" ? "Portfolio" : view === "order" ? "Order" : view === "umsaetze" ? "Account & card" : undefined;
 
   return (
     <div className="web">
@@ -102,21 +102,21 @@ function Home({ save, go }: { save: Save; go: (v: View, s?: string) => void }) {
           <thead><tr><th>Account</th><th>Actions</th><th>IBAN / number</th><th className="r">Available</th><th className="r">Balance</th></tr></thead>
           <tbody>
             <tr data-tour="acc-giro">
-              <td><button className="link" onClick={() => go("umsaetze")}>Girokonto</button></td>
+              <td><button className="link" onClick={() => go("umsaetze")}>Current account</button></td>
               <td><button className="pill" data-tour="btn-transfer" onClick={() => go("transfer")}>Transfer ›</button></td>
               <td className="num muted">{IBAN.giro}</td>
               <td className="r num">{eur(save.giro)}</td>
               <td className="r num bal">{eur(save.giro)}</td>
             </tr>
             <tr data-tour="acc-depot">
-              <td><button className="link" onClick={() => go("depot")}>Depot</button> <span className="info" title="Your securities">ⓘ</span></td>
+              <td><button className="link" onClick={() => go("depot")}>Portfolio</button> <span className="info" title="Your securities">ⓘ</span></td>
               <td><button className="pill" onClick={() => go("order")}>Buy/Sell ›</button></td>
               <td className="num muted">{DEPOT_NO}</td>
               <td className="r num" />
               <td className="r num bal">{eur(dep)}</td>
             </tr>
             <tr data-tour="acc-verrechnung">
-              <td><button className="link" onClick={() => go("umsaetze")}>Verrechnungskonto</button> <span className="info" title="Settlement account: your cash for trading">ⓘ</span><div className="xs muted">Trading account</div></td>
+              <td><button className="link" onClick={() => go("umsaetze")}>Trading account</button> <span className="info" title="Settlement account: your cash for trading">ⓘ</span></td>
               <td />
               <td className="num muted">{IBAN.verrechnung}</td>
               <td className="r num">{eur(avail)}</td>
@@ -141,7 +141,7 @@ function Home({ save, go }: { save: Save; go: (v: View, s?: string) => void }) {
         <div className="acc-title">Recent activity</div>
         <dl>
           <dt>Login</dt><dd>{dateDE(today(save))} at {TIME.slice(0, 5)}</dd>
-          <dt>Transfer</dt><dd>{lastTransfer ? `${dateDE(dateOf(U, lastTransfer.day))} · ${eur(Math.abs(lastTransfer.amount))} to Verrechnungskonto` : "None yet"}</dd>
+          <dt>Transfer</dt><dd>{lastTransfer ? `${dateDE(dateOf(U, lastTransfer.day))} · ${eur(Math.abs(lastTransfer.amount))} to trading account` : "None yet"}</dd>
           <dt>Orders</dt><dd>{save.sim.acct.trades.length ? `${save.sim.acct.trades.length} executed` : "None yet"}{save.sim.acct.orders.length ? ` · ${save.sim.acct.orders.length} open` : ""}</dd>
         </dl>
       </section>
@@ -157,7 +157,7 @@ function AddPlayMoney({ onClose }: { onClose: () => void }) {
       <div className="modal" onClick={(e) => e.stopPropagation()}>
         <span className="sandbox-tag" style={{ alignSelf: "flex-start" }}>Sandbox control · not a comdirect function</span>
         <h2>Add play money</h2>
-        <p className="small muted">Goes to your Girokonto. It’s play money and never counts as profit.</p>
+        <p className="small muted">Goes to your current account. It’s play money and never counts as profit.</p>
         <div className="row">{[50, 100, 500, 1000].map((x) => <button key={x} className="btn btn-outline btn-sm" onClick={() => setV(String(x))}>+{num(x, 0)} €</button>)}</div>
         <label className="field">Amount (EUR)<input inputMode="decimal" value={v} onChange={(e) => setV(e.target.value)} /></label>
         <div className="row">
@@ -196,7 +196,7 @@ function Transfer({ save, go }: { save: Save; go: (v: View) => void }) {
       <PageHead title="Transfer" />
       <div className="success-box" role="status">
         <strong>✓ Transfer completed</strong>
-        <p className="small">{eur(done)} {toTrading ? "moved to your trading account (Verrechnungskonto)." : "moved back to your Girokonto."}</p>
+        <p className="small">{eur(done)} {toTrading ? "moved to your trading account." : "moved back to your current account."}</p>
         <div className="row">
           <button className="pill pill-lg" onClick={() => go("umsaetze")}>Show transactions ›</button>
           <button className="pill pill-lg" onClick={() => go("home")}>Overview ›</button>
@@ -212,12 +212,12 @@ function Transfer({ save, go }: { save: Save; go: (v: View) => void }) {
       <div className="form-card">
         <div className="form-row" data-tour="tr-to">
           <span className="form-label">From</span>
-          <div className="acct-box"><strong>{toTrading ? "Girokonto" : "Verrechnungskonto"}</strong><span className="xs muted num">{toTrading ? IBAN.giro : IBAN.verrechnung}</span><span className="xs num">Balance {eur(fromBal)}</span></div>
+          <div className="acct-box"><strong>{toTrading ? "Current account" : "Trading account"}</strong><span className="xs muted num">{toTrading ? IBAN.giro : IBAN.verrechnung}</span><span className="xs num">Balance {eur(fromBal)}</span></div>
           <span className="form-label">To</span>
           <div className="select-like">
             <select value={toTrading ? "v" : "g"} onChange={(e) => setToTrading(e.target.value === "v")} aria-label="To account">
-              <option value="v">Verrechnungskonto (trading account)</option>
-              <option value="g">Girokonto</option>
+              <option value="v">Trading account</option>
+              <option value="g">Current account</option>
             </select>
           </div>
         </div>
@@ -252,7 +252,7 @@ function PhotoTan({ amount, toTrading, onOk, onCancel }: { amount: number; toTra
     <div className="overlay" role="dialog" aria-modal="true" aria-label="Confirm with photoTAN">
       <div className="modal modal-mid" data-tour="tan-box">
         <h2>Confirm with photoTAN</h2>
-        <p className="small muted">Transfer of <strong>{eur(amount)}</strong> to your {toTrading ? "Verrechnungskonto" : "Girokonto"}.</p>
+        <p className="small muted">Transfer of <strong>{eur(amount)}</strong> to your {toTrading ? "Trading account" : "Current account"}.</p>
         <div className="tan">
           <div className="tan-mosaic" aria-label="photoTAN graphic">
             <svg viewBox="0 0 12 12" width="168" height="168" shapeRendering="crispEdges">
@@ -488,7 +488,7 @@ function OrderForm({ save, sym: initial, go, setSym }: { save: Save; sym: string
     if (!(n > 0)) return setErr("Enter a whole number of shares.");
     if (type !== "market" && !(lim > 0)) return setErr(type === "limit" ? "Enter a limit." : "Enter a stop price.");
     if (side === "sell" && n > own) return setErr(`You own ${qtyFmt(own)} shares.`);
-    if (side === "buy" && totalCost > avail + 1e-9) return setErr(`Not enough money on your trading account: ${eur(avail)} available. Move money from your Girokonto first.`);
+    if (side === "buy" && totalCost > avail + 1e-9) return setErr(`Not enough money on your trading account: ${eur(avail)} available. Move money from your current account first.`);
     setErr(null); setStage("review");
   }
   function confirm() {
@@ -600,8 +600,8 @@ function OrderTop({ avail }: { save: Save; avail: number }) {
     <>
       <PageHead title="Order" />
       <div className="order-top">
-        <div><span className="small">Standard depot</span><span className="xs muted">{USER.name} · {DEPOT_NO}</span></div>
-        <div><span className="small">Verrechnungskonto</span><span className="xs muted num">{IBAN.verrechnung}</span></div>
+        <div><span className="small">Standard portfolio</span><span className="xs muted">{USER.name} · {DEPOT_NO}</span></div>
+        <div><span className="small">Trading account</span><span className="xs muted num">{IBAN.verrechnung}</span></div>
         <div className="r"><span className="small num">{eur(avail)}</span><span className="xs muted">Available amount</span></div>
       </div>
     </>
@@ -619,10 +619,10 @@ function Depot({ save, go }: { save: Save; go: (v: View, s?: string) => void }) 
   const dPrev = value - prevValue, dBuy = value - cost;
   return (
     <div className="web-page">
-      <PageHead title="Depot" owner />
+      <PageHead title="Portfolio" owner />
       <div className="dcards">
         <div className="dcard">
-          <div className="dcard-h"><strong>Your depot value</strong><span className="info">ⓘ</span></div>
+          <div className="dcard-h"><strong>Your portfolio value</strong><span className="info">ⓘ</span></div>
           <span className="xs muted">Difference to previous day</span>
           <div className="dcard-v"><span className={`small ${cls(dPrev)}`}><Arrow up={dPrev >= 0} /> {pct(prevValue ? (dPrev / prevValue) * 100 : 0)} | {signed(dPrev)} EUR</span><span className="dcard-num num">{EUR(value)}</span></div>
         </div>
@@ -637,7 +637,7 @@ function Depot({ save, go }: { save: Save; go: (v: View, s?: string) => void }) 
       </div>
       {pos.length === 0 ? (
         <div className="empty" data-tour="depot-empty">
-          <strong>Your depot is empty</strong>
+          <strong>Your portfolio is empty</strong>
           <span className="small muted">Buy your first stock and it shows up here, with its profit or loss.</span>
           <button className="pill pill-lg pill-yellow" onClick={() => go("order")}>Buy/Sell ›</button>
         </div>
@@ -702,7 +702,7 @@ function Transactions({ save }: { save: Save }) {
   const [acc, setAcc] = useState<"all" | "giro" | "verrechnung" | "depot">("all");
   const list = save.tx.filter((t) => acc === "all" || t.account === acc);
   const groups = (["giro", "verrechnung", "depot"] as const).filter((g) => acc === "all" || g === acc);
-  const label = { giro: "Girokonto", verrechnung: "Verrechnungskonto", depot: "Depot" };
+  const label = { giro: "Current account", verrechnung: "Trading account", depot: "Portfolio" };
   return (
     <div className="web-page">
       <PageHead title="Transactions" owner />
@@ -711,7 +711,7 @@ function Transactions({ save }: { save: Save }) {
         <div className="finder-grid pad">
           <span className="form-label">Show transactions for</span>
           <div className="select-like"><select value={acc} onChange={(e) => setAcc(e.target.value as typeof acc)} aria-label="Account">
-            <option value="all">All accounts</option><option value="giro">Girokonto</option><option value="verrechnung">Verrechnungskonto</option><option value="depot">Depot</option>
+            <option value="all">All accounts</option><option value="giro">Current account</option><option value="verrechnung">Trading account</option><option value="depot">Portfolio</option>
           </select></div>
           <span className="form-label">Period</span>
           <div className="select-like"><select aria-label="Period" defaultValue="30"><option value="30">30 days</option><option>90 days</option></select></div>

@@ -4,8 +4,8 @@ import { ALL_COMPANIES, COMPANIES, type Company } from "@/features/market/compan
 import { Wordmark } from "@/shared/ui/Wordmark";
 
 // Layout copied from the comdirect web customer area (references/01, 1_web-kundenbereich/*); text in English.
-export const MAIN_NAV = ["Personal area", "Informer", "Current account", "Depot", "Trading"] as const;
-export const SUB_NAV = ["Depot", "Order", "Account & card"] as const;
+export const MAIN_NAV = ["Personal area", "Informer", "Current account", "Portfolio", "Trading"] as const;
+export const SUB_NAV = ["Portfolio", "Order", "Account & card"] as const;
 
 export function searchCompanies(q: string, list: Company[] = COMPANIES) {
   const s = q.trim().toLowerCase();
@@ -71,7 +71,7 @@ export default function WebHeader({ onSearch, onNav, current, sub, logout, extra
       <nav className="wh-sub" aria-label="Personal area">
         {SUB_NAV.map((s) => (
           <button key={s} className={sub === s ? "on" : ""} onClick={() => onNav?.("Personal area", s)}
-            data-tour={s === "Depot" ? "nav-depot" : s === "Account & card" ? "nav-umsaetze" : undefined}>
+            data-tour={s === "Portfolio" ? "nav-depot" : s === "Account & card" ? "nav-umsaetze" : undefined}>
             {s === "Account & card" ? "Transactions" : s}
           </button>
         ))}

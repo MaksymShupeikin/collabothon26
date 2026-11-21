@@ -6,11 +6,11 @@ import { USER } from "@/shared/lib/user";
 // The (mocked) comdirect start page of a real customer, with our entry banner (🆕).
 // Account figures are placeholders.
 const ROWS: [string, string, string, string, string][] = [
-  ["Girokonto", "Transfer ›", "DE89 2004 1111 0987 6543 00", "3.214,57 €", "3.214,57 €"],
+  ["Current account", "Transfer ›", "DE89 2004 1111 0987 6543 00", "3.214,57 €", "3.214,57 €"],
   ["Visa card (credit card)", "", "•••• •••• •••• 4653", "2.000,00 €", "0,00 €"],
   ["Tagesgeld PLUS account", "", "DE71 2004 1111 0987 6543 05", "12.500,00 €", "12.500,00 €"],
-  ["Depot", "Buy/Sell ›", "9876543", "", "0,00 €"],
-  ["Verrechnungskonto", "", "DE44 2004 1111 0987 6543 40", "0,00 €", "0,00 €"],
+  ["Portfolio", "Buy/Sell ›", "9876543", "", "0,00 €"],
+  ["Trading account", "", "DE44 2004 1111 0987 6543 40", "0,00 €", "0,00 €"],
 ];
 
 /** The mocked comdirect start page; shown at / before onboarding and at /comdirect. */
@@ -52,7 +52,7 @@ export default function ComdirectHome() {
             <div className="acc-title">Recent activity</div>
             <dl>
               <dt>Login</dt><dd>Today at 09.12</dd>
-              <dt>Depot</dt><dd>Opened 3 years ago · never used</dd>
+              <dt>Portfolio</dt><dd>Opened 3 years ago · never used</dd>
             </dl>
           </section>
           <p className="xs muted foot-note">Mocked comdirect start page for the demo. The banner above is the entry to comdirect edu. <Link href="/">comdirect edu</Link></p>

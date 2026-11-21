@@ -16,7 +16,7 @@ import s from "./LearningMap.module.css";
 
 const STARS_MAX = 21;
 /** Each boss is one of the market bots; its node wears the bot's pictogram. */
-const BOSS_ICON: Record<string, string> = { b2: "max", b3: "alex", b4: "paula" };
+export const BOSS_ICON: Record<string, string> = { b2: "max", b3: "alex", b4: "paula" };
 
 /** The hub after onboarding: next-up hero with rank, the world path, side modes, concept cards. */
 export default function LearningMap() {
@@ -65,9 +65,6 @@ export default function LearningMap() {
   const proOpen = save.proUnlocked || save.allUnlocked;
   const stars = Object.values(save.stars).reduce((a, b) => a + b, 0);
   const worldsOpen = WORLDS.filter((w) => worldOpen(save, w.n)).length;
-  // History mode = the historical replays; it opens the first one not played yet (or the first one to replay).
-  const replays = CHAPTERS.filter((c) => c.replay && isOpen(save, c));
-  const replay = replays.find((c) => !save.done.includes(c.id)) ?? replays[0];
   const started = save.done.length > 0;
 
   return (
@@ -87,7 +84,7 @@ export default function LearningMap() {
             <>
               <Quote />
               <Link className={`btn btn-primary btn-lg ${s.go}`} href="/ready">
-                Open your depot
+                Open your portfolio
                 <span className={s.goSub}>All cleared</span>
                 <Arrow />
               </Link>
@@ -117,8 +114,9 @@ export default function LearningMap() {
           onOpen={() => { actions.start(null); setUi({}); router.push("/pro"); }} />
         {/* shortcut: the game isn't built yet, so the tile opens nothing; wire onOpen when it exists. */}
         <ModeTile open icon="sprout" title="Investor Simulator" line="30 years of life in 10 minutes." onOpen={() => {}} />
-        <ModeTile open={!!replay} lockText="In Module 2" icon="hourglass" title="History Mode" line={replay ? replay.title.replace(/^Boss: /, "vs. ") : "Real crashes, hidden dates."}
-          onOpen={() => replay && launch(replay)} />
+        {/* always open: History mode is separate from the modules */}
+        <ModeTile open icon="hourglass" title="History Mode" line="Real crashes, hidden dates."
+          onOpen={() => router.push("/history")} />
       </section>
 
       <section aria-labelledby="worlds-h">
@@ -135,7 +133,7 @@ export default function LearningMap() {
             <span className={s.finishText}>
               <span className={`xs ${s.kicker}`}>Finish line</span>
               <strong>Ready for real</strong>
-              <span className="xs">You're ready. Same depot, real money.</span>
+              <span className="xs">You're ready. Same portfolio, real money.</span>
             </span>
             {/* Sandbox → real platform: every module segment lit. */}
             <span className={s.bridge} aria-hidden>
@@ -338,11 +336,11 @@ function ModeTile({ open, lockText, icon, title, line, onOpen, highlight }: { op
 }
 
 // Small authored glyphs, one stroke family, so no emoji or unicode stands in for icons.
-const Arrow = () => <svg className={s.glyph} viewBox="0 0 16 16" aria-hidden><path d="M3 8h9M8.5 4l4 4-4 4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>;
-const Check = () => <svg className={s.glyph} viewBox="0 0 16 16" aria-hidden><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" /></svg>;
-const Lock = () => <svg className={s.glyph} viewBox="0 0 16 16" aria-hidden><path d="M5 7V5.5a3 3 0 016 0V7" fill="none" stroke="currentColor" strokeWidth="1.8" /><rect x="3.5" y="7" width="9" height="6.5" rx="1.5" fill="currentColor" /></svg>;
+export const Arrow = () => <svg className={s.glyph} viewBox="0 0 16 16" aria-hidden><path d="M3 8h9M8.5 4l4 4-4 4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>;
+export const Check = () => <svg className={s.glyph} viewBox="0 0 16 16" aria-hidden><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" /></svg>;
+export const Lock = () => <svg className={s.glyph} viewBox="0 0 16 16" aria-hidden><path d="M5 7V5.5a3 3 0 016 0V7" fill="none" stroke="currentColor" strokeWidth="1.8" /><rect x="3.5" y="7" width="9" height="6.5" rx="1.5" fill="currentColor" /></svg>;
 // Same filled family as the star: a card with a diamond punched out, a globe.
 const CardGlyph = () => <svg className={s.glyph} viewBox="0 0 16 16" aria-hidden><path fillRule="evenodd" d="M5 1.5h6a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2v-9a2 2 0 012-2zM8 4.8L5.6 8 8 11.2 10.4 8z" fill="currentColor" /></svg>;
 // Stacked layers: modules built one on top of the other.
 const Layers = () => <svg className={s.glyph} viewBox="0 0 16 16" aria-hidden><path d="M8 1.5l6.5 3.4L8 8.3 1.5 4.9z" fill="currentColor" /><path d="M2 8.1l6 3.1 6-3.1M2 11.3l6 3.1 6-3.1" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" /></svg>;
-const Star = () => <svg className={s.glyph} viewBox="0 0 16 16" aria-hidden><path d="M8 1.8l1.9 3.9 4.3.6-3.1 3 .7 4.3L8 11.6l-3.8 2 .7-4.3-3.1-3 4.3-.6z" fill="currentColor" /></svg>;
+export const Star = () => <svg className={s.glyph} viewBox="0 0 16 16" aria-hidden><path d="M8 1.8l1.9 3.9 4.3.6-3.1 3 .7 4.3L8 11.6l-3.8 2 .7-4.3-3.1-3 4.3-.6z" fill="currentColor" /></svg>;

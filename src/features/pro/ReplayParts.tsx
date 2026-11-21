@@ -65,12 +65,14 @@ export function BossIntro({ replay, chapter, onStart }: { replay: Replay; chapte
   return (
     <div className="overlay overlay-dark" role="dialog" aria-modal="true" aria-label={chapter.title}>
       <div className="boss">
-        <span className="unlock-kicker">👾 Boss round · Module {chapter.world}</span>
+        <span className="unlock-kicker">👾 Boss round{chapter.world ? ` · Module ${chapter.world}` : ""}</span>
         <Icon name={boss} size={96} round label={BOTS[boss].name} />
         <h1>{BOTS[boss].name}</h1>
         <p className="unlock-sub">{BOTS[boss].habit}.</p>
         <div className="boss-rules">
-          <p><strong>A historical replay.</strong> A real company and real events, but the name and the date stay hidden until the end.</p>
+          {replay.sim
+            ? <p><strong>A simulated market.</strong> Made-up headlines, real companies, real lessons.</p>
+            : <p><strong>A historical replay.</strong> A real company and real events, but the name and the date stay hidden until the end.</p>}
           <p><strong>Budget:</strong> 1.000 € play money, the same for you and every bot. Scores are in %.</p>
           <p><strong>To win:</strong> {replay.win}</p>
           <p className="xs">Score = return − ½ × worst drawdown. When a bot trades, name the habit behind it: XP for the right concept, no matter how the trade ends.</p>
@@ -207,7 +209,7 @@ export function RevealModal({ replay, chapter, sim, answers, name, onClose }: { 
   return (
     <div className="overlay" role="dialog" aria-modal="true" aria-label="Reveal">
       <div className="modal modal-wide reveal">
-        <span className="badge badge-dark">The reveal</span>
+        <span className="badge badge-dark">{replay.sim ? "Round over" : "The reveal"}</span>
         <h1 className="reveal-title">{replay.reveal}</h1>
         <p>{replay.after}</p>
         {boss && (
@@ -240,7 +242,7 @@ export function RevealModal({ replay, chapter, sim, answers, name, onClose }: { 
             <p className="xs">Your understanding score: <strong>{spotted} / {spots.length}</strong> habits spotted.</p>
           </div>
           <div>
-            <h3>Depot curves</h3>
+            <h3>Portfolio curves</h3>
             <LineChart series={series} height={200} />
             <div className="row xs legend-row">{series.map((s) => <span key={s.label}><span className="swatch" style={{ background: s.color }} /> {s.label}</span>)}</div>
           </div>
@@ -250,7 +252,9 @@ export function RevealModal({ replay, chapter, sim, answers, name, onClose }: { 
         <div className="card-row"><ConceptCard id={replay.concept} /></div>
         <div className="row" style={{ justifyContent: "flex-end" }}>
           <button className="btn btn-ghost" onClick={onClose}>Look at the market</button>
-          <Link className="btn btn-primary" href="/" onClick={() => actions.start(null)}>Learning map ›</Link>
+          {replay.sim
+            ? <Link className="btn btn-primary" href="/" onClick={() => actions.start(null)}>Back to the learning map ›</Link>
+            : <Link className="btn btn-primary" href="/history" onClick={() => actions.start(null)}>Back to History mode ›</Link>}
         </div>
       </div>
     </div>

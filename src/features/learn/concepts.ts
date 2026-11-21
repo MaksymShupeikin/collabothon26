@@ -81,7 +81,7 @@ export const CONCEPTS: Concept[] = [
   { id: "bull-bear", world: 5, title: "Bull & bear market", sentence: "A bull market is a long rise, a bear market a long fall (usually −20% or more).", example: "2020: a sharp bear market in March, then a strong bull market.", game: "Weather forecast",
     quiz: { q: "Markets fell 25% over months. That's a…", options: ["Bull market", "Bear market", "Dividend"], answer: 1 } },
   { id: "taxes", world: 5, title: "Taxes & allowance", sentence: "Investment profits are taxed, but there is a yearly tax-free allowance.", example: "Set a Freistellungsauftrag at your bank so profits up to the allowance stay tax-free.", game: "Tax shield",
-    quiz: { q: "Without a Freistellungsauftrag, your bank…", options: ["Withholds tax right away", "Never taxes you", "Closes your depot"], answer: 0 } },
+    quiz: { q: "Without a Freistellungsauftrag, your bank…", options: ["Withholds tax right away", "Never taxes you", "Closes your portfolio"], answer: 0 } },
 ];
 
 export const conceptById = (id: string) => CONCEPTS.find((c) => c.id === id);

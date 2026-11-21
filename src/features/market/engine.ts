@@ -16,12 +16,12 @@ export type Trade = { day: number; sym: string; side: Side; qty: number; price: 
 export type Order = { id: number; sym: string; side: Side; qty: number; type: OrderType; limit: number; validity: Validity; placed: number; exchange: string };
 export type Plan = { sym: string; amount: number; from: number };
 export type Account = {
-  cash: number; // Verrechnungskonto
+  cash: number; // Trading account
   holdings: Record<string, Holding>;
   trades: Trade[];
   orders: Order[];
   plans: Plan[];
-  values: number[]; // total value (cash + depot) at the end of each game day, index = game day
+  values: number[]; // total value (cash + portfolio) at the end of each game day, index = game day
   deposits: number[]; // cumulative play money added up to each day (so top-ups don't count as profit)
   nextId: number;
 };
@@ -214,7 +214,7 @@ export function deposit(prev: Sim, amount: number): Sim {
   s.acct.values[s.day] = round2((s.acct.values[s.day] ?? 0) + amount);
   return s;
 }
-/** Moves money out of the trading account (back to the Girokonto). */
+/** Moves money out of the trading account (back to the current account). */
 export const withdraw = (prev: Sim, amount: number): Sim => (amount > 0 ? deposit(prev, -amount) : prev);
 
 export const addPlan = (prev: Sim, plan: Omit<Plan, "from">): Sim => {

@@ -272,3 +272,51 @@
   .seg { flex: 1; width: auto; }
   .finishGo { margin-right: 0; }
 }
+
+/* ── History Mode (/history): the hub's hero and cards, with a case-file panel and a list of replays ── */
+.histHero { min-height: 0; }
+.histHero .next h1 { max-width: none; }
+.back { color: var(--color-bg-dark); font-weight: 700; text-decoration: none; }
+.back:hover { color: var(--color-white); text-decoration: none; }
+.histLocked { display: inline-flex; align-items: center; gap: var(--space-3); color: var(--color-bg-dark); margin-top: var(--space-5); }
+
+/* The next story as a case file, on the hub's HUD panel: masked name, price line up to day 0, then a "?". */
+.case { width: 520px; gap: var(--space-5); }
+.caseName { display: flex; flex-direction: column; gap: var(--space-2); }
+.caseName strong { font-size: var(--text-lg); line-height: 28px; text-wrap: balance; }
+.caseName .xs { color: var(--color-bg-dark); letter-spacing: 0.04em; }
+.caseChart { display: block; width: 100%; height: auto; color: var(--color-bg-light); overflow: visible; }
+.caseQ { font-size: 56px; font-weight: 700; fill: var(--color-accent); }
+.caseFoot { display: flex; align-items: center; gap: var(--space-4); color: var(--color-bg-dark); }
+.caseSegs { display: flex; gap: 6px; flex: 1; }
+.caseSegs span { flex: 1; height: 6px; border-radius: 3px; background: rgba(255, 255, 255, 0.14); }
+.caseSegs .caseSegOn { background: var(--color-accent); }
+
+.histList { list-style: none; display: flex; flex-direction: column; gap: var(--space-5); }
+.histItem {
+  display: flex; align-items: center; gap: var(--space-6); padding: var(--space-6);
+  border-radius: var(--radius-md); background: var(--color-white); border: 1px solid var(--color-bg-light); box-shadow: var(--shadow-lg);
+}
+.histItem.current { border-color: var(--color-ink); box-shadow: var(--shadow-xl), 0 10px 24px rgba(11, 31, 38, 0.14); }
+.histItem.locked { box-shadow: none; }
+.histItem.locked .xs { color: var(--color-ink-2); }
+.histText { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--space-1); }
+.histText h3 { font-size: var(--text-lg); line-height: 28px; }
+.histText > .xs { color: var(--color-ink-2); }
+.histKicker { font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; }
+.histStory { margin-top: var(--space-2); color: var(--color-ink) !important; font-weight: 700; }
+.histSide { display: flex; flex-direction: column; align-items: flex-end; gap: var(--space-3); flex-shrink: 0; min-width: 170px; }
+.histStars { display: flex; gap: var(--space-1); color: var(--color-ink); }
+.histStars .glyph { width: 16px; height: 16px; }
+.starOff { opacity: 0.2; }
+.histLockText { display: inline-flex; align-items: center; gap: var(--space-3); }
+.histItem.current :global(.btn-primary) { background: var(--color-ink); color: var(--color-accent); }
+
+@media (max-width: 860px) {
+  .case { width: auto; }
+}
+@media (max-width: 600px) {
+  .histItem { flex-wrap: wrap; gap: var(--space-5); }
+  .histText { flex-basis: calc(100% - 72px); }
+  .histSide { flex-basis: 100%; align-items: stretch; min-width: 0; }
+}

@@ -10,7 +10,7 @@ export default function EntryBanner() {
       <div className="entry-text">
         <span className="entry-kicker">New · Training sandbox</span>
         <h2>Practice first, then invest</h2>
-        <p>Your depot is still empty? Try it here first: the same comdirect screens, with play money and a coach at your side. No sign-up.</p>
+        <p>Your portfolio is still empty? Try it here first: the same comdirect screens, with play money and a coach at your side. No sign-up.</p>
       </div>
       <Link className="btn btn-dark btn-lg" href={save.persona ? "/" : "/start"}>{save.persona ? "Continue practising ›" : "Start practising ›"}</Link>
       <svg className="entry-line" viewBox="0 0 600 120" preserveAspectRatio="none" aria-hidden>
