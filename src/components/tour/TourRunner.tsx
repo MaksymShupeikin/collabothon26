@@ -7,6 +7,7 @@ import { actions, useGame } from "@/lib/game/store";
 import { priceNow } from "@/lib/sim/engine";
 import { setUi, useUi } from "@/lib/game/ui";
 import MiniGameView from "../MiniGames";
+import PlanCompare from "./PlanCompare";
 import CoachMark from "./CoachMark";
 import ConceptCard from "./ConceptCard";
 import Icon from "../Icon";
@@ -96,7 +97,7 @@ export function ChapterDone({ ch, extra }: { ch: Chapter; extra?: React.ReactNod
   return (
     <div className="overlay" role="dialog" aria-modal="true" aria-label="Chapter complete">
       <div className="modal modal-mid">
-        <span className="badge badge-accent">{ch.n} complete</span>
+        <span className="badge badge-accent">{ch.kind === "mission" ? "Mission" : ch.n} complete</span>
         <h2>{ch.title}</h2>
         {extra}
         {(ch.card ?? []).length > 0 && (
@@ -176,7 +177,7 @@ function MissionCard({ ch, ctx }: { ch: Chapter; ctx: Ctx }) {
 
   if (phase === "done") {
     if (ch.id === "w1") return <ProUnlocked stars={stars} />;
-    return <ChapterDone ch={ch} extra={<Stars n={stars} smartLabel={m.smartLabel} />} />;
+    return <ChapterDone ch={ch} extra={<><Stars n={stars} smartLabel={m.smartLabel} />{ch.id === "w4" && <PlanCompare monthly={persona(ctx).plan} />}</>} />;
   }
 
   return (

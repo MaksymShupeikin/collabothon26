@@ -446,6 +446,8 @@ button.ccard-face:hover { background: color-mix(in srgb, var(--color-accent) 90%
 .pt-field select { background: var(--color-white); color: var(--color-ink); border: 0; border-radius: var(--space-1); padding: var(--space-1) var(--space-3); font-size: var(--text-xs); min-width: 170px; }
 .pt-yellow { background: var(--color-accent); border: 0; border-radius: var(--space-1); width: 64px; height: 24px; font-weight: 700; color: var(--color-ink); font-size: var(--text-sm); line-height: 1; }
 .pt-yellow:hover { background: color-mix(in srgb, var(--color-accent) 85%, var(--color-white)); }
+.pt-play { border: 1px dashed var(--color-accent); background: none; color: var(--color-accent); border-radius: var(--space-1); padding: 0 var(--space-3); height: 24px; font-weight: 700; font-size: var(--text-xs); white-space: nowrap; }
+.pt-play:hover { background: rgba(255, 245, 0, 0.12); }
 .pt-menu { position: absolute; top: 100%; left: 0; z-index: 60; background: var(--color-white); color: var(--color-ink); border-radius: var(--space-2); box-shadow: var(--shadow-md); padding: var(--space-4); display: flex; flex-direction: column; gap: var(--space-3); min-width: 160px; }
 .pt-figs { display: flex; gap: var(--space-5); }
 .pt-figs span { display: flex; flex-direction: column; font-weight: 700; font-size: var(--text-sm); letter-spacing: 0.5px; }

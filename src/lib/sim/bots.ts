@@ -3,7 +3,7 @@ import type { BotId, Replay } from "./scenarios.ts";
 
 export const BOTS: Record<BotId, { name: string; habit: string; concept: string }> = {
   max: { name: "FOMO Max", habit: "Buys every rumor and hype", concept: "rumor" },
-  paula: { name: "Panic Paula", habit: "Sells on every drop", concept: "drawdown" },
+  paula: { name: "Panic Paula", habit: "Sells on every drop", concept: "volatility" },
   alex: { name: "All-in Alex", habit: "Puts everything in one stock", concept: "diversification" },
   sam: { name: "Steady Sam", habit: "Monthly ETF savings plan, never sells", concept: "savings-plan" },
 };

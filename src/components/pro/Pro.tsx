@@ -8,7 +8,7 @@ import { chapterById, worldOpen, type Chapter } from "@/lib/game/chapters";
 import { PERSONAS } from "@/lib/game/personas";
 import { actions, getSave, useGame } from "@/lib/game/store";
 import { setUi } from "@/lib/game/ui";
-import { addPlan, advance, ask, bid, cancelOrder, companiesOf, costBasis, dateOf, depotValue, fee, placeOrder, pricesOf, priceAt, round2, universeOf, type OrderInput, type OrderType, type Sim, type SimEvent, type Validity, newSim } from "@/lib/sim/engine";
+import { addPlan, advance, deposit, ask, bid, cancelOrder, companiesOf, costBasis, dateOf, depotValue, fee, placeOrder, pricesOf, priceAt, round2, universeOf, type OrderInput, type OrderType, type Sim, type SimEvent, type Validity, newSim } from "@/lib/sim/engine";
 import { REPLAYS, SIM_LESSONS, type BotMove, type Replay } from "@/lib/sim/scenarios";
 import Icon from "../Icon";
 import SandboxBar from "../SandboxBar";
@@ -82,6 +82,7 @@ function Desk({ mode, chapter }: { mode: Mode; chapter?: Chapter }) {
   const [workspace, setWorkspace] = useState<"depot" | "focus">("depot");
   const [hidden, setHidden] = useState<Record<string, boolean>>({});
   const [widgetsOpen, setWidgetsOpen] = useState(false);
+  const [moneyOpen, setMoneyOpen] = useState(false);
   const isEnded = ended(sim);
   const years = save.allUnlocked || worldOpen(save, 4) || (mode.kind === "lesson" && mode.id === "w4-plan");
 
@@ -139,6 +140,11 @@ function Desk({ mode, chapter }: { mode: Mode; chapter?: Chapter }) {
     else { const s = addPlan(local, { sym: symbol, amount }); setLocal(s); simRef.current = s; }
     setPlanSet(true);
   }
+  function addMoney(a: number) {
+    if (mode.kind === "main") { actions.addPlayMoney(a); actions.transfer(a, true); }
+    else { const s = deposit(local, a); setLocal(s); simRef.current = s; }
+    toast(`${eur(a)} play money added to your trading account.`);
+  }
   function cancel(id: number) {
     if (mode.kind === "main") actions.setSim(cancelOrder(save.sim, id));
     else setLocal(cancelOrder(local, id));
@@ -191,6 +197,14 @@ function Desk({ mode, chapter }: { mode: Mode; chapter?: Chapter }) {
           <span className="hide-sm"><small>Intraday credit (EUR)</small>0,00</span>
           <span className="hide-sm"><small>Total (EUR)</small>{num(total)}</span>
         </div>
+        <div className="pt-field pt-widgets"><span>Sandbox</span><button className="pt-play" onClick={() => setMoneyOpen(!moneyOpen)} aria-expanded={moneyOpen}>+ Play money</button>
+          {moneyOpen && (
+            <div className="pt-menu" role="menu">
+              <span className="xs muted">Straight to your trading account. Never counts as profit.</span>
+              {[100, 500, 1000].map((a) => <button key={a} className="btn btn-outline btn-sm" onClick={() => { addMoney(a); setMoneyOpen(false); }}>+{num(a, 0)} €</button>)}
+            </div>
+          )}
+        </div>
         <div className="pt-right">
           <span className="pt-figs num"><span><small>Depot number</small>{mode.kind === "main" ? "1234567" : replay ? "Replay" : "Practice"}</span></span>
           <Link className="pt-logout" href="/learn">Exit</Link>
@@ -198,7 +212,7 @@ function Desk({ mode, chapter }: { mode: Mode; chapter?: Chapter }) {
       </header>
 
       <TimeBar clock={clock} speed={speed} setSpeed={(s) => { setBreaking(null); setSpeed(s); }} ended={isEnded} years={years}
-        jump={(n) => { setBreaking(null); stepTime(n, mode.kind !== "main"); }}
+        jump={(n) => { setBreaking(null); stepTime(n, mode.kind === "replay"); }}
         next={() => { setBreaking(null); const nx = u.news.find((n) => n.major && n.day > simRef.current.day); const mv = replay?.moves.find((m) => m.day > simRef.current.day); const to = Math.min(nx?.day ?? u.days, mv?.day ?? u.days); stepTime(Math.max(1, to - simRef.current.day), true); }}
         progress={mode.kind === "main" ? undefined : `${sim.day} / ${u.days} days`}
         label={replay ? "Historical replay · headlines retold, prices shaped like the real curve" : "Simulated market"}
