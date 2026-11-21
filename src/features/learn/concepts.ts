@@ -5,6 +5,9 @@ export type Concept = {
   quiz: { q: string; options: string[]; answer: number };
 };
 
+/** XP for collecting a concept card (correct quiz answer). */
+export const QUIZ_XP = 25;
+
 export const WORLDS = [
   { n: 1, title: "Basics", boss: null },
   { n: 2, title: "Trading mechanics", boss: "dan" },
