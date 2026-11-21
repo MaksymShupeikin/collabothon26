@@ -76,7 +76,7 @@ export default function LearningMap() {
               <Quote />
               <button className={`btn btn-primary btn-lg ${s.go}`} onClick={() => launch(next)}>
                 {started ? "Continue" : "Start"}
-                <span className={s.goSub}>{next.title}</span>
+                <span className="btn-context">{next.title}</span>
                 <Arrow />
               </button>
             </>
@@ -85,7 +85,7 @@ export default function LearningMap() {
               <Quote />
               <Link className={`btn btn-primary btn-lg ${s.go}`} href="/ready">
                 Open your portfolio
-                <span className={s.goSub}>All cleared</span>
+                <span className="btn-context">All cleared</span>
                 <Arrow />
               </Link>
             </>
@@ -112,8 +112,7 @@ export default function LearningMap() {
       <section className={s.modes} aria-label="Play modes">
         <ModeTile open={proOpen} lockText="After Module 1" icon="chart" title="Real Market" line="Simple or Pro view. Beat the bots."
           onOpen={() => { actions.start(null); setUi({}); router.push("/pro"); }} />
-        {/* shortcut: the game isn't built yet, so the tile opens nothing; wire onOpen when it exists. */}
-        <ModeTile open icon="sprout" title="Investor Simulator" line="30 years of life in 10 minutes." onOpen={() => {}} />
+        <ModeTile open icon="sprout" title="Investor Simulator" line="30 years of life in 10 minutes." onOpen={() => router.push("/invest")} />
         {/* always open: History mode is separate from the modules */}
         <ModeTile open icon="hourglass" title="History Mode" line="Real crashes, hidden dates."
           onOpen={() => router.push("/history")} />
@@ -133,7 +132,7 @@ export default function LearningMap() {
             <span className={s.finishText}>
               <span className={`xs ${s.kicker}`}>Finish line</span>
               <strong>Ready for real</strong>
-              <span className="xs">You're ready. Same portfolio, real money.</span>
+              <span className="xs">You’re ready. Same portfolio, real money.</span>
             </span>
             {/* Sandbox → real platform: every module segment lit. */}
             <span className={s.bridge} aria-hidden>

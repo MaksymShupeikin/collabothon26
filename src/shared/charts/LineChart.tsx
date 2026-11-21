@@ -1,10 +1,11 @@
-export type Series = { values: number[]; color: string; label: string; width?: number };
+export type Series = { values: number[]; color: string; label: string; width?: number; dash?: string };
 export type Marker = { i: number; label: string; kind: "buy" | "sell" | "bot" };
 
 const W = 600, H = 220, PAD = 8;
 
 /** Minimal SVG line chart: no dependency needed for a few polylines. */
-export default function LineChart({ series, markers = [], length, height = H }: { series: Series[]; markers?: Marker[]; length?: number; height?: number }) {
+/** `topLast`: draw series[0] on top of the others (it still sets the markers). */
+export default function LineChart({ series, markers = [], length, height = H, topLast = false }: { series: Series[]; markers?: Marker[]; length?: number; height?: number; topLast?: boolean }) {
   const all = series.flatMap((s) => s.values);
   if (all.length < 2) return <svg viewBox={`0 0 ${W} ${height}`} width="100%" role="img" aria-label="No data yet" />;
   const min = Math.min(...all), max = Math.max(...all);
@@ -17,8 +18,8 @@ export default function LineChart({ series, markers = [], length, height = H }: 
       {[0.25, 0.5, 0.75].map((f) => (
         <line key={f} x1={0} x2={W} y1={height * f} y2={height * f} stroke="var(--color-bg-light)" />
       ))}
-      {series.map((s) => (
-        <polyline key={s.label} fill="none" stroke={s.color} strokeWidth={s.width ?? 2} strokeLinejoin="round"
+      {(topLast ? [...series.slice(1), series[0]] : series).map((s) => (
+        <polyline key={s.label} fill="none" stroke={s.color} strokeWidth={s.width ?? 2} strokeLinejoin="round" strokeDasharray={s.dash} strokeLinecap={s.dash ? "round" : undefined}
           points={s.values.map((v, i) => `${x(i)},${y(v)}`).join(" ")} />
       ))}
       {markers.filter((m) => m.i < main.length).map((m, k) => (

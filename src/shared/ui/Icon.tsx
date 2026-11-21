@@ -21,6 +21,9 @@ const ICONS: Record<string, (c: C) => ReactNode> = {
   dan: () => <path d="M28 4L10 28h12l-4 16 20-26H26z" fill={ACC} />,
   hanna: ({ fg, bg }) => <><rect x="8" y="9" width="32" height="30" rx="4" fill={fg} /><rect x="12" y="13" width="24" height="7" rx="1" fill={ACC} /><path d="M13 26h22M13 33h14" stroke={bg} strokeWidth="3.5" strokeLinecap="round" /></>,
   sam: ({ fg }) => <><path d="M7 32a15 15 0 0130 0z" fill={ACC} /><circle cx="40" cy="28" r="5" fill={fg} /><rect x="11" y="31" width="6" height="8" rx="2" fill={fg} /><rect x="27" y="31" width="6" height="8" rx="2" fill={fg} /></>,
+  // Investor Simulator rivals: careful Anna's safe, the sleeper's mattress
+  anna: ({ fg, bg }) => <><rect x="7" y="7" width="34" height="31" rx="5" fill={fg} /><circle cx="24" cy="22.5" r="8.5" fill={ACC} /><path d="M24 17v5.5l3.5 3" stroke={bg} strokeWidth="3" strokeLinecap="round" fill="none" /><rect x="11" y="38" width="7" height="4" rx="1.5" fill={fg} /><rect x="30" y="38" width="7" height="4" rx="1.5" fill={fg} /></>,
+  sleeper: ({ fg }) => <><rect x="5" y="27" width="38" height="9" rx="4" fill={fg} /><path d="M7 36v5M41 36v5" stroke={fg} strokeWidth="4" strokeLinecap="round" /><path d="M27 7h9l-9 9h9M15 14h7l-7 7h7" stroke={ACC} strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" fill="none" /></>,
   you: ({ fg }) => <><circle cx="24" cy="16" r="9" fill={fg} /><path d="M8 42c1-10 7-15 16-15s15 5 16 15z" fill={fg} /></>,
   // collection & mini-games
   card: ({ fg }) => <><rect x="11" y="6" width="26" height="36" rx="5" fill={ACC} stroke={fg} strokeWidth="3.5" /><path d="M24 15l6 9-6 9-6-9z" fill={fg} /></>,
