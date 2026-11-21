@@ -22,6 +22,20 @@ export default function LearningMaterial() {
               <span><strong className="num">{WORLDS.filter((w) => unlocked(w.n)).length}</strong>/{WORLDS.length} topics</span>
             </div>
           </div>
+          {/* Path (mockup 02): one dot per topic — done ✓, current yellow, locked grey. */}
+          <ol className="path" aria-label="Your path">
+            {WORLDS.map((w) => {
+              const items = CONCEPTS.filter((c) => c.world === w.n);
+              const complete = items.every((c) => p.done.includes(c.id));
+              const state = complete ? "done" : w.n === currentTopic ? "current" : unlocked(w.n) ? "open" : "locked";
+              return (
+                <li key={w.n} className={`path-step ${state}`} aria-current={state === "current" ? "step" : undefined}>
+                  <span className="path-dot" aria-hidden>{state === "done" ? "✓" : state === "locked" ? "" : w.n}</span>
+                  <span className="path-label">{w.title}</span>
+                </li>
+              );
+            })}
+          </ol>
           <div className="worlds">
             {WORLDS.map((w, i) => {
               const open = unlocked(w.n);

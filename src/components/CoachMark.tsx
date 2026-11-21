@@ -43,7 +43,7 @@ export default function CoachMark({ step, index, total, canNext, onNext, onSkip 
   return (
     <>
       {/* Blocks clicks outside the spotlight; the spotlighted element sits above it. */}
-      <div className="coach-block" style={rect ? { background: "transparent" } : { background: "rgba(11, 31, 38, 0.6)" }} />
+      <div className={`coach-block ${rect ? "" : "coach-block-intro"}`} />
       {rect && <div className="coach-spot" style={{ top: rect.top - pad, left: rect.left - pad, width: rect.width + 2 * pad, height: rect.height + 2 * pad }} />}
       <div className="coach-bubble" role="dialog" aria-live="polite" aria-label={step.title} style={bubbleStyle}>
         <div className="row" style={{ justifyContent: "space-between" }}>

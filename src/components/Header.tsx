@@ -1,4 +1,5 @@
 import Link from "next/link";
+import MobileTabBar from "./MobileTabBar";
 import PlatformNav from "./PlatformNav";
 
 // shortcut: mock signed-in user; read from the comdirect session once a backend exists.
@@ -21,6 +22,7 @@ export default function Header() {
           <span className="user-avatar" aria-hidden>{USER.initials}</span>
         </div>
       </div>
+      <MobileTabBar />
     </header>
   );
 }

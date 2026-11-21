@@ -177,6 +177,21 @@ export default function Simulator({ tour = false }: { tour?: boolean }) {
               ))}
             </div>
           </div>
+          {/* Watchlist (OKX-style markets list): every stock one click away, price and change at a glance. */}
+          <section className="panel p-watch" aria-label="Watchlist">
+            <div className="panel-head">Watchlist</div>
+            <div className="panel-body">
+              {COMPANIES.map((c) => {
+                const p = priceOf(m, c.sym), ch = (p / priceOf(m, c.sym, Math.max(0, m.day - 1)) - 1) * 100;
+                return (
+                  <button key={c.sym} className="watch-row" aria-pressed={c.sym === selected} onClick={() => pick(c.sym)}>
+                    <span className="watch-name"><strong>{c.sym === "MSCIW" ? "MSCI" : c.sym}</strong><span className="xs muted">{c.name}</span></span>
+                    <span className="watch-price"><span className="num">{eur(p)}</span><span className={`chg num ${cls(ch)}`}>{pct(ch)}</span></span>
+                  </button>
+                );
+              })}
+            </div>
+          </section>
           <section className="panel p-feed" aria-label="News and rivals">
             <div className="tabs" role="tablist">
               <button role="tab" aria-selected={tab === "news"} onClick={() => setTab("news")} data-tour="news">News</button>
