@@ -28,7 +28,7 @@ const QUESTIONS: { key: keyof Answers; q: string; options: Opt[] }[] = [
   ] },
 ];
 
-// Players who trade regularly can prove it and skip World 1.
+// Players who trade regularly can prove it and skip Module 1.
 const CHECK = [
   { q: "Limit buy at 50 €, price is 55 €. The order…", options: ["Buys at 55 €", "Waits for ≤ 50 €", "Is cancelled"], answer: 1 },
   { q: "Money for stocks has to be on…", options: ["Trading account", "Credit card", "Any account"], answer: 0 },
@@ -59,7 +59,7 @@ export default function Onboarding() {
   function go(skip: boolean) {
     actions.setPersona(persona!, a as Answers, skip);
     setUi({});
-    // Both paths land on the hub (learning map); "Start the tour" there opens World 1.
+    // Both paths land on the hub (learning map); "Start the tour" there opens Module 1.
     router.push("/");
   }
 
@@ -129,7 +129,7 @@ export default function Onboarding() {
 
         {screen === 4 && (
           <div className={s.body} key="check">
-            <h1>Prove it, skip World 1.</h1>
+            <h1>Prove it, skip Module 1.</h1>
             <div className={s.quiz}>
               {CHECK.map((c, i) => (
                 <fieldset key={c.q} className={s.qRow}>
@@ -161,7 +161,7 @@ export default function Onboarding() {
                 <button className={`btn btn-primary btn-lg ${s.go}`} onClick={() => go(false)}>Let’s start <Arrow /></button>
                 {expert && checkPassed && <button className={`btn btn-lg ${s.ghost}`} onClick={() => go(true)}>Skip to Pro</button>}
               </div>
-              {expert && !checkPassed && <p className={s.note}>Not quite. World 1 is a good warm-up.</p>}
+              {expert && !checkPassed && <p className={s.note}>Not quite. Module 1 is a good warm-up.</p>}
             </div>
             <div className={s.wallet}>
               <span className={s.walletLabel}>Play money</span>

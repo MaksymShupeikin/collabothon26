@@ -18,13 +18,13 @@ type H = { day: number; time?: string; kind: NewsKind; headline: string; body?: 
 const news = (list: H[], source = "Newswire"): News[] =>
   list.map((h) => ({ source, major: true, effects: [], time: "09:00:00", ...h, id: `s${++nid}` })).sort((a, b) => a.day - b.day);
 
-export const MAIN_DAYS = 2900; // > 10 years of trading days, so World 4 can fast-forward
+export const MAIN_DAYS = 2900; // > 10 years of trading days, so Module 4 can fast-forward
 export const MAIN: Universe = {
   id: "main", seed: 2026, syms: ALL, days: MAIN_DAYS, history: 1300,
   news: generateNews(MAIN_DAYS, 2026, -40), etf: { sym: ETF_SYM, of: STOCKS }, startDate: "2026-11-24",
 };
 
-// ── Simulated lessons (World 2) ───────────────────────────────────────────
+// ── Simulated lessons (Module 2) ───────────────────────────────────────────
 
 const SIM_PRICED: Universe = {
   id: "sim-priced", seed: 11, syms: ALL, days: 10, history: 260, etf: { sym: ETF_SYM, of: STOCKS }, startDate: "2026-11-24",
@@ -43,7 +43,7 @@ const SIM_RUMOR: Universe = {
   ], "Simulated newswire"),
 };
 
-/** World 2 mission: three headlines in one simulated week. */
+/** Module 2 mission: three headlines in one simulated week. */
 const W2_MISSION: Universe = {
   id: "w2-mission", seed: 13, syms: ALL, days: 6, history: 260, etf: { sym: ETF_SYM, of: STOCKS }, startDate: "2026-11-30",
   news: news([
@@ -53,7 +53,7 @@ const W2_MISSION: Universe = {
   ], "Simulated newswire"),
 };
 
-// ── World 4: ten years with a savings plan ────────────────────────────────
+// ── Module 4: ten years with a savings plan ────────────────────────────────
 
 const W4_PLAN: Universe = {
   id: "w4-plan", seed: 14, syms: [ETF_SYM], days: 2530, history: 260, startDate: "2027-01-04",

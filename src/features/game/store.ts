@@ -20,7 +20,7 @@ export type Save = {
   understanding: number; // right concept answers (Spot the habit, card quizzes)
   proUnlocked: boolean;
   proCelebrated: boolean;
-  proTrader: boolean; // the learner confirmed the switch from the simple trading area to ProTrader (offered after the World 2 mission)
+  proTrader: boolean; // the learner confirmed the switch from the simple trading area to ProTrader (offered after the Module 2 mission)
   allUnlocked: boolean; // demo switch on the learning map
   active: string | null; // chapter / mission currently running
   giro: number;
@@ -156,7 +156,7 @@ export const actions = {
     write(logEvents({ ...s, sim }, events));
     return events;
   },
-  /** Fresh account for the World 1 mission: money back on the Girokonto, nothing in the depot. */
+  /** Fresh account for the Module 1 mission: money back on the Girokonto, nothing in the depot. */
   resetSandbox() {
     const s = read();
     const p = s.persona ? PERSONAS[s.persona].start : 100;
@@ -167,6 +167,6 @@ export const actions = {
 export function useGame(): Save {
   return useSyncExternalStore(subscribe, read, () => EMPTY);
 }
-/** ProTrader is offered once World 2 is done (its mission), or with the demo switch. */
+/** ProTrader is offered once Module 2 is done (its mission), or with the demo switch. */
 export const proTraderOffered = (s: Save) => s.allUnlocked || s.done.includes("w2");
 export const pricedNow = (s: Save, sym: string) => priceNow(s.sim, sym);

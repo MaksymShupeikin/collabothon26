@@ -14,7 +14,7 @@ import { MistakeCam, useBoard } from "@/features/pro/ReplayParts";
 
 /**
  * The simple trading area (the trading screen from main): one screen, three columns.
- * World 2 runs here; ProTrader takes over from World 3, once the learner confirms the switch.
+ * Module 2 runs here; ProTrader takes over from Module 3, once the learner confirms the switch.
  * Same market, same depot, same replays as ProTrader: only the layout is simpler.
  */
 const PACES = [{ speed: 1, label: "1 day/s" }, { speed: 5, label: "1 week/s" }];

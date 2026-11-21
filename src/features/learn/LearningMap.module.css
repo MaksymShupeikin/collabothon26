@@ -69,8 +69,9 @@
 }
 /* Connector to the next world, drawn in the gap at badge height. */
 .world:not(:last-child)::after {
-  content: ""; position: absolute; top: calc(var(--space-6) + 27px); left: 100%; width: var(--space-6); height: 2px;
-  background: repeating-linear-gradient(90deg, var(--color-border) 0 4px, transparent 4px 8px);
+  /* left: 100% starts inside the 1px border; +1px clears it, +3px each side matches the 3px gaps: three 4px dashes, evenly spaced. */
+  content: ""; position: absolute; top: calc(var(--space-6) + 27px); left: calc(100% + 4px); width: calc(var(--space-6) - 6px); height: 2px;
+  background: repeating-linear-gradient(90deg, var(--color-border) 0 4px, transparent 4px 7px);
 }
 .world.complete:not(:last-child)::after { background: var(--color-ink); }
 
@@ -154,8 +155,30 @@
 .modeHot { background: var(--color-accent); border-color: var(--color-ink); }
 .modeHot .modeText .xs { color: var(--color-ink); }
 .mode:hover:not(:disabled) { text-decoration: none; }
-.finish, .finish:hover { margin-top: var(--space-6); color: inherit; text-decoration: none; }
-.finish:hover { box-shadow: var(--shadow-xl), 0 8px 20px rgba(11, 31, 38, 0.12); transform: translateY(-2px); text-decoration: none; }
+/* Finish line: a dark bookend to the hero. Sandbox (edu) on the left, the real platform's wordmark on the right, one bridge segment per module. */
+.finish {
+  position: relative; overflow: hidden; display: flex; align-items: center; gap: var(--space-6); margin-top: var(--space-6);
+  padding: var(--space-6) var(--space-7, 28px); border-radius: var(--radius-md); background: var(--color-ink); color: var(--color-white);
+  text-decoration: none; box-shadow: var(--shadow-lg); transition: box-shadow var(--ease), transform 0.16s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.finish:hover { color: var(--color-white); text-decoration: none; transform: translateY(-2px); box-shadow: var(--shadow-xl), 0 8px 20px rgba(11, 31, 38, 0.18); }
+/* Chequered finish stripe on the right edge. */
+.finish::after {
+  content: ""; position: absolute; right: 0; top: 0; bottom: 0; width: 24px; opacity: 0.14;
+  background: repeating-conic-gradient(var(--color-white) 0 25%, transparent 0 50%) 0 0 / 12px 12px;
+}
+.flag { display: grid; place-items: center; width: 56px; height: 56px; border-radius: 50%; background: var(--color-accent); flex-shrink: 0; }
+.finishText { display: flex; flex-direction: column; gap: var(--space-1); flex: 1; min-width: 0; }
+.finishText strong { font-size: var(--text-lg); line-height: 1.2; }
+.finishText .xs { color: var(--color-bg-dark); }
+.finishText .kicker { color: var(--color-accent); font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; }
+.bridge { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+.bridgeEnd { font-size: var(--text-sm); font-weight: 700; color: var(--color-bg-dark); padding-right: 4px; }
+.real { display: inline-flex; padding: 6px 10px; border-radius: 6px; background: var(--color-accent); color: var(--color-ink); line-height: 0; }
+.seg { width: 36px; height: 6px; border-radius: 3px; background: var(--color-accent); }
+.finishGo { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; background: var(--color-accent); color: var(--color-ink); flex-shrink: 0; margin-right: var(--space-5); }
+.finishGo .glyph { width: 20px; height: 20px; transition: transform var(--ease); }
+.finish:hover .finishGo .glyph { transform: translateX(3px); }
 
 /* ── Concept cards ── */
 .cards { list-style: none; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: var(--space-5); }
@@ -219,4 +242,11 @@
   .world::after { display: none; }
   .worldSlot { min-height: 0; }
   .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-4); }
+}
+/* Narrow: the bridge drops to its own full-width row under the title. */
+@media (max-width: 860px) {
+  .finish { flex-wrap: wrap; gap: var(--space-5); padding: var(--space-6) calc(var(--space-6) + 24px) var(--space-6) var(--space-6); } /* right: clear the chequered stripe */
+  .bridge { order: 3; flex-basis: 100%; }
+  .seg { flex: 1; width: auto; }
+  .finishGo { margin-right: 0; }
 }

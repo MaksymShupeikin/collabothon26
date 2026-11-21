@@ -34,10 +34,10 @@ export default function Pro() {
   const ch = save.active ? chapterById(save.active) : undefined;
   const pro = ch?.surface === "pro" ? ch : undefined;
   if (!save.persona) return <Gate text="Answer three quick questions first." href="/start" cta="Start" />;
-  if (!save.proUnlocked && !save.allUnlocked) return <Gate text="The trading area unlocks after the World 1 mission: your first stock." href="/" cta="Learning map" />;
+  if (!save.proUnlocked && !save.allUnlocked) return <Gate text="The trading area unlocks after the Module 1 mission: your first stock." href="/" cta="Learning map" />;
   const mode: Mode = pro?.replay ? { kind: "replay", replay: REPLAYS[pro.replay] } : pro?.lesson ? { kind: "lesson", id: SIM_LESSONS[pro.lesson as keyof typeof SIM_LESSONS].id } : { kind: "main" };
-  // The learner starts on the simple trading area. World 2 always runs there; ProTrader takes over
-  // from World 3 (and in free play) only after the learner has confirmed the switch.
+  // The learner starts on the simple trading area. Module 2 always runs there; ProTrader takes over
+  // from Module 3 (and in free play) only after the learner has confirmed the switch.
   const layout: Layout = pro?.world === 2 || !save.proTrader ? "simple" : "pro";
   const offerSwitch = proTraderOffered(save) && !save.proTrader && pro?.world !== 2;
   return <Desk key={`${save.active ?? "free"}:${layout}`} mode={mode} chapter={pro} layout={layout} offerSwitch={offerSwitch} />;
@@ -50,9 +50,9 @@ function ProTraderSwitch({ chapter, onLater }: { chapter?: Chapter; onLater: () 
   return (
     <div className="overlay overlay-dark" role="dialog" aria-modal="true" aria-labelledby="switch-title">
       <div className="unlock">
-        <p className="unlock-kicker">World 2 complete · ProTrader unlocked</p>
+        <p className="unlock-kicker">Module 2 complete · ProTrader unlocked</p>
         <h1 id="switch-title">Ready for the full trading desk?</h1>
-        <p className="unlock-sub">{chapter ? `${chapter.n} ${chapter.title} runs in ProTrader, the workspace experienced comdirect traders use.` : "From World 3 on you trade in ProTrader, the workspace experienced comdirect traders use."} Your depot, cash and orders come with you.</p>
+        <p className="unlock-sub">{chapter ? `${chapter.n} ${chapter.title} runs in ProTrader, the workspace experienced comdirect traders use.` : "From Module 3 on you trade in ProTrader, the workspace experienced comdirect traders use."} Your depot, cash and orders come with you.</p>
         <ul className="switch-list">
           <li><strong>Widgets</strong>Watchlist, depot, chart, order book and news side by side.</li>
           <li><strong>Order window</strong>The yellow Order button opens a floating ticket with exchange and validity.</li>
@@ -110,7 +110,7 @@ function Desk({ mode, chapter, layout, offerSwitch }: { mode: Mode; chapter?: Ch
   const [intro, setIntro] = useState(chapter?.kind === "boss");
   const [revealOpen, setRevealOpen] = useState(false);
   const [planSet, setPlanSet] = useState(sim.acct.plans.length > 0);
-  const w2 = useRef({ a: 0, r: 0 }); // World 2 mission: answered / right
+  const w2 = useRef({ a: 0, r: 0 }); // Module 2 mission: answered / right
   const [workspace, setWorkspace] = useState<"depot" | "focus">("depot");
   const [hidden, setHidden] = useState<Record<string, boolean>>({});
   const [widgetsOpen, setWidgetsOpen] = useState(false);
@@ -402,8 +402,8 @@ function TimeBar({ clock, speed, setSpeed, jump, next, ended, years, progress, l
         <button onClick={() => jump(1)} disabled={ended}>+1 day</button>
         <button onClick={() => jump(5)} disabled={ended}>+1 week</button>
         <button onClick={() => jump(21)} disabled={ended}>+1 month</button>
-        <button onClick={() => jump(252)} disabled={ended || !years} title={years ? "" : "Unlocks in World 4"}>{years ? "" : "🔒 "}+1 year</button>
-        <button onClick={() => jump(2520)} disabled={ended || !years} title={years ? "" : "Unlocks in World 4"}>{years ? "" : "🔒 "}+10 years</button>
+        <button onClick={() => jump(252)} disabled={ended || !years} title={years ? "" : "Unlocks in Module 4"}>{years ? "" : "🔒 "}+1 year</button>
+        <button onClick={() => jump(2520)} disabled={ended || !years} title={years ? "" : "Unlocks in Module 4"}>{years ? "" : "🔒 "}+10 years</button>
       </div>
       {progress && <span className="xs tm-prog num">{progress}</span>}
       <span className="tm-label xs">{label}</span>
@@ -561,7 +561,7 @@ function OrderWindow({ sim, comps, sym: initial, setSym, cover, coverWkn, order,
         </div>
         <div className="pt-tabs" role="tablist">
           <button role="tab" aria-selected={tab === "std"} onClick={() => setTab("std")}>Standard order</button>
-          <button role="tab" aria-selected={tab === "plan"} onClick={() => setTab("plan")} data-tour="w-order-plan" disabled={!planAllowed} title={planAllowed ? "" : "Unlocks in World 4"}>{planAllowed ? "" : "🔒 "}Savings plan</button>
+          <button role="tab" aria-selected={tab === "plan"} onClick={() => setTab("plan")} data-tour="w-order-plan" disabled={!planAllowed} title={planAllowed ? "" : "Unlocks in Module 4"}>{planAllowed ? "" : "🔒 "}Savings plan</button>
         </div>
         {tab === "std" ? (
           <>

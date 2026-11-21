@@ -5,7 +5,7 @@ import { eur } from "@/shared/lib/format";
 import { addPlan, advance, newSim, priceAt, universeOf } from "@/features/market/engine";
 import LineChart from "@/shared/charts/LineChart";
 
-/** World 4: savings plan vs. one-time buy vs. cash under the mattress, over the same 10 years. */
+/** Module 4: savings plan vs. one-time buy vs. cash under the mattress, over the same 10 years. */
 export default function PlanCompare({ monthly }: { monthly: number }) {
   const { plan, lump, cash, paid } = useMemo(() => {
     const u = universeOf("w4-plan");

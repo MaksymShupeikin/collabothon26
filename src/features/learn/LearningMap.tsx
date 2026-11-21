@@ -10,6 +10,7 @@ import { setUi } from "@/features/game/ui";
 import Icon from "@/shared/ui/Icon";
 import ProgressRing from "@/shared/ui/ProgressRing";
 import CountUp from "@/shared/ui/CountUp";
+import { Wordmark } from "@/shared/ui/Wordmark";
 import CardArt, { CARD_SHORT } from "@/features/learn/CardArt";
 import s from "./LearningMap.module.css";
 
@@ -106,36 +107,45 @@ export default function LearningMap() {
           <dl className={s.tally}>
             <div><dt>Stars <Star /></dt><dd className="num"><CountUp to={stars} active={rankShown} /><small>/{STARS_MAX}</small></dd></div>
             <div><dt>Cards <CardGlyph /></dt><dd className="num"><CountUp to={save.cards.length} active={rankShown} /><small>/{CARDS.length}</small></dd></div>
-            <div><dt>Worlds <Globe /></dt><dd className="num"><CountUp to={worldsOpen} active={rankShown} /><small>/{WORLDS.length}</small></dd></div>
+            <div><dt>Modules <Layers /></dt><dd className="num"><CountUp to={worldsOpen} active={rankShown} /><small>/{WORLDS.length}</small></dd></div>
           </dl>
         </div>
       </section>
 
       <section className={s.modes} aria-label="Play modes">
-        <ModeTile open={proOpen} lockText="After World 1" icon="chart" title="Real Market" line="Simple or Pro view. Beat the bots."
+        <ModeTile open={proOpen} lockText="After Module 1" icon="chart" title="Real Market" line="Simple or Pro view. Beat the bots."
           onOpen={() => { actions.start(null); setUi({}); router.push("/pro"); }} />
         {/* shortcut: the game isn't built yet, so the tile opens nothing; wire onOpen when it exists. */}
         <ModeTile open icon="sprout" title="Investor Simulator" line="30 years of life in 10 minutes." onOpen={() => {}} />
-        <ModeTile open={!!replay} lockText="In World 2" icon="hourglass" title="History Mode" line={replay ? replay.title.replace(/^Boss: /, "vs. ") : "Real crashes, hidden dates."}
+        <ModeTile open={!!replay} lockText="In Module 2" icon="hourglass" title="History Mode" line={replay ? replay.title.replace(/^Boss: /, "vs. ") : "Real crashes, hidden dates."}
           onOpen={() => replay && launch(replay)} />
       </section>
 
       <section aria-labelledby="worlds-h">
-        <h2 id="worlds-h" className={s.sectionHead}>Worlds</h2>
+        <h2 id="worlds-h" className={s.sectionHead}>Learning path</h2>
         <ol className={s.path}>
           {WORLDS.map((w) => (
             <WorldTile key={w.n} w={w} save={save} next={next} launch={launch} />
           ))}
         </ol>
-        {/* The finish line of the path: the step from sandbox to a real depot. */}
-        <Link href="/ready" className={`${s.mode} ${s.finish} ${allDone ? s.modeHot : ""}`}>
-          <Icon name="play" size={44} round />
-          <span className={s.modeText}>
-            <strong>Ready for real</strong>
-            <span className="xs">{allDone ? "You're ready. Open your real depot." : "When you're done here: your real depot."}</span>
-          </span>
-          <Arrow />
-        </Link>
+        {/* The finish line: shown only once every module is cleared, so it never competes with the lessons. */}
+        {allDone && (
+          <Link href="/ready" className={s.finish}>
+            <span className={s.flag} aria-hidden><Icon name="flag" size={30} /></span>
+            <span className={s.finishText}>
+              <span className={`xs ${s.kicker}`}>Finish line</span>
+              <strong>Ready for real</strong>
+              <span className="xs">You're ready. Same depot, real money.</span>
+            </span>
+            {/* Sandbox → real platform: every module segment lit. */}
+            <span className={s.bridge} aria-hidden>
+              <span className={s.bridgeEnd}>edu</span>
+              {WORLDS.map((w) => <span key={w.n} className={s.seg} />)}
+              <span className={`${s.bridgeEnd} ${s.real}`}><Wordmark width={84} /></span>
+            </span>
+            <span className={s.finishGo} aria-hidden><Arrow /></span>
+          </Link>
+        )}
       </section>
 
 
@@ -146,7 +156,7 @@ export default function LearningMap() {
             const has = save.cards.includes(c.id);
             return (
               <li key={c.id} className={`${s.mini} ${has ? s.has : s.sealed}`}>
-                <span className={s.miniTop}>World {c.world}</span>
+                <span className={s.miniTop}>Module {c.world}</span>
                 <span className={s.art}>
                   <CardArt id={c.id} size={88} />
                   {!has && <span className={s.seal}><Lock /></span>}
@@ -217,7 +227,7 @@ function WorldTile({ w, save, next, launch }: { w: World; save: Save; next: Chap
         <div className={s.worldText}>
           <h3>{w.title}</h3>
           {/* Hovering a node peeks at that level. */}
-          <span className={`xs ${s.caption}`}>{open ? caption.title : `Unlocks after ${prev?.title ?? `World ${w.n - 1}`}`}</span>
+          <span className={`xs ${s.caption}`}>{open ? caption.title : `Unlocks after ${prev?.title ?? `Module ${w.n - 1}`}`}</span>
         </div>
       </div>
       </div>
@@ -278,5 +288,6 @@ const Check = () => <svg className={s.glyph} viewBox="0 0 16 16" aria-hidden><pa
 const Lock = () => <svg className={s.glyph} viewBox="0 0 16 16" aria-hidden><path d="M5 7V5.5a3 3 0 016 0V7" fill="none" stroke="currentColor" strokeWidth="1.8" /><rect x="3.5" y="7" width="9" height="6.5" rx="1.5" fill="currentColor" /></svg>;
 // Same filled family as the star: a card with a diamond punched out, a globe.
 const CardGlyph = () => <svg className={s.glyph} viewBox="0 0 16 16" aria-hidden><path fillRule="evenodd" d="M5 1.5h6a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2v-9a2 2 0 012-2zM8 4.8L5.6 8 8 11.2 10.4 8z" fill="currentColor" /></svg>;
-const Globe = () => <svg className={s.glyph} viewBox="0 0 16 16" aria-hidden><circle cx="8" cy="8" r="6.6" fill="currentColor" /><path d="M1.6 8h12.8M8 1.4c-2.6 2.2-2.6 11 0 13.2M8 1.4c2.6 2.2 2.6 11 0 13.2" fill="none" stroke="var(--color-ink)" strokeWidth="1.2" /></svg>;
+// Stacked layers: modules built one on top of the other.
+const Layers = () => <svg className={s.glyph} viewBox="0 0 16 16" aria-hidden><path d="M8 1.5l6.5 3.4L8 8.3 1.5 4.9z" fill="currentColor" /><path d="M2 8.1l6 3.1 6-3.1M2 11.3l6 3.1 6-3.1" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" /></svg>;
 const Star = () => <svg className={s.glyph} viewBox="0 0 16 16" aria-hidden><path d="M8 1.8l1.9 3.9 4.3.6-3.1 3 .7 4.3L8 11.6l-3.8 2 .7-4.3-3.1-3 4.3-.6z" fill="currentColor" /></svg>;
