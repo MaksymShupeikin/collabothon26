@@ -50,7 +50,6 @@ export default function ProChart({ sym, closes, firstDay, label, marks, type, bo
     bbU.current = c.addSeries(LineSeries, { color: css("--color-bg-dark"), lineWidth: 1, priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false });
     bbL.current = c.addSeries(LineSeries, { color: css("--color-bg-dark"), lineWidth: 1, priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false });
     vol.current = c.addSeries(HistogramSeries, { color: css("--color-bg-dark"), priceFormat: { type: "volume" }, priceLineVisible: false, lastValueVisible: false }, 1);
-    vol.current.priceScale().applyOptions({ visible: false });
     c.panes()[1]?.setHeight(64);
     markers.current = createSeriesMarkers(candles.current, []);
     lineMarkers.current = createSeriesMarkers(line.current, []);

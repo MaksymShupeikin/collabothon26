@@ -105,6 +105,7 @@ const WIRECARD: Universe = {
 
 const GAMESTOP: Universe = {
   id: "replay-gamestop", seed: 22, syms: ["GME", ETF_SYM, "AAPL", "MSFT", "SAP"], days: 20, history: 260, startDate: "2021-01-12", hideDate: true,
+  etf: { sym: ETF_SYM, of: ["AAPL", "MSFT", "SAP"] },
   // USD closes converted at ~0,82 €/$
   paths: { GME: [day(0, 16.4), day(1, 25.8), day(2, 32.7), day(5, 32.3), day(7, 35.3), day(8, 53.3), day(9, 63.1), day(10, 121.3), day(11, 285.0), day(12, 158.8), day(13, 266.5), day(14, 184.5), day(15, 73.8), day(16, 75.4), day(17, 43.9), day(18, 52.3), day(19, 49.2), day(20, 41.0)] as Path },
   news: news([
@@ -131,7 +132,7 @@ const VW: Universe = {
 
 const NVIDIA: Universe = {
   id: "replay-nvidia", seed: 24, syms: ["NVDA", ETF_SYM, "SAP", "ALV", "DTE"], days: 250, history: 260, startDate: "2023-01-03", hideDate: true,
-  paths: { NVDA: [day(0, 133), day(21, 190), day(40, 215), day(62, 255), day(98, 283), day(99, 352), day(124, 385), day(167, 452), day(205, 372), day(230, 430), day(250, 448)] as Path },
+  paths: { [ETF_SYM]: [day(0, 66.5), day(60, 70.1), day(120, 73.8), day(205, 70.2), day(250, 79.6)], NVDA: [day(0, 133), day(21, 190), day(40, 215), day(62, 255), day(98, 283), day(99, 352), day(124, 385), day(167, 452), day(205, 372), day(230, 430), day(250, 448)] as Path },
   news: news([
     { day: 0, kind: "noise", headline: "US chipmaker's share lost about half of its value last year", explain: "Old news: already in the price.", concept: "volatility" },
     { day: 25, kind: "sector", headline: "AI chatbot hype lifts chip stocks", explain: "A theme everyone talks about. Prices can run far ahead of profits.", concept: "volatility" },
@@ -151,17 +152,17 @@ const COVID: Universe = {
     DTE: [day(0, 15.1), day(12, 16.4), day(19, 14.3), day(33, 11.3), day(48, 13.5), day(87, 14.9), day(146, 14.6), day(190, 13.3), day(229, 14.9)],
   },
   news: news([
-    { day: 12, kind: "noise", headline: "DAX closes at a record high", explain: "Looking back, the top. Nobody can see that in the moment.", concept: "drawdown" },
-    { day: 14, kind: "signal", headline: "Northern Italy closes towns as virus cases rise sharply", explain: "The first sign the virus reaches Europe's economy.", concept: "drawdown" },
-    { day: 25, kind: "macro", headline: "Oil price collapses by about a quarter after producers fail to agree", explain: "A second shock on top of the first.", concept: "drawdown" },
-    { day: 29, kind: "macro", headline: "US suspends most travel from Europe; worst day for stocks in decades", explain: "Panic. The drawdown is now about 35 %.", concept: "drawdown" },
-    { day: 31, kind: "macro", headline: "Germany closes borders to several neighbours; most shops must close", explain: "Close to the bottom, but nobody knows that yet.", concept: "drawdown" },
-    { day: 33, kind: "macro", headline: "ECB announces 750 bn € emergency bond-buying programme", explain: "Central banks step in. The low is reached around now.", concept: "drawdown" },
-    { day: 36, kind: "macro", headline: "Germany agrees a huge rescue package for companies and workers", explain: "Help arrives. Markets start to recover long before the virus is gone.", concept: "drawdown" },
+    { day: 12, kind: "noise", headline: "DAX closes at a record high", explain: "Looking back, the top. Nobody can see that in the moment.", concept: "volatility" },
+    { day: 14, kind: "signal", headline: "Northern Italy closes towns as virus cases rise sharply", explain: "The first sign the virus reaches Europe's economy.", concept: "volatility" },
+    { day: 25, kind: "macro", headline: "Oil price collapses by about a quarter after producers fail to agree", explain: "A second shock on top of the first.", concept: "volatility" },
+    { day: 29, kind: "macro", headline: "US suspends most travel from Europe; worst day for stocks in decades", explain: "Panic. The drawdown is now about 35 %.", concept: "volatility" },
+    { day: 31, kind: "macro", headline: "Germany closes borders to several neighbours; most shops must close", explain: "Close to the bottom, but nobody knows that yet.", concept: "volatility" },
+    { day: 33, kind: "macro", headline: "ECB announces 750 bn € emergency bond-buying programme", explain: "Central banks step in. The low is reached around now.", concept: "volatility" },
+    { day: 36, kind: "macro", headline: "Germany agrees a huge rescue package for companies and workers", explain: "Help arrives. Markets start to recover long before the virus is gone.", concept: "volatility" },
     { day: 80, kind: "macro", headline: "Lockdowns ease across Europe", explain: "Prices had already risen a lot: the recovery was priced in early.", concept: "priced-in" },
-    { day: 120, kind: "macro", headline: "EU leaders agree on a 750 bn € recovery fund", explain: "More support for the economy.", concept: "drawdown" },
-    { day: 198, kind: "macro", headline: "Vaccine more than 90 % effective in trial, first results show", explain: "Real, surprising news: markets jumped the same day.", concept: "drawdown" },
-    { day: 226, kind: "macro", headline: "First vaccinations start in the EU", explain: "By now, the DAX is back at its old high.", concept: "drawdown" },
+    { day: 120, kind: "macro", headline: "EU leaders agree on a 750 bn € recovery fund", explain: "More support for the economy.", concept: "volatility" },
+    { day: 198, kind: "macro", headline: "Vaccine more than 90 % effective in trial, first results show", explain: "Real, surprising news: markets jumped the same day.", concept: "volatility" },
+    { day: 226, kind: "macro", headline: "First vaccinations start in the EU", explain: "By now, the DAX is back at its old high.", concept: "volatility" },
   ]),
 };
 
@@ -230,7 +231,7 @@ export const REPLAYS: Record<string, Replay> = {
     id: "covid", universe: COVID, hero: DAX_ETF, cover: "DAX index (ETF)", coverWkn: "●●●●●●",
     reveal: "This was the COVID crash, February to December 2020.",
     after: "The DAX fell by almost 40 % in four weeks, then was back at its record high by the end of the year. Selling at the bottom turned a temporary loss into a real one.",
-    concept: "drawdown", boss: "paula", bots: ["paula", "max", "alex", "sam"], budget: 1000,
+    concept: "volatility", boss: "paula", bots: ["paula", "max", "alex", "sam"], budget: 1000,
     win: "Don't sell your depot during the crash (days 25–40), and beat Paula's risk-adjusted score.",
     avoid: (s) => !s.trades.some((t) => t.side === "sell" && t.day >= 25 && t.day <= 40),
     moves: [
@@ -241,12 +242,13 @@ export const REPLAYS: Record<string, Replay> = {
         spot: { options: ["Selling after a big drop, near the bottom", "Not having a savings plan", "Nothing, cash is safe"], answer: 0, why: "Selling locks in the loss. Her horizon is years, not weeks." } },
       { day: 146, bot: "paula", side: "buy", buys: [[DAX_ETF, 1]], say: "OK, it's been rising for months. Safe to get back in now!",
         spot: { options: ["Buying back higher than she sold", "Buying an ETF", "Nothing, she's careful"], answer: 0, why: "She sold low and bought high: the cost of panic." } },
-      { day: 198, bot: "max", side: "buy", buys: [["LHA", 1]], say: "Vaccine! Airlines to the moon!",
-        spot: { options: ["Buying on a headline, after the jump", "Buying too early", "Nothing, it's good news"], answer: 0, why: "By the time he read it, the price had already jumped." } },
+      { day: 12, bot: "max", side: "buy", buys: [["LHA", 1]], say: "DAX at a record high! Everyone's getting rich. All in!",
+        spot: { options: ["Buying on euphoria, not on facts", "Buying an airline", "Nothing, records mean it keeps going"], answer: 0, why: "A record high says nothing about tomorrow. He bought on a feeling, all in one stock." } },
     ],
   },
 };
 
 export const SIM_LESSONS = { priced: SIM_PRICED, rumor: SIM_RUMOR, w2: W2_MISSION, plan: W4_PLAN };
 
+for (const r of Object.values(REPLAYS)) r.moves.sort((a, b) => a.day - b.day);
 for (const u of [MAIN, SIM_PRICED, SIM_RUMOR, W2_MISSION, W4_PLAN, ...Object.values(REPLAYS).map((r) => r.universe)]) registerUniverse(u);

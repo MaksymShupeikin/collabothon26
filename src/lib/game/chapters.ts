@@ -167,6 +167,7 @@ const W2: Chapter[] = [
       { target: "time-machine", title: "Two days later", text: "Watch what the TV analyst says.", task: "Press ⏭ Next event until day 6.", done: (c) => (c.ui.day as number ?? 0) >= 6 },
       { target: "w-news", title: "Opinions", text: "Now a TV analyst says the whole sector is finished.",
         quiz: { q: "\"The whole auto sector is finished\", says an analyst on TV. Signal or noise?", options: ["Signal", "Noise: a dramatic opinion"], answer: 1, why: "Other carmakers fell much less. The problem was at one company." } },
+      { title: "The reveal: Volkswagen, September 2015", text: "\"Dieselgate\". The share lost about a third in a few days. Other carmakers fell much less: the signal was about one company, the TV drama was noise." },
     ],
   },
   {
@@ -221,6 +222,7 @@ const W3: Chapter[] = [
       { target: "time-machine", title: "Keep going", text: "Let's see the rest of the year.", task: "Play until the end of the replay.", done: (c) => !!c.ui.ended },
       { title: "Alex won", text: "Alex's one stock more than tripled.",
         quiz: { q: "Alex won with an all-in bet. Was it a good decision?", options: ["Yes, he made the most money", "It worked in spite of the strategy, not because of it", "Yes, AI always wins"], answer: 1, why: "Same habit, same risk as with Wirecard. A bad habit can win in the short run." } },
+      { target: "reveal-banner", title: "The reveal: NVIDIA, 2023", text: "The share more than tripled, with drops of 15–20 % on the way. Big swings in both directions: that's volatility, and the drawdowns are what you have to sit through." },
     ],
   },
   {
@@ -249,7 +251,7 @@ const W3: Chapter[] = [
     blurb: "Spread your money so no single stock is above 30 %.",
     mission: {
       goal: () => "Invest at least half of your money so that no single stock is above 30 % of your depot. An ETF counts as diversified. Watch the fees.",
-      hint: () => "One ETF order is the cheapest way. Open Order, search for MSCI World (A0RPWH) and buy with most of your available money.",
+      hint: () => "One ETF order is the cheapest way: Order → MSCI World ETF (A0RPWH). Not enough money for one share? The sandbox \"+ Play money\" button tops up your trading account. Selling a single stock also frees money.",
       check: (c) => {
         const s = c.save.sim, total = totalValue(s), dep = depotValue(s);
         if (!(total > 0) || dep < total * 0.5) return false;

@@ -6,9 +6,10 @@ import Icon from "../Icon";
 
 /** A concept card. Front: one sentence. Back: example + one quiz question (XP for the right answer). */
 export default function ConceptCard({ id, startFlipped = false }: { id: string; startFlipped?: boolean }) {
-  const card = cardById(id)!;
+  const card = cardById(id);
   const [flipped, setFlipped] = useState(startFlipped);
   const [picked, setPicked] = useState<number | null>(null);
+  if (!card) return null;
   return (
     <div className={`ccard ${flipped ? "flipped" : ""}`}>
       {!flipped ? (
