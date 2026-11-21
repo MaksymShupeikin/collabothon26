@@ -116,7 +116,9 @@ const W1: Chapter[] = [
       { target: "of-limit", title: "Your limit", text: "The most you're willing to pay per share.", task: "Enter a limit, for example today's price.", done: (c) => (c.ui.limit ?? 0) > 0 },
       { target: "of-validity", title: "Validity", text: "How long your order waits if the price isn't reached. \"Good for day\" ends at today's close." },
       { target: "of-costs-link", title: "Costs", text: "Every order has a fee, plus a small spread.", task: "Click \"Show order costs\".", done: (c) => !!c.ui.costsOpen },
-      { target: "of-costs", title: "Look at the fee", text: (c) => `A fixed 4,90 € plus 0,25 %. On ${PERSONAS[c.save.persona ?? "starter"].start} € that's a big slice, so fewer, bigger orders are cheaper.` },
+      { target: "of-costs", title: "Look at the fee", text: (c) => (PERSONAS[c.save.persona ?? "starter"].start <= 100
+        ? "A fixed 4,90 € plus 0,25 %. On a 100 € order that's almost 5 %, so fewer, bigger orders are cheaper."
+        : "A fixed 4,90 € plus 0,25 %. On 1.000 € that's under 1 %, on 100 € almost 5 %. Fewer, bigger orders are cheaper.") },
       { target: "of-submit", title: "That's the form", text: "You know every field now. In the mission you'll do it for real, on your own." },
     ],
   },
