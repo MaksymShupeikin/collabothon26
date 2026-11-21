@@ -55,24 +55,27 @@ function ChapterTour({ ch, ctx }: { ch: Chapter; ctx: Ctx }) {
     return () => window.clearTimeout(id);
   }, [taskDone, i]);
 
-  if (finished) return <ChapterDone ch={ch} />;
+  if (finished) return <ChapterDone ch={ch} skipCard />;
   if (!step) return null;
 
   const quizDone = step.quiz && picked === step.quiz.answer;
+  // What this click pays (0 on a replay: awards only count once).
+  const earned = ctx.save.earned;
+  const pays = (earned.includes(`${ch.id}:${i}`) ? 0 : 10) + (i + 1 === steps.length && !earned.includes(`${ch.id}:done`) ? 30 : 0);
   return (
-    <CoachMark target={step.target} place={step.place} title={step.title} progress={i / steps.length} step={`${ch.n} · Step ${i + 1} of ${steps.length}`}
+    <CoachMark target={step.target} place={step.place} live={isTask} allow={isTask ? step.zone ?? step.target ?? "*" : undefined} title={step.title} progress={(i + 1) / steps.length} step={`${ch.n} · Step ${i + 1} of ${steps.length}`}
       footer={
         <div className="row coach-foot">
           <button className="btn btn-ghost btn-sm" onClick={() => { actions.start(null); setUi({}); }}>Leave chapter</button>
           {isTask ? (
-            <span className={`xs ${taskDone ? "up" : "muted"}`}>{taskDone ? "✓ Done, +10 XP" : "Do it in the screen behind"}</span>
+            taskDone ? <span className="xp-done">✓ Done {pays > 0 && <span className="xp-chip">+{pays} XP</span>}</span> : pays > 0 ? <span className="xp-chip is-pending">+{pays} XP</span> : null
           ) : (
-            <button className="btn btn-primary btn-sm" onClick={next} disabled={!!step.quiz && !quizDone}>{i + 1 === steps.length ? "Finish" : "Next"}</button>
+            <button className="btn btn-primary btn-sm" onClick={next} disabled={!!step.quiz && !quizDone}>{i + 1 === steps.length ? "Finish" : <>Next <NextArrow /></>}</button>
           )}
         </div>
       }>
       <p className="small">{resolve(step.text, ctx)}</p>
-      {isTask && taskText && <p className="small task"><strong>Your turn:</strong> {taskText}</p>}
+      {isTask && taskText && <p className="small task"><strong>Your turn</strong><span>{taskText}</span></p>}
       {step.game && <div className="coach-game"><MiniGameView game={step.game} /></div>}
       {step.quiz && (
         <div className="stack-sm">
@@ -90,32 +93,65 @@ function ChapterTour({ ch, ctx }: { ch: Chapter; ctx: Ctx }) {
   );
 }
 
+/** Same arrow glyph as the learning map's "Start lesson" button. */
+const NextArrow = () => <svg className="btn-arrow" viewBox="0 0 16 16" aria-hidden><path d="M3 8h9M8.5 4l4 4-4 4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>;
+
 /** End of a chapter: the concept card drops into the collection. */
-export function ChapterDone({ ch, extra }: { ch: Chapter; extra?: React.ReactNode }) {
+export function ChapterDone({ ch, extra, skipCard }: { ch: Chapter; extra?: React.ReactNode; skipCard?: boolean }) {
   const save = useGame();
   const next = nextChapter(save);
+  const [stay, setStay] = useState(!!skipCard);
+  const nextLink = next && next.id !== ch.id ? (
+    <Link className="btn btn-primary btn-sm" href={surfaceHref(next)} onClick={() => { if (next.id === "w1") actions.resetSandbox(); actions.start(next.id); setUi({}); }}>
+      {next.kind === "boss" ? next.title : `Start ${next.kind === "mission" ? "mission" : next.n}: ${next.title}`} →
+    </Link>
+  ) : null;
+  const label = ch.kind === "mission" ? "Mission" : `Chapter ${ch.n}`;
+  if (stay) return <SandboxBar label={`${label} complete`} next={nextLink} />;
+  const cards = ch.card ?? [];
   return (
     <div className="overlay" role="dialog" aria-modal="true" aria-label="Chapter complete">
-      <div className="modal modal-mid">
-        <span className="badge badge-accent">{ch.kind === "mission" ? "Mission" : ch.n} complete</span>
-        <h2>{ch.title}</h2>
+      <div className="done-card">
+        <div className="coach-head">
+          <span className="coach-step"><strong>✓ {label}</strong><span>complete</span></span>
+          <div className="coach-bar" aria-hidden><span style={{ width: "100%" }} /></div>
+        </div>
+        <h3>You finished “{ch.title}”</h3>
         {extra}
-        {(ch.card ?? []).length > 0 && (
+        {cards.length > 0 && (
           <>
-            <p className="small"><Icon name="card" size={22} /> {(ch.card ?? []).length === 1 ? "A new concept card" : "New concept cards"} for your collection ({save.cards.length} / 12). Turn it over for a quick question.</p>
-            <div className="card-row">{(ch.card ?? []).map((c) => <ConceptCard key={c} id={c} />)}</div>
+            <p className="small"><Icon name="card" size={22} /> {cards.length === 1 ? "A new concept card" : "New concept cards"} for your collection ({save.cards.length} / 12). Turn it over for a quick question.</p>
+            <div className="card-row">{cards.map((c) => <ConceptCard key={c} id={c} />)}</div>
           </>
         )}
-        <div className="row">
-          <Link className="btn btn-outline" href="/" onClick={() => actions.start(null)}>Learning map</Link>
-          {next && next.id !== ch.id && (
-            <Link className="btn btn-primary" href={surfaceHref(next)} onClick={() => { if (next.id === "w1") actions.resetSandbox(); actions.start(next.id); setUi({}); }}>
-              Next: {next.n} {next.title} →
-            </Link>
-          )}
+        <div className="row done-foot">
+          <div className="row">
+            <Link className="btn btn-ghost btn-sm" href="/" onClick={() => actions.start(null)}>Back to learning map</Link>
+            <button className="btn btn-ghost btn-sm" onClick={() => setStay(true)}>Keep exploring here</button>
+          </div>
+          {nextLink}
         </div>
       </div>
     </div>
+  );
+}
+
+/** After "Keep exploring here": free play, with the way out (or on) docked at the bottom. */
+function SandboxBar({ label, next }: { label: string; next: React.ReactNode }) {
+  return (
+    <aside className="sandbox-bar" aria-label="Lesson complete">
+      <span className="sandbox-check" aria-hidden="true">
+        <svg viewBox="0 0 16 16" width="14" height="14"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+      </span>
+      <div className="sandbox-text">
+        <strong>{label}</strong>
+        <span>Free play: click around, nothing is scored.</span>
+      </div>
+      <div className="sandbox-actions">
+        <Link className="btn btn-ghost btn-sm" href="/" onClick={() => actions.start(null)}>Learning map</Link>
+        {next}
+      </div>
+    </aside>
   );
 }
 
@@ -177,7 +213,7 @@ function MissionCard({ ch, ctx }: { ch: Chapter; ctx: Ctx }) {
 
   if (phase === "done") {
     if (ch.id === "w1") return <ProUnlocked stars={stars} />;
-    return <ChapterDone ch={ch} extra={<><Stars n={stars} smartLabel={m.smartLabel} />{ch.id === "w4" && <PlanCompare monthly={persona(ctx).plan} />}</>} />;
+    return <ChapterDone ch={ch} extra={<><Stars n={stars} smartLabel={m.smartLabel} />{ch.id === "w4" && <div className="light-panel"><PlanCompare monthly={persona(ctx).plan} /></div>}</>} />;
   }
 
   return (
@@ -230,6 +266,11 @@ export function Stars({ n, smartLabel }: { n: number; smartLabel?: string }) {
 
 /** The switch from web cabinet to Pro mode is a moment in the demo. */
 function ProUnlocked({ stars }: { stars: number }) {
+  const [stay, setStay] = useState(false);
+  const enter = (
+    <Link className="btn btn-primary btn-sm" href="/pro" onClick={() => { actions.celebratePro(); actions.start("2.1"); setUi({}); }}>Next: enter the trading area →</Link>
+  );
+  if (stay) return <SandboxBar label="Mission complete" next={enter} />;
   return (
     <div className="overlay overlay-dark" role="dialog" aria-modal="true" aria-label="Pro mode unlocked">
       <div className="unlock">
@@ -239,7 +280,8 @@ function ProUnlocked({ stars }: { stars: number }) {
         <p className="unlock-sub">Trading area unlocked: one screen with live news, rival bots and time that moves. ProTrader follows after World 2.</p>
         <div className="card-row"><ConceptCard id="pnl" /></div>
         <div className="row" style={{ justifyContent: "center" }}>
-          <Link className="btn btn-outline-light" href="/" onClick={() => { actions.celebratePro(); actions.start(null); }}>Learning map</Link>
+          <button className="btn btn-outline-light" onClick={() => { actions.celebratePro(); setStay(true); }}>Keep exploring here</button>
+          <Link className="btn btn-outline-light" href="/" onClick={() => { actions.celebratePro(); actions.start(null); }}>Back to learning map</Link>
           <Link className="btn btn-primary btn-lg" href="/pro" onClick={() => { actions.celebratePro(); actions.start("2.1"); setUi({}); }}>Enter the trading area →</Link>
         </div>
       </div>
