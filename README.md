@@ -27,11 +27,15 @@ Progress lives in `localStorage` (`cd-edu-v3`); "Reset progress" at the bottom o
 
 | Path | What |
 |---|---|
-| `src/lib/sim/engine.ts` | Deterministic market + account: orders, fees, savings plans, time jumps, risk score |
-| `src/lib/sim/scenarios.ts` | The main sandbox, simulated lessons and the historical replays (with scripted bot moves) |
-| `src/lib/sim/bots.ts` | Mock bots: depot curves computed from the scripted moves |
-| `src/lib/game/` | Personas, chapters/missions/bosses, the game store (XP, cards, stars) and the tour UI bus |
-| `src/components/cabinet/` | Web cabinet screens (references `1_web-kundenbereich`, `2_web-ordermaske`) |
-| `src/components/pro/` | Pro mode widgets, chart, order window, replay pieces (references `02`–`42`) |
-| `src/components/tour/` | Spotlight coach, missions, concept cards |
+| `src/app/` | Routes only: thin pages that render a feature screen |
+| `src/features/market/` | Deterministic market + account (`engine.ts`), scripted lessons and historical replays (`scenarios.ts`), mock bots, news, companies. Runs under plain `node` for `npm run check`, so it uses relative `.ts` imports |
+| `src/features/game/` | The save (XP, cards, stars, persona), personas and the tour UI bus |
+| `src/features/tour/` | Chapters/missions/bosses, spotlight coach, tour runner, plan comparison |
+| `src/features/learn/` | Learning map, mini games, concept cards and card/concept content |
+| `src/features/onboarding/` | Persona questions and the "ready" screen |
+| `src/features/home/` | The mocked comdirect start page, entry banner and the home switch |
+| `src/features/cabinet/` | Web cabinet screens (references `1_web-kundenbereich`, `2_web-ordermaske`) |
+| `src/features/pro/` | Simple trading area, ProTrader widgets, chart, order window, replay pieces (references `02`–`42`) |
+| `src/features/shell/` | App header and the sandbox bar |
+| `src/shared/` | Feature-agnostic building blocks: `ui/` (icons, logo, ring), `charts/`, `lib/` (format, rng) |
 | `docs/replay-sources.md` | Fact-check notes and sources for the replays |

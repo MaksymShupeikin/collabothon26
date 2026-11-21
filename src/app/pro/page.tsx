@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Pro from "@/components/pro/Pro";
+import Pro from "@/features/pro/Pro";
 
 export const metadata: Metadata = { title: "Pro mode · comdirect edu" };
 

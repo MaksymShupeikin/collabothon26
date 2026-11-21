@@ -1,6 +1,6 @@
 # Historical replays: fact-check notes
 
-The replays in `src/lib/sim/scenarios.ts` use **real companies and real events**, retold as short headlines we wrote ourselves.
+The replays in `src/features/market/scenarios.ts` use **real companies and real events**, retold as short headlines we wrote ourselves.
 Prices are **mock data shaped like the real curve** (keypoints below, noise in between). Figures are approximate and
 rounded; check them again before a public demo. EUR values for US stocks use a rough fixed rate.
 

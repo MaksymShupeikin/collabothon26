@@ -222,7 +222,7 @@ Copied from the ProTrader **News** widget (`42`, `10`): list with `Date, time | 
 
 Educational layer on top:
 - **Two kinds of news:** in historical replays, real events retold as short factual headlines we write ourselves; in free play, simulated macro and sector news only, with a permanent **"Simulated"** label (see §8).
-- Each news item has a hidden **type**: *signal · noise · priced in · rumor · sector · macro* (already modelled in `src/lib/news.ts`).
+- Each news item has a hidden **type**: *signal · noise · priced in · rumor · sector · macro* (already modelled in `src/features/market/news.ts`).
 - **The type is revealed only after the price reaction.** Showing it before would give away the answer.
 - After the reveal: one line on *why*, plus a link to the concept card.
 
@@ -325,7 +325,7 @@ Steady Sam is never a boss. He's the **benchmark** that's always in the table, a
 
 After World 4: **Free play** (open ProTrader market with all 4 bots) and a **"Ready for real?"** screen that links to the real comdirect depot / savings-plan page.
 
-> The current `src/lib/data/concepts.ts` has 30 cards in 5 worlds. For the MVP we cut it down to the 12 above. The other cards stay in the file for the roadmap.
+> The current `src/features/learn/concepts.ts` has 30 cards in 5 worlds. For the MVP we cut it down to the 12 above. The other cards stay in the file for the roadmap.
 
 ## 13. Gamification
 
@@ -429,7 +429,7 @@ The rule for building: **anything marked 🆕 that isn't described in this file 
 
 | Exists | Keep / change |
 |---|---|
-| `Simulator.tsx` (`main`): one broker-style trading screen with tour, bots, news, speed control, debrief | Its layout is kept 1:1 as the **World 2 trading area** (`src/components/pro/Simple.tsx`), now running on the shared sim engine and save; ProTrader (`Pro.tsx`) takes over from World 3 after the confirmed switch |
+| `Simulator.tsx` (`main`): one broker-style trading screen with tour, bots, news, speed control, debrief | Its layout is kept 1:1 as the **World 2 trading area** (`src/features/pro/Simple.tsx`), now running on the shared sim engine and save; ProTrader (`Pro.tsx`) takes over from World 3 after the confirmed switch |
 | `CoachMark.tsx`: spotlight + bubble | Keep; reuse in both surfaces |
 | `market.ts`, `news.ts`, `rng.ts`: seeded market, news types, bots, risk score | Keep; add scripted per-lesson scenarios and jump-in-time; the existing bot logic stays as a starting point for phase 2, but phase 1 uses scripted bot actions; `START_CASH` goes from 10.000 € to the persona start amount (≤ 1.000 €); `topUp` allows any amount afterwards |
 | `companies.ts`: only real companies | Keep; add the companies from the replay catalogue (Wirecard, GameStop, VW…) |

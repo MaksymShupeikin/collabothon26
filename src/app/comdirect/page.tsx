@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import ComdirectHome from "@/components/ComdirectHome";
+import ComdirectHome from "@/features/home/ComdirectHome";
 
 export const metadata: Metadata = { title: "Personal area · comdirect" };
 
