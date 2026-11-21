@@ -1,11 +1,11 @@
-import { COMPANIES, DAX_ETF, ETF_SYM } from "./companies.ts";
+import { COMPANIES, companyOf, DAX_ETF, ETF_SYM } from "./companies.ts";
 import { generateNews, type News, type NewsKind } from "./news.ts";
 import { registerUniverse, type Path, type Universe } from "./engine.ts";
 
 /**
  * Every market the player can be in.
  * - main: the player's own sandbox (web cabinet + free play), simulated future, macro/sector news only.
- * - sim-*: short simulated lessons, macro/sector news only, labelled "Simulated".
+ * - sim-*: short simulated lessons and the learning path's boss rounds, macro/sector news only, labelled "Simulated".
  * - replay-*: historical replays. Real companies, real events retold as our own short factual headlines,
  *   mock prices shaped like the real curve. Figures are approximate; see docs/replay-sources.md.
  */
@@ -53,6 +53,30 @@ const W2_MISSION: Universe = {
   ], "Simulated newswire"),
 };
 
+// ── Simulated stories (learning path, Modules 2 and 3) ─────────────────────
+
+/** 2.2: which headline is signal, and whose business does it really hit? */
+const SIM_CHIPS: Universe = {
+  id: "sim-chips", seed: 15, syms: ALL, days: 10, history: 260, etf: { sym: ETF_SYM, of: STOCKS }, startDate: "2027-02-08",
+  news: news([
+    { day: 1, kind: "noise", headline: 'Star investor on a podcast: "Telecom stocks are boring, I sold them all"', explain: "An opinion. Nothing about any telecom company's business changed.", concept: "signal-noise" },
+    { day: 3, kind: "sector", headline: "Fire at a major chip supplier: deliveries to carmakers stop for months", body: "Modern cars need hundreds of chips each. Without them, assembly lines stand still.", effects: [{ target: "sector:Auto", from: 3, days: 2, total: -0.09 }, { target: "sector:Tech", from: 3, days: 1, total: -0.01 }], explain: "Real, new information. No chips, no cars: carmakers are hit hardest, although the fire wasn't at a carmaker.", concept: "signal-noise" },
+    { day: 5, kind: "noise", headline: 'Viral post: "Carmakers will all be bankrupt by Christmas!"', explain: "A loud claim without facts. Nothing new happened to the business.", concept: "signal-noise" },
+    { day: 8, kind: "sector", headline: "Chip supplier: production restarts weeks earlier than feared", effects: [{ target: "sector:Auto", from: 8, days: 2, total: 0.04 }], explain: "Good new information: part of the drop comes back.", concept: "signal-noise" },
+  ], "Simulated newswire"),
+};
+
+/** 3.1: one year, a wild stock next to a calm ETF. */
+const SIM_SWING: Universe = {
+  id: "sim-swing", seed: 16, syms: ALL, days: 250, history: 260, etf: { sym: ETF_SYM, of: STOCKS }, startDate: "2027-01-04",
+  news: news([
+    { day: 30, kind: "macro", headline: "Interest rates rise faster than expected; growth stocks slide", effects: [{ target: "*", from: 30, days: 5, total: -0.05 }], explain: "Higher rates hit the most expensive, fastest-growing stocks hardest.", concept: "volatility" },
+    { day: 70, kind: "sector", headline: "Europe extends electric-car subsidies by three years", effects: [{ target: "sector:Auto", from: 70, days: 10, total: 0.18 }], explain: "Good news for carmakers, and the wild ones jump the most.", concept: "volatility" },
+    { day: 140, kind: "sector", headline: "Price war: electric carmakers cut prices by up to 20 %", effects: [{ target: "sector:Auto", from: 140, days: 15, total: -0.22 }], explain: "Lower prices, lower profits. The jump from spring is gone again.", concept: "volatility" },
+    { day: 200, kind: "macro", headline: "Inflation cools; stock markets rally", effects: [{ target: "*", from: 200, days: 10, total: 0.06 }], explain: "Good news for the whole market.", concept: "volatility" },
+  ], "Simulated newswire"),
+};
+
 // ── Module 4: ten years with a savings plan ────────────────────────────────
 
 const W4_PLAN: Universe = {
@@ -83,6 +107,7 @@ export type Replay = {
   win: string; // the boss rule in one sentence
   avoid: (s: { weights: Record<string, number>[]; trades: { day: number; sym: string; side: string }[] }) => boolean; // did the player avoid the boss mistake?
   budget: number;
+  sim?: true; // a simulated boss round on the learning path: nothing is hidden, nothing gets revealed
 };
 
 const day = (d: number, p: number): [number, number] => [d, p];
@@ -166,6 +191,48 @@ const COVID: Universe = {
   ]),
 };
 
+// ── Simulated boss rounds (learning path) ─────────────────────────────────
+
+const SIM_HYPE: Universe = {
+  id: "sim-hype", seed: 31, syms: ALL, days: 20, history: 260, etf: { sym: ETF_SYM, of: STOCKS }, startDate: "2027-03-01",
+  news: news([
+    { day: 1, kind: "rumor", headline: "Conference talk: start-up claims a breakthrough in quantum chips", effects: [{ target: "sector:Tech", from: 1, days: 2, total: 0.06 }], explain: "A claim, not a product. Nobody has checked it yet.", concept: "rumor" },
+    { day: 4, kind: "rumor", headline: 'Forum users: "Quantum will make every chip stock 10×"', effects: [{ target: "sector:Tech", from: 4, days: 3, total: 0.12 }], explain: "Hype, not information about any business.", concept: "rumor" },
+    { day: 8, kind: "noise", headline: "Influencer posts huge gains on tech stocks; the rally speeds up", effects: [{ target: "sector:Tech", from: 8, days: 2, total: 0.1 }], explain: "A post is not a business result.", concept: "rumor" },
+    { day: 11, kind: "signal", headline: "Independent lab: the quantum breakthrough could not be reproduced", effects: [{ target: "sector:Tech", from: 11, days: 3, total: -0.25 }], explain: "The claim didn't hold. The hope leaves the prices again, faster than it came.", concept: "rumor" },
+    { day: 15, kind: "noise", major: false, headline: "Tech stocks keep sliding as the hype fades", effects: [{ target: "sector:Tech", from: 15, days: 3, total: -0.06 }], explain: "Latecomers sell. Prices drift back toward what the businesses earn.", concept: "rumor" },
+  ], "Simulated newswire"),
+};
+
+const SIM_SNEAKERS: Universe = {
+  id: "sim-sneakers", seed: 32, syms: ALL, days: 14, history: 260, etf: { sym: ETF_SYM, of: STOCKS }, startDate: "2027-06-07",
+  news: news([
+    { day: 1, kind: "sector", headline: "Summer football tournament starts: sporting-goods makers expect record sales", effects: [{ target: "sector:Consumer", from: 1, days: 3, total: 0.07 }], explain: "Real, but everyone knows it. Hopes are already high.", concept: "diversification" },
+    { day: 3, kind: "noise", major: false, headline: 'Fan forum: "Sneaker stocks can only go up this summer"', explain: "An opinion, not information.", concept: "signal-noise" },
+    { day: 6, kind: "sector", headline: "Big retailers cancel sports-shoe orders: warehouses are overflowing", effects: [{ target: "sector:Consumer", from: 6, days: 3, total: -0.3 }], explain: "Real, bad news for sporting-goods makers. One stock can lose a third in days.", concept: "diversification" },
+    { day: 9, kind: "noise", major: false, headline: "Rest of the market shrugs: DAX little changed", explain: "The problem is in one corner of the market, not everywhere.", concept: "diversification" },
+    { day: 11, kind: "sector", headline: "Sporting-goods makers cut their outlook for the year", effects: [{ target: "sector:Consumer", from: 11, days: 2, total: -0.1 }], explain: "The bad news keeps coming. Cheaper wasn't the same as safe.", concept: "diversification" },
+  ], "Simulated newswire"),
+};
+
+const SIM_SCARE: Universe = {
+  id: "sim-scare", seed: 33, syms: ALL, days: 250, history: 260, etf: { sym: ETF_SYM, of: STOCKS }, startDate: "2027-02-01",
+  news: news([
+    { day: 10, kind: "noise", headline: "DAX closes at a record high", explain: "Looking back, the top. Nobody can see that in the moment.", concept: "volatility" },
+    { day: 20, kind: "macro", headline: "Large bank fails overnight; regulators call an emergency weekend meeting", effects: [{ target: "*", from: 20, days: 5, total: -0.12 }, { target: "sector:Finance", from: 20, days: 5, total: -0.08 }], explain: "A real shock. Fear spreads faster than facts.", concept: "volatility" },
+    { day: 28, kind: "macro", headline: "Banking fears spread: worst week for stock markets in years", effects: [{ target: "*", from: 28, days: 6, total: -0.15 }], explain: "Panic. The drop is now about a quarter.", concept: "volatility" },
+    { day: 36, kind: "macro", headline: "Central banks guarantee deposits and cut interest rates", effects: [{ target: "*", from: 36, days: 6, total: 0.08 }], explain: "Help arrives. The low often comes when things feel worst.", concept: "volatility" },
+    { day: 80, kind: "macro", headline: "Bank stress fades; lending back to normal", effects: [{ target: "*", from: 80, days: 30, total: 0.1 }], explain: "The recovery was well underway before the all-clear.", concept: "volatility" },
+    { day: 160, kind: "macro", headline: "Economy grows faster than expected", effects: [{ target: "*", from: 160, days: 15, total: 0.08 }], explain: "A real surprise: prices move.", concept: "volatility" },
+    { day: 215, kind: "macro", headline: "Inflation back at target; stocks keep climbing", effects: [{ target: "*", from: 215, days: 15, total: 0.07 }], explain: "One year on, the panic is a dip in the chart.", concept: "volatility" },
+  ], "Simulated newswire"),
+};
+
+const MAX_MISTAKE = (from: number) => (s: { trades: { day: number; sym: string; side: string }[] }) =>
+  !s.trades.some((t) => t.side === "buy" && t.day >= from && companyOf(t.sym).sector === "Tech");
+const SPREAD_OUT = (s: { weights: Record<string, number>[] }) =>
+  s.weights.every((w) => Object.entries(w).every(([sym, v]) => companyOf(sym).type === "ETF" || v <= 0.3));
+
 const HOLDS = (sym: string, max: number) => (s: { weights: Record<string, number>[] }) => s.weights.every((w) => (w[sym] ?? 0) <= max);
 
 export const REPLAYS: Record<string, Replay> = {
@@ -174,7 +241,7 @@ export const REPLAYS: Record<string, Replay> = {
     reveal: "This was Wirecard, June 2020.",
     after: "Wirecard was the first DAX member ever to go insolvent. The share went from about 104 € to around 1 € in one week. People who had everything in it lost almost everything.",
     concept: "diversification", boss: "alex", bots: ["alex", "max", "paula", "sam"], budget: 1000,
-    win: "Never have more than 30 % of your depot in one stock, and beat Alex's risk-adjusted score.",
+    win: "Never have more than 30 % of your portfolio in one stock, and beat Alex's risk-adjusted score.",
     avoid: HOLDS("WDI", 0.3),
     moves: [
       { day: 0, bot: "alex", side: "buy", buys: [["WDI", 1]], say: "They're a DAX star, what could go wrong? Everything in!",
@@ -205,7 +272,7 @@ export const REPLAYS: Record<string, Replay> = {
     ],
   },
   vw: {
-    id: "vw", universe: VW, hero: "VOW3", cover: "German carmaker (preference shares)", coverWkn: "●●●●●●",
+    id: "vw", universe: VW, hero: "VOW3", cover: "German carmaker", coverWkn: "●●●●●●",
     reveal: "This was Volkswagen, September 2015 (\"Dieselgate\").",
     after: "The share lost about a third in a few days. Other carmakers fell less: the problem was at one company, not in the whole sector.",
     concept: "signal-noise", bots: ["paula", "sam"], budget: 1000, win: "", avoid: () => true,
@@ -232,7 +299,7 @@ export const REPLAYS: Record<string, Replay> = {
     reveal: "This was the COVID crash, February to December 2020.",
     after: "The DAX fell by almost 40 % in four weeks, then was back at its record high by the end of the year. Selling at the bottom turned a temporary loss into a real one.",
     concept: "volatility", boss: "paula", bots: ["paula", "max", "alex", "sam"], budget: 1000,
-    win: "Don't sell your depot during the crash (days 25–40), and beat Paula's risk-adjusted score.",
+    win: "Don't sell your portfolio during the crash (days 25–40), and beat Paula's risk-adjusted score.",
     avoid: (s) => !s.trades.some((t) => t.side === "sell" && t.day >= 25 && t.day <= 40),
     moves: [
       { day: 0, bot: "paula", side: "buy", buys: [[DAX_ETF, 0.6], ["ALV", 0.2], ["DTE", 0.2]], say: "A nice diversified start." },
@@ -246,9 +313,63 @@ export const REPLAYS: Record<string, Replay> = {
         spot: { options: ["Buying on euphoria, not on facts", "Buying an airline", "Nothing, records mean it keeps going"], answer: 0, why: "A record high says nothing about tomorrow. He bought on a feeling, all in one stock." } },
     ],
   },
+  hype: {
+    id: "hype", universe: SIM_HYPE, hero: "NVDA", cover: "NVIDIA", coverWkn: "918422", sim: true,
+    reveal: "The quantum hype (simulated).",
+    after: "The breakthrough was never confirmed. Tech stocks gave back the whole rally and more within days. Whoever bought late, on posts and forum buzz, paid for the early sellers' profits.",
+    concept: "rumor", boss: "max", bots: ["max", "alex", "paula", "sam"], budget: 1000,
+    win: "Don't buy tech stocks once the hype is running (from day 6), and beat Max's risk-adjusted score.",
+    avoid: MAX_MISTAKE(6),
+    moves: [
+      { day: 0, bot: "sam", side: "buy", buys: [[ETF_SYM, 1]], say: "World ETF, like every month." },
+      { day: 0, bot: "paula", side: "buy", buys: [["SAP", 0.25], ["ALV", 0.25], ["DTE", 0.25], [ETF_SYM, 0.25]], say: "A bit of everything. Calm and spread out." },
+      { day: 0, bot: "alex", side: "buy", buys: [["MSFT", 1]], say: "I only trust one company. All in Microsoft." },
+      { day: 9, bot: "max", side: "buy", buys: [["NVDA", 1]], say: "Tech is up 30 % in a week! Everyone's getting rich. All in!",
+        spot: { options: ["Buying after the hype already ran", "Buying too little", "Nothing, the trend is his friend"], answer: 0, why: "Prices had already jumped on a claim and forum posts. Nothing about the businesses had changed." } },
+      { day: 13, bot: "max", side: "sell", sells: ["NVDA"], say: "It's crashing! Get me out!",
+        spot: { options: ["Selling in panic after buying the hype", "Selling too slowly", "Nothing, he cut his losses"], answer: 0, why: "Bought high on hype, sold low in panic: the FOMO round trip." } },
+    ],
+  },
+  sneakers: {
+    id: "sneakers", universe: SIM_SNEAKERS, hero: "ADS", cover: "adidas", coverWkn: "A1EWWW", sim: true,
+    reveal: "The sneaker summer (simulated).",
+    after: "One piece of sector news took about a third off adidas in three days, and the outlook cut took more. Alex had everything in it. A portfolio spread over many companies barely noticed.",
+    concept: "diversification", boss: "alex", bots: ["alex", "max", "paula", "sam"], budget: 1000,
+    win: "Never have more than 30 % of your portfolio in one stock, and beat Alex's risk-adjusted score.",
+    avoid: SPREAD_OUT,
+    moves: [
+      { day: 0, bot: "alex", side: "buy", buys: [["ADS", 1]], say: "Tournament summer, everyone buys sneakers. All in adidas!",
+        spot: { options: ["Everything in one stock", "Buying a consumer company", "Nothing, the tournament is a sure thing"], answer: 0, why: "There's no sure thing. One stock can always fall hard, for reasons nobody expected." } },
+      { day: 0, bot: "sam", side: "buy", buys: [[ETF_SYM, 1]], say: "Same as every month: the whole world." },
+      { day: 0, bot: "paula", side: "buy", buys: [["SAP", 0.25], ["ALV", 0.25], ["DTE", 0.25], [ETF_SYM, 0.25]], say: "A bit of everything. I feel safe." },
+      { day: 6, bot: "paula", side: "sell", sells: ["SAP", "ALV", "DTE", ETF_SYM], say: "Sneaker stocks crashed! Sell everything, now!",
+        spot: { options: ["Selling everything over news about a stock she doesn't own", "Not selling fast enough", "Nothing, selling is always safe"], answer: 0, why: "Paula doesn't even own adidas. Her stocks barely moved." } },
+      { day: 8, bot: "max", side: "buy", buys: [["ADS", 1]], say: "It's down 30 %, that's a bargain! All in!",
+        spot: { options: ["Buying because it's cheaper, not on facts", "Buying too little", "Nothing, it has to bounce back"], answer: 0, why: "\"Cheaper\" isn't \"safe\". The orders really were cancelled, and the outlook cut came next." } },
+    ],
+  },
+  scare: {
+    id: "scare", universe: SIM_SCARE, hero: ETF_SYM, cover: "MSCI World ETF", coverWkn: "A0RPWH", sim: true,
+    reveal: "The banking scare (simulated).",
+    after: "Stocks fell about a quarter in three weeks, then climbed back over the following months. Selling in the panic turned a temporary loss into a real one.",
+    concept: "volatility", boss: "paula", bots: ["paula", "max", "alex", "sam"], budget: 1000,
+    win: "Don't sell during the crash (days 20–45), and beat Paula's risk-adjusted score.",
+    avoid: (s) => !s.trades.some((t) => t.side === "sell" && t.day >= 20 && t.day <= 45),
+    moves: [
+      { day: 0, bot: "paula", side: "buy", buys: [[ETF_SYM, 0.6], ["ALV", 0.2], ["DTE", 0.2]], say: "A nice diversified start." },
+      { day: 0, bot: "sam", side: "buy", buys: [[ETF_SYM, 1]], say: "World ETF. And then: nothing." },
+      { day: 0, bot: "alex", side: "buy", buys: [["ALV", 1]], say: "Insurers always win. All in Allianz!" },
+      { day: 10, bot: "max", side: "buy", buys: [["SAP", 1]], say: "Record high! Everyone's getting rich. All in!",
+        spot: { options: ["Buying on euphoria, not on facts", "Buying a software company", "Nothing, records mean it keeps going"], answer: 0, why: "A record high says nothing about tomorrow. He bought on a feeling, all in one stock." } },
+      { day: 32, bot: "paula", side: "sell", sells: [ETF_SYM, "ALV", "DTE"], say: "Down 25 %?! Get me out before it goes to zero!",
+        spot: { options: ["Selling after a big drop, near the bottom", "Not having a savings plan", "Nothing, cash is safe"], answer: 0, why: "Selling locks in the loss. Her horizon is years, not weeks." } },
+      { day: 130, bot: "paula", side: "buy", buys: [[ETF_SYM, 1]], say: "OK, it's been rising for months. Safe to get back in now!",
+        spot: { options: ["Buying back higher than she sold", "Buying an ETF", "Nothing, she's careful"], answer: 0, why: "She sold low and bought back higher: the cost of panic." } },
+    ],
+  },
 };
 
-export const SIM_LESSONS = { priced: SIM_PRICED, rumor: SIM_RUMOR, w2: W2_MISSION, plan: W4_PLAN };
+export const SIM_LESSONS = { priced: SIM_PRICED, rumor: SIM_RUMOR, w2: W2_MISSION, plan: W4_PLAN, chips: SIM_CHIPS, swing: SIM_SWING };
 
 for (const r of Object.values(REPLAYS)) r.moves.sort((a, b) => a.day - b.day);
-for (const u of [MAIN, SIM_PRICED, SIM_RUMOR, W2_MISSION, W4_PLAN, ...Object.values(REPLAYS).map((r) => r.universe)]) registerUniverse(u);
+for (const u of [MAIN, ...Object.values(SIM_LESSONS), ...Object.values(REPLAYS).map((r) => r.universe)]) registerUniverse(u);

@@ -4,10 +4,10 @@ import { useEffect, useRef, useState } from "react";
 import { companyOf, ETF_SYM } from "@/features/market/companies";
 import { cls, dateDE, eur, num, pct, qtyFmt, shortDay, signed } from "@/shared/lib/format";
 import { KIND_LABEL, type News } from "@/features/market/news";
-import { chapterById, worldOpen, type Chapter } from "@/features/tour/chapters";
+import { chapterById, isHistory, worldOpen, type Chapter } from "@/features/tour/chapters";
 import { PERSONAS } from "@/features/game/personas";
 import { actions, getSave, proTraderOffered, useGame } from "@/features/game/store";
-import { setUi } from "@/features/game/ui";
+import { setUi, useUi } from "@/features/game/ui";
 import { addPlan, advance, deposit, ask, bid, cancelOrder, companiesOf, costBasis, dateOf, depotValue, fee, placeOrder, pricesOf, priceAt, round2, universeOf, type OrderInput, type OrderType, type Sim, type SimEvent, type Validity, newSim } from "@/features/market/engine";
 import { REPLAYS, SIM_LESSONS, type BotMove, type Replay } from "@/features/market/scenarios";
 import Icon from "@/shared/ui/Icon";
@@ -34,7 +34,7 @@ export default function Pro() {
   const ch = save.active ? chapterById(save.active) : undefined;
   const pro = ch?.surface === "pro" ? ch : undefined;
   if (!save.persona) return <Gate text="Answer three quick questions first." href="/start" cta="Start" />;
-  if (!save.proUnlocked && !save.allUnlocked) return <Gate text="The trading area unlocks after the Module 1 mission: your first stock." href="/" cta="Learning map" />;
+  if (!save.proUnlocked && !save.allUnlocked && !(pro && isHistory(pro))) return <Gate text="The trading area unlocks after the Module 1 mission: your first stock." href="/" cta="Learning map" />;
   const mode: Mode = pro?.replay ? { kind: "replay", replay: REPLAYS[pro.replay] } : pro?.lesson ? { kind: "lesson", id: SIM_LESSONS[pro.lesson as keyof typeof SIM_LESSONS].id } : { kind: "main" };
   // The learner starts on the simple trading area. Module 2 always runs there; ProTrader takes over
   // from Module 3 (and in free play) only after the learner has confirmed the switch.
@@ -87,8 +87,13 @@ function Desk({ mode, chapter, layout, offerSwitch }: { mode: Mode; chapter?: Ch
   const [startDay] = useState(sim.day);
 
   const comps = companiesOf(u);
-  const cover = (sym: string) => (replay && sym === replay.hero && !ended(sim) ? replay.cover : companyOf(sym).short);
-  const coverWkn = (sym: string) => (replay && sym === replay.hero && !ended(sim) ? replay.coverWkn : companyOf(sym).wkn);
+  // replays: the company name appears when the guided tour's last pop-up is finished; without a tour, once the hero's last headline has played out (no headlines → at the end)
+  const tourFinished = useUi().tourFinished === chapter?.id;
+  const heroDays = replay ? u.news.filter((n) => n.sym === replay.hero).map((n) => n.day) : [];
+  const storyEnd = heroDays.length ? Math.max(...heroDays) : u.days;
+  const masked = (s: Sim) => !!replay && (chapter?.kind === "chapter" ? !tourFinished : s.day < storyEnd);
+  const cover = (sym: string) => (replay && sym === replay.hero && masked(sim) ? replay.cover : companyOf(sym).short);
+  const coverWkn = (sym: string) => (replay && sym === replay.hero && masked(sim) ? replay.coverWkn : companyOf(sym).wkn);
   const [sym, setSym] = useState<string>(replay ? replay.hero : mode.kind === "lesson" && mode.id === "w4-plan" ? ETF_SYM : mode.kind === "lesson" ? ETF_SYM : "DTE");
   const [speed, setSpeed] = useState(0);
   const [orderOpen, setOrderOpen] = useState(false);
@@ -115,7 +120,7 @@ function Desk({ mode, chapter, layout, offerSwitch }: { mode: Mode; chapter?: Ch
   useEffect(() => {
     setUi({ surface: "pro", day: sim.day, dayDelta: sim.day - startDay, sym, orderOpen, speed, ended: isEnded, planSet });
   }, [sim.day, startDay, sym, orderOpen, speed, isEnded, planSet]);
-  useEffect(() => () => setUi({ orderOpen: false, ended: false, planSet: false, day: 0, dayDelta: 0, w2Answered: 0, w2Right: 0 }), []);
+  useEffect(() => () => setUi({ tourFinished: undefined, orderOpen: false, ended: false, planSet: false, day: 0, dayDelta: 0, w2Answered: 0, w2Right: 0 }), []);
 
   // ── time ──
   const toast = (text: string) => setToasts((t) => [...t.slice(-2), { id: Date.now() + Math.random(), text }]);
@@ -195,7 +200,7 @@ function Desk({ mode, chapter, layout, offerSwitch }: { mode: Mode; chapter?: Ch
   })();
   const lastMove = replay?.moves.filter((m) => m.day <= sim.day && m.day >= sim.day - 2).at(-1);
   const show = (w: string) => !hidden[w];
-  const simulated = mode.kind !== "replay";
+  const simulated = mode.kind !== "replay" || !!mode.replay.sim;
 
   const overlays = (
     <>
@@ -260,14 +265,14 @@ function Desk({ mode, chapter, layout, offerSwitch }: { mode: Mode; chapter?: Ch
         <div className="pt-field pt-widgets"><span>Widgets</span><button className="pt-yellow" onClick={() => setWidgetsOpen(!widgetsOpen)} aria-label="Show or hide widgets" aria-expanded={widgetsOpen}>+</button>
           {widgetsOpen && (
             <div className="pt-menu" role="menu">
-              {["Watchlist", "Depot", "Chart", "Orderbook", "News", ...(replay ? ["Rivals"] : [])].map((w) => (
+              {["Watchlist", "Portfolio", "Chart", "Orderbook", "News", ...(replay ? ["Rivals"] : [])].map((w) => (
                 <label key={w} className="xs"><input type="checkbox" checked={show(w)} onChange={() => setHidden({ ...hidden, [w]: !hidden[w] })} /> {w}</label>
               ))}
             </div>
           )}
         </div>
         <div className="pt-figs num">
-          <span><small>Depot value (EUR)</small>{num(dv)}</span>
+          <span><small>Portfolio value (EUR)</small>{num(dv)}</span>
           <span><small>Available (EUR)</small>{num(round2(sim.acct.cash - sim.acct.orders.filter((o) => o.side === "buy").reduce((v, o) => v + o.qty * o.limit + fee(o.qty * o.limit), 0)))}</span>
           <span className="hide-sm"><small>Intraday credit (EUR)</small>0,00</span>
           <span className="hide-sm"><small>Total (EUR)</small>{num(total)}</span>
@@ -281,7 +286,7 @@ function Desk({ mode, chapter, layout, offerSwitch }: { mode: Mode; chapter?: Ch
           )}
         </div>
         <div className="pt-right">
-          <span className="pt-figs num"><span><small>Depot number</small>{mode.kind === "main" ? "1234567" : replay ? "Replay" : "Practice"}</span></span>
+          <span className="pt-figs num"><span><small>Portfolio number</small>{mode.kind === "main" ? "1234567" : replay && !replay.sim ? "Replay" : "Practice"}</span></span>
           <Link className="pt-logout" href="/">Exit</Link>
         </div>
       </header>
@@ -290,7 +295,7 @@ function Desk({ mode, chapter, layout, offerSwitch }: { mode: Mode; chapter?: Ch
         jump={(n) => { setBreaking(null); stepTime(n, mode.kind === "replay"); }}
         next={() => { setBreaking(null); const nx = u.news.find((n) => n.major && n.day > simRef.current.day); const mv = replay?.moves.find((m) => m.day > simRef.current.day); const to = Math.min(nx?.day ?? u.days, mv?.day ?? u.days); stepTime(Math.max(1, to - simRef.current.day), true); }}
         progress={mode.kind === "main" ? undefined : `${sim.day} / ${u.days} days`}
-        label={replay ? "Historical replay · headlines retold, prices shaped like the real curve" : "Simulated market"}
+        label={replay && !replay.sim ? "Historical replay · headlines retold, prices shaped like the real curve" : "Simulated market"}
         breaking={breaking}
         reveal={isEnded && replay ? replay.reveal : undefined}
         onReveal={replay && chapter?.kind !== "chapter" ? () => setRevealOpen(true) : undefined} />
@@ -318,10 +323,10 @@ function Desk({ mode, chapter, layout, offerSwitch }: { mode: Mode; chapter?: Ch
           </Widget>
         )}
 
-        {show("Depot") && (
-          <Widget id="w-depot" title="Depot" className="g-depot">
+        {show("Portfolio") && (
+          <Widget id="w-depot" title="Portfolio" className="g-depot">
             <div className="pt-depot-sum num">
-              <span>Depot value (EUR) <strong>{num(dv)}</strong></span>
+              <span>Portfolio value (EUR) <strong>{num(dv)}</strong></span>
               <span>Purchase value (EUR) <strong>{num(costBasis(sim))}</strong></span>
               <span>Diff. since purchase <strong className={cls(dv - costBasis(sim))}>{signed(dv - costBasis(sim))}</strong></span>
             </div>

@@ -11,7 +11,7 @@ export const BOTS: Record<BotId, { name: string; habit: string; concept: string 
 export type BotRun = { id: BotId; acct: Account };
 
 /**
- * Scripted mock bots (phase 1): the moves are hand-written per replay, the depot curves follow from them.
+ * Scripted mock bots (phase 1): the moves are hand-written per replay, the portfolio curves follow from them.
  * Deterministic, so the "precomputed" leaderboard is the same on every run.
  */
 export function runBots(r: Replay): BotRun[] {

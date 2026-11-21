@@ -15,10 +15,10 @@ import { MistakeCam, useBoard } from "@/features/pro/ReplayParts";
 /**
  * The simple trading area (the trading screen from main): one screen, three columns.
  * Module 2 runs here; ProTrader takes over from Module 3, once the learner confirms the switch.
- * Same market, same depot, same replays as ProTrader: only the layout is simpler.
+ * Same market, same portfolio, same replays as ProTrader: only the layout is simpler.
  */
 const PACES = [{ speed: 1, label: "1 day/s" }, { speed: 5, label: "1 week/s" }];
-const TOPUP_MAX = 100_000; // keeps play money in a realistic range for a beginner depot
+const TOPUP_MAX = 100_000; // keeps play money in a realistic range for a beginner portfolio
 
 export type SimpleProps = {
   sim: Sim; u: Universe; comps: Company[]; sym: string; setSym: (s: string) => void;
@@ -142,7 +142,7 @@ export default function SimpleDesk(p: SimpleProps) {
                 )}
                 {tab === "rivals" && (replay
                   ? <ReplayRivals replay={replay} sim={sim} answers={p.answers} cover={cover} />
-                  : <EmptyState icon="max" title="No rivals in this market" hint="Rival bots trade with you in the historical replays." />)}
+                  : <EmptyState icon="max" title="No rivals in this market" hint="Rival bots trade with you in boss rounds and History mode." />)}
               </div>
             </section>
           </div>

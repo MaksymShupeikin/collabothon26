@@ -120,17 +120,17 @@ export const actions = {
   setAllUnlocked(on: boolean) { update((s) => ({ ...s, allUnlocked: on, proUnlocked: s.proUnlocked || on })); },
   reset() { write(EMPTY); },
 
-  /** Girokonto → Verrechnungskonto (or back). */
+  /** Current account → Trading account (or back). */
   transfer(amount: number, toTrading = true): string | null {
     const s = read();
     amount = round2(amount);
     if (!(amount > 0)) return "Enter an amount above 0,00 €.";
-    if (toTrading && amount > s.giro + 1e-9) return "Not enough money on the Girokonto.";
+    if (toTrading && amount > s.giro + 1e-9) return "Not enough money on the current account.";
     if (!toTrading && amount > s.sim.acct.cash + 1e-9) return "Not enough money on the trading account.";
     const sim = toTrading ? deposit(s.sim, amount) : withdraw(s.sim, amount);
     let n: Save = { ...s, giro: round2(s.giro + (toTrading ? -amount : amount)), sim };
-    n = addTx(n, { day: s.sim.day, account: "giro", text: toTrading ? "Transfer to Verrechnungskonto" : "Transfer from Verrechnungskonto", amount: toTrading ? -amount : amount });
-    n = addTx(n, { day: s.sim.day, account: "verrechnung", text: toTrading ? "Transfer from Girokonto" : "Transfer to Girokonto", amount: toTrading ? amount : -amount });
+    n = addTx(n, { day: s.sim.day, account: "giro", text: toTrading ? "Transfer to trading account" : "Transfer from trading account", amount: toTrading ? -amount : amount });
+    n = addTx(n, { day: s.sim.day, account: "verrechnung", text: toTrading ? "Transfer from current account" : "Transfer to current account", amount: toTrading ? amount : -amount });
     write(n);
     return null;
   },
@@ -158,7 +158,7 @@ export const actions = {
     write(logEvents({ ...s, sim }, events));
     return events;
   },
-  /** Fresh account for the Module 1 mission: money back on the Girokonto, nothing in the depot. */
+  /** Fresh account for the Module 1 mission: money back on the current account, nothing in the portfolio. */
   resetSandbox() {
     const s = read();
     const p = s.persona ? PERSONAS[s.persona].start : 100;

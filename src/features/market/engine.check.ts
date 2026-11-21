@@ -50,6 +50,13 @@ assert.ok(max.acct.values.at(-1)! < 600, "FOMO Max loses on GameStop");
 const paula = runBots(REPLAYS.covid).find((b) => b.id === "paula")!;
 const samC = runBots(REPLAYS.covid).find((b) => b.id === "sam")!;
 assert.ok(riskScore(paula.acct.values) < riskScore(samC.acct.values), "Panic Paula trails Steady Sam");
+// simulated boss rounds: every boss trails Steady Sam, so beating the boss with the safe strategy is possible
+for (const id of ["hype", "sneakers", "scare"]) {
+  const run = runBots(REPLAYS[id]);
+  const boss = run.find((b) => b.id === REPLAYS[id].boss)!, s = run.find((b) => b.id === "sam")!;
+  assert.ok(riskScore(boss.acct.values) < riskScore(s.acct.values), `${id}: the boss trails Steady Sam`);
+  assert.ok(REPLAYS[id].universe.news.every((n) => !n.sym), `${id}: simulated news is never about one real company`);
+}
 assert.ok(MAIN.news.every((n) => !n.sym), "free-play news is never about one real company");
 
 console.log("engine.check: all good");

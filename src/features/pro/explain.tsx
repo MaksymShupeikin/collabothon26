@@ -13,12 +13,12 @@ export const useProView = () => useContext(ProView);
 
 /** 🆕 Plain-language glossary for every label a first-timer stumbles over. */
 export const GLOSSARY = {
-  "depot-value": "Depot value: what everything in your depot is worth at today's price.",
+  "depot-value": "Portfolio value: what everything in your portfolio is worth at today's price.",
   available: "Available: cash on your trading account you can still spend. Money held back for open buy orders is already taken out.",
   intraday: "Intraday credit: a loan for trades opened and closed on the same day. A tool for experienced traders; in the sandbox it stays at 0.",
-  total: "Total: cash plus depot value. Everything you have here.",
-  "depot-number": "Depot number: the ID of your securities account, like an IBAN for stocks.",
-  workspaces: "Workspaces: saved layouts of widgets. Switch between the depot overview and a single-stock focus.",
+  total: "Total: cash plus portfolio value. Everything you have here.",
+  "depot-number": "Portfolio number: the ID of your securities account, like an IBAN for stocks.",
+  workspaces: "Workspaces: saved layouts of widgets. Switch between the portfolio overview and a single-stock focus.",
   widgets: "Widgets: the panels on this screen. Show or hide them here.",
   exchange: "Exchange: where your trade happens. Xetra is Germany's main exchange (9:00–17:30), Tradegate also trades in the evening (8:00–22:00).",
   last: "Last: the price of the most recent trade.",
