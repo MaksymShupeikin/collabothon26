@@ -14,6 +14,7 @@ export type Step = {
   quiz?: { q: string; options: string[]; answer: number; why: string };
   game?: "basket" | "eggs" | "snowball";
   place?: "corner"; // keep the bubble out of the way (e.g. of a dropdown)
+  zone?: string; // data-tour area the player may use on a task step, when it's wider than the target
 };
 export type Mission = {
   goal: (c: Ctx) => string;
@@ -61,7 +62,6 @@ const W1: Chapter[] = [
       { target: "acc-giro", title: "Girokonto", text: (c) => `Your current account. Your ${PERSONAS[c.save.persona ?? "starter"].start} € of play money starts here.` },
       { target: "acc-verrechnung", title: "Trading account", text: "This is your cash for trading. It's separate from your current account, and it's empty for now." },
       { target: "acc-depot", title: "Depot", text: "Your depot holds the stocks and ETFs you own. Nothing yet." },
-      { target: "acc-total", title: "Total", text: "Gesamt adds it all up: the money and everything in your depot." },
       { target: "nav-depot", title: "Look inside", text: "Every account has its own page.", task: "Open your depot.", done: (c) => c.ui.view === "depot" },
       { target: "depot-empty", title: "Empty depot", text: "This is where your first stock will show up, with its profit or loss." },
       { target: "nav-home", title: "Back to the overview", text: "The overview is always one click away.", task: "Go back to the overview.", done: (c) => c.ui.view === "home" },
@@ -283,7 +283,7 @@ const W4: Chapter[] = [
     steps: [
       { title: "A savings plan", text: "Same amount every month, automatically. No timing, no stress." },
       { target: "pt-order", title: "Open the order window", text: "Savings plans are set up in the order window.", task: "Open the order window.", done: (c) => !!c.ui.orderOpen },
-      { target: "w-order-plan", title: "Savings plan tab", text: "Switch to the savings plan tab.", task: (c) => `Set up a ${PERSONAS[c.save.persona ?? "starter"].plan} €/month plan on the ETF.`, done: (c) => !!c.ui.planSet },
+      { target: "w-order-plan", zone: "w-order", title: "Savings plan tab", text: "Switch to the savings plan tab.", task: (c) => `Set up a ${PERSONAS[c.save.persona ?? "starter"].plan} €/month plan on the ETF.`, done: (c) => !!c.ui.planSet },
       { target: "time-machine", title: "Fast-forward", text: "Now let time work.", task: "Jump +1 year three times.", done: (c) => (c.ui.day as number ?? 0) >= 750 },
       { target: "w-depot", title: "Cost averaging", text: "In the bad year your plan bought more shares for the same money. That's the cost-average effect." },
     ],
