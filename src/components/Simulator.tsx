@@ -36,9 +36,9 @@ const lineColor = (id: string, i: number) => (id === "you" ? "var(--color-accent
 type Ctx = { selected: string; qty: number; holdings: number; speed: number; side: Side; type: OrderType };
 const TOUR: (CoachStep & { done?: (c: Ctx) => boolean })[] = [
   { title: "Your practice depot", text: "The real comdirect trading screen, with 10,000 € play money." },
-  { target: "depot", title: "Your account", text: "Total value, cash and profit or loss — always on top." },
-  { target: "pricelist", title: "Find a stock", text: "Search by name, ticker or WKN.", task: "Find and pick SAP.", done: (c) => c.selected === "SAP" },
-  { target: "detail", title: "Chart", text: "The price over time. Your trades appear as dots." },
+  { target: "depot", title: "Your account", text: "Total value, cash and profit or loss. Low on cash? Top up here." },
+  { target: "search", place: "side", title: "Find a stock", text: "Type a name, ticker or WKN, then pick the stock from the list.", task: "Type SAP and pick it.", done: (c) => c.selected === "SAP" },
+  { target: "detail", title: "Chart", text: "One candle per trading day: green when the price rose, red when it fell. Your trades show up as arrows." },
   { target: "side", title: "Buy or sell", text: "You can only sell what you own.", task: "Select Buy.", done: (c) => c.side === "buy" },
   { target: "qty", title: "Quantity", text: "Number of shares.", task: "Enter 5.", done: (c) => c.qty === 5 },
   { target: "ordertype", title: "Order type", text: "Market: now. Limit: only at your price. Stop: when the price hits a level." },
@@ -246,8 +246,9 @@ export default function Simulator({ tour = false }: { tour?: boolean }) {
 
         {/* Center: stock search + chart of the selected stock */}
         <div className="trade-col">
-          <section className="panel p-search" aria-label="Search stocks">
-            <div className="search" data-tour="pricelist">
+          {/* Tour target is the panel: it has its own z-index, so a child can't rise above the tour overlay. */}
+          <section className="panel p-search" aria-label="Search stocks" data-tour="search">
+            <div className="search">
               <input type="search" placeholder="Search stocks — name, ticker or WKN" value={query} aria-label="Search stocks"
                 onChange={(e) => { setQuery(e.target.value); setSearchOpen(true); }} onFocus={() => setSearchOpen(true)} onBlur={() => setSearchOpen(false)}
                 onKeyDown={(e) => { if (e.key === "Enter" && results[0]) pick(results[0].sym); if (e.key === "Escape") e.currentTarget.blur(); }} />
