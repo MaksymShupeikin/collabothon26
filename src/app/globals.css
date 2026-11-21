@@ -89,6 +89,8 @@ h3 { font-size: var(--text-base); line-height: 24px; font-weight: 700; }
 .chip[aria-pressed="true"] { background: var(--color-ink); color: var(--color-white); border-color: var(--color-ink); }
 .field { display: flex; flex-direction: column; gap: var(--space-2); font-size: var(--text-xs); color: var(--color-ink-2); }
 .field input, .field select { border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: var(--space-3) var(--space-4); font-size: var(--text-sm); color: var(--color-ink); background: var(--color-white); }
+/* Native arrow hugs the rounded edge; draw our own chevron with room to breathe. */
+.field select { appearance: none; -webkit-appearance: none; cursor: pointer; padding-right: calc(var(--space-4) + 20px); background: var(--color-white) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%230b1f26' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right var(--space-4) center / 12px 8px; }
 
 /* ── Header of our own pages ── */
 .header { background: var(--color-ink); color: var(--color-white); container-type: inline-size; }
@@ -97,7 +99,7 @@ h3 { font-size: var(--text-base); line-height: 24px; font-weight: 700; }
 .logo-mark { --x: calc(max(0px, (100cqw - 1180px) / 2) + var(--space-5)); --out: min(var(--space-9), var(--x)); display: flex; align-items: center; height: 64px; background: var(--color-accent); color: var(--color-ink); margin-left: calc(-1 * var(--out)); padding: 0 var(--space-6) 0 var(--out); }
 .logo-edu { color: var(--color-accent); font-weight: 700; font-size: var(--text-lg); }
 .hnav { display: flex; align-self: stretch; gap: var(--space-6); }
-.hnav a { display: flex; align-items: center; font-weight: 700; font-size: var(--text-sm); text-decoration: none; color: var(--color-bg-dark); border-bottom: 3px solid transparent; border-top: 3px solid transparent; transition: color var(--ease), border-color var(--ease); }
+.hnav a { display: flex; white-space: nowrap; flex-shrink: 0; align-items: center; font-weight: 700; font-size: var(--text-sm); text-decoration: none; color: var(--color-bg-dark); border-bottom: 3px solid transparent; border-top: 3px solid transparent; transition: color var(--ease), border-color var(--ease); }
 .hnav a:hover { color: var(--color-white); }
 .hnav a[aria-current="page"] { color: var(--color-white); border-bottom-color: var(--color-accent); }
 .user { margin-left: auto; display: flex; align-items: center; gap: var(--space-4); }
