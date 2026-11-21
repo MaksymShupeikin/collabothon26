@@ -149,14 +149,21 @@ h3 { font-size: var(--text-base); line-height: 24px; font-weight: 700; }
 .chart-body svg { max-height: 100%; }
 .chart-body { position: relative; }
 .candle-chart { flex: 1; align-self: stretch; min-height: 240px; }
-.chart-empty { position: absolute; inset: 0; display: grid; place-items: center; }
+.chart-empty { position: absolute; inset: 0; display: grid; place-items: center; z-index: 2; pointer-events: none; }
+.chart-empty .empty-state { background: var(--color-white); border-radius: var(--radius-md); min-height: 0; box-shadow: var(--shadow-lg); }
 .tabs { display: flex; gap: var(--space-5); padding: 0 var(--space-5); border-bottom: 1px solid var(--color-bg-light); }
 .tabs button { border: 0; background: none; padding: var(--space-4) 0; font-weight: 700; font-size: var(--text-sm); color: var(--color-ink-2); border-bottom: 3px solid transparent; cursor: pointer; transition: color var(--ease), border-color var(--ease); }
 .tabs button:hover { color: var(--color-ink); }
 .tabs button[aria-selected="true"] { color: var(--color-ink); border-bottom-color: var(--color-accent); }
 .count { display: inline-grid; place-items: center; min-width: 20px; height: 20px; padding: 0 var(--space-2); margin-left: var(--space-2); border-radius: var(--radius-lg); background: var(--color-bg-light); font-size: var(--text-xs); }
 .count.hot { background: var(--color-accent); color: var(--color-ink); }
-.empty { color: var(--color-ink-2); font-size: var(--text-sm); padding: var(--space-4) 0; }
+.empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-2); text-align: center; padding: var(--space-6) var(--space-5); min-height: 100%; }
+.empty-state svg { margin-bottom: var(--space-2); opacity: 0.9; }
+.empty-state strong { font-size: var(--text-sm); }
+.empty-state span { font-size: var(--text-xs); color: var(--color-ink-2); max-width: 28ch; line-height: 18.4px; }
+.panel-body:has(> .empty-state), .panel-body:has(> .news > .empty-state) { display: flex; flex-direction: column; } /* center the empty state in its panel */
+.news:has(> .empty-state) { flex: 1; }
+.panel-body > .empty-state, .news > .empty-state { flex: 1; }
 .rivals { display: flex; flex-direction: column; gap: var(--space-5); }
 
 /* Stock search: a combobox in the chart header instead of a permanent list. */
