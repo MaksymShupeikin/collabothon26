@@ -112,12 +112,12 @@ export default function LearningMap() {
       </section>
 
       <section className={s.modes} aria-label="Play modes">
-        <ModeTile open={proOpen} lockText="After World 1" icon="chart" title="Market Simulator" line="Live news. Beat the bots."
+        <ModeTile open={proOpen} lockText="After World 1" icon="chart" title="Real Market" line="Simple or Pro view. Beat the bots."
           onOpen={() => { actions.start(null); setUi({}); router.push("/pro"); }} />
+        {/* shortcut: the game isn't built yet, so the tile opens nothing; wire onOpen when it exists. */}
+        <ModeTile open icon="sprout" title="Investor Simulator" line="30 years of life in 10 minutes." onOpen={() => {}} />
         <ModeTile open={!!replay} lockText="In World 2" icon="hourglass" title="History Mode" line={replay ? replay.title.replace(/^Boss: /, "vs. ") : "Real crashes, hidden dates."}
           onOpen={() => replay && launch(replay)} />
-        <ModeTile open icon="play" title="Ready for real" line={allDone ? "You're ready." : "Your real depot."} highlight={allDone}
-          onOpen={() => router.push("/ready")} />
       </section>
 
       <section aria-labelledby="worlds-h">
@@ -127,6 +127,15 @@ export default function LearningMap() {
             <WorldTile key={w.n} w={w} save={save} next={next} launch={launch} />
           ))}
         </ol>
+        {/* The finish line of the path: the step from sandbox to a real depot. */}
+        <Link href="/ready" className={`${s.mode} ${s.finish} ${allDone ? s.modeHot : ""}`}>
+          <Icon name="play" size={44} round />
+          <span className={s.modeText}>
+            <strong>Ready for real</strong>
+            <span className="xs">{allDone ? "You're ready. Open your real depot." : "When you're done here: your real depot."}</span>
+          </span>
+          <Arrow />
+        </Link>
       </section>
 
 

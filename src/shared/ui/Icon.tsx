@@ -9,7 +9,9 @@ const ICONS: Record<string, (c: C) => ReactNode> = {
   // modes
   compass: ({ fg }) => <><circle cx="24" cy="24" r="16" fill="none" stroke={fg} strokeWidth="4" /><path d="M24 12l5 12-5 12-5-12z" fill={ACC} /></>,
   chart: ({ fg }) => <><path d="M8 40h32" stroke={fg} strokeWidth="4" strokeLinecap="round" /><rect x="9.5" y="27.5" width="8" height="9" rx="1.5" fill="none" stroke={fg} strokeWidth="3" /><rect x="20.5" y="18.5" width="8" height="18" rx="1.5" fill="none" stroke={fg} strokeWidth="3" /><rect x="31" y="8" width="8" height="30" rx="1.5" fill={ACC} /></>,
-  hourglass: ({ fg }) => <><path d="M10 7h28M10 41h28" stroke={fg} strokeWidth="4" strokeLinecap="round" /><path d="M14 7c0 10 8 13 8 17s-8 7-8 17h20c0-10-8-13-8-17s8-7 8-17z" fill="none" stroke={fg} strokeWidth="4" strokeLinejoin="round" /><path d="M19 14h10c-1 4-3 5-5 6-2-1-4-2-5-6zM18 37c1-3 3-5 6-5s5 2 6 5z" fill={ACC} /></>,
+  // a sapling growing out of a coin stack: money that grows over a lifetime
+  sprout: ({ fg }) => <><rect x="10" y="35" width="28" height="7" rx="3.5" fill={fg} /><rect x="13" y="27" width="22" height="7" rx="3.5" fill="none" stroke={fg} strokeWidth="3" /><path d="M24 27V13" stroke={fg} strokeWidth="4" strokeLinecap="round" /><path d="M24 21c-2-7-8-9-14-8 0 6 6 10 14 8zM24 14c2-7 8-9 14-8 0 6-6 10-14 8z" fill={ACC} /></>,
+  hourglass:({ fg }) => <><path d="M10 7h28M10 41h28" stroke={fg} strokeWidth="4" strokeLinecap="round" /><path d="M14 7c0 10 8 13 8 17s-8 7-8 17h20c0-10-8-13-8-17s8-7 8-17z" fill="none" stroke={fg} strokeWidth="4" strokeLinejoin="round" /><path d="M19 14h10c-1 4-3 5-5 6-2-1-4-2-5-6zM18 37c1-3 3-5 6-5s5 2 6 5z" fill={ACC} /></>,
   // bots
   max: ({ fg, bg }) => <><path d="M24 6c8 6 10 16 7 26H17C14 22 16 12 24 6z" fill={fg} /><circle cx="24" cy="19" r="4" fill={bg} /><path d="M17 26l-6 9h7M31 26l6 9h-7" fill={fg} /><path d="M19 34h10l-5 10z" fill={ACC} /></>,
   paula: () => <><circle cx="24" cy="24" r="17" fill={ACC} /><circle cx="18" cy="20" r="3" fill={INK} /><circle cx="30" cy="20" r="3" fill={INK} /><ellipse cx="24" cy="31" rx="4" ry="5" fill={INK} /></>,
