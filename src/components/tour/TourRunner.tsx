@@ -236,11 +236,11 @@ function ProUnlocked({ stars }: { stars: number }) {
         <Stars n={stars} />
         <p className="unlock-kicker">Mission complete · Profit &amp; loss card collected</p>
         <h1>You just did what most people never dare to do.</h1>
-        <p className="unlock-sub">Pro mode unlocked: a ProTrader-style market with live news, rival bots and a time machine.</p>
+        <p className="unlock-sub">Trading area unlocked: one screen with live news, rival bots and time that moves. ProTrader follows after World 2.</p>
         <div className="card-row"><ConceptCard id="pnl" /></div>
         <div className="row" style={{ justifyContent: "center" }}>
           <Link className="btn btn-outline-light" href="/" onClick={() => { actions.celebratePro(); actions.start(null); }}>Learning map</Link>
-          <Link className="btn btn-primary btn-lg" href="/pro" onClick={() => { actions.celebratePro(); actions.start("2.1"); setUi({}); }}>Enter Pro mode →</Link>
+          <Link className="btn btn-primary btn-lg" href="/pro" onClick={() => { actions.celebratePro(); actions.start("2.1"); setUi({}); }}>Enter the trading area →</Link>
         </div>
       </div>
     </div>

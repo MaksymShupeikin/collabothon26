@@ -19,7 +19,7 @@ import Widget from "./Widget";
 
 type Row = { id: string; name: string; habit?: string; series: number[]; score: number; ret: number; dd: number };
 
-function useBoard(replay: Replay, sim: Sim): Row[] {
+export function useBoard(replay: Replay, sim: Sim): Row[] {
   const bots = useMemo(() => runBots(replay), [replay]);
   return useMemo(() => {
     const d = sim.day;
@@ -131,7 +131,7 @@ export function DecisionCard({ news, onDecide, onClose }: { news: News; onDecide
   );
 }
 
-function MistakeCam({ replay, sim, answers, name, compact }: { replay: Replay; sim: Sim; answers: Record<string, number>; name: (s: string) => string; compact?: boolean }) {
+export function MistakeCam({ replay, sim, answers, name, compact }: { replay: Replay; sim: Sim; answers: Record<string, number>; name: (s: string) => string; compact?: boolean }) {
   const u = universeOf(replay.universe.id);
   const done = sim.day >= u.days;
   const moves = replay.moves.filter((m) => m.spot && (done || sim.day >= m.day + 3));

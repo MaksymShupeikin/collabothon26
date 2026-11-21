@@ -42,9 +42,9 @@ export type World = { n: number; title: string; surface: string; blurb: string }
 
 export const WORLDS: World[] = [
   { n: 1, title: "First steps", surface: "Web cabinet", blurb: "Top up, find a stock, place your first order." },
-  { n: 2, title: "Reading the news", surface: "Pro mode", blurb: "Signal or noise? Learn what really moves prices." },
-  { n: 3, title: "Risk", surface: "Pro mode", blurb: "Ups and downs, and why one basket is a bad idea." },
-  { n: 4, title: "Time", surface: "Pro mode + years", blurb: "Let time and a savings plan do the work." },
+  { n: 2, title: "Reading the news", surface: "Trading area", blurb: "Signal or noise? Learn what really moves prices." },
+  { n: 3, title: "Risk", surface: "ProTrader", blurb: "Ups and downs, and why one basket is a bad idea." },
+  { n: 4, title: "Time", surface: "ProTrader + years", blurb: "Let time and a savings plan do the work." },
 ];
 
 const hasPos = (c: Ctx, sym: string, qty = 1) => (c.save.sim.acct.holdings[sym]?.qty ?? 0) >= qty;
@@ -140,19 +140,17 @@ const W1: Chapter[] = [
 
 const W2: Chapter[] = [
   {
-    id: "2.1", world: 2, n: "2.1", kind: "chapter", title: "Your new cockpit", surface: "pro",
-    blurb: "A guided tour of the ProTrader workspace.",
+    id: "2.1", world: 2, n: "2.1", kind: "chapter", title: "Your trading area", surface: "pro",
+    blurb: "A guided tour of the trading screen: everything on one screen.",
     steps: [
-      { title: "Pro mode", text: "This is a copy of comdirect ProTrader: more on one screen, and time that moves." },
-      { target: "pt-header", title: "The header", text: "Depot value and money available, always on top." },
-      { target: "w-depot", title: "Depot widget", text: "Your positions, the same depot as in the web cabinet." },
-      { target: "w-watchlist", title: "Watchlist", text: "Prices of the stocks you follow.", task: "Click SAP in the watchlist.", done: (c) => c.ui.sym === "SAP" },
-      { target: "w-chart", title: "Chart", text: "Candles: each one is one day. Green closed higher, red lower. Volume sits below." },
+      { title: "The trading area", text: "Everything on one screen, and time that moves. It's the same depot as in the web cabinet. After World 2 you move on to ProTrader." },
+      { target: "w-account", title: "Your account", text: "Total value, cash and profit or loss. Low on cash? Top up here." },
+      { target: "w-search", title: "Find a stock", text: "Type a name, ticker or WKN, then pick the stock from the list.", task: "Search for SAP and pick it.", done: (c) => c.ui.sym === "SAP" },
+      { target: "w-chart", title: "Chart", text: "Candles: each one is one day. Green closed higher, red lower. Your trades show up as arrows." },
+      { target: "w-ticket", title: "Order ticket", text: "Buy or sell, quantity, order type and costs, always in view.", task: "Enter a quantity of 5.", done: (c) => c.ui.qty === 5 },
+      { target: "w-depot", title: "Positions and orders", text: "What you own, and your limit and stop orders waiting for their price." },
       { target: "w-news", title: "News", text: "Simulated macro and sector news. Big headlines pause the time." },
-      { target: "pt-order", title: "Order button", text: "The yellow Order button opens a floating order window.", task: "Open the order window.", done: (c) => !!c.ui.orderOpen },
-      { target: "w-order", title: "Order window", text: "Same fields as the web form, more compact. Close it when you're done.", task: "Close the order window.", done: (c) => !c.ui.orderOpen },
-      { target: "time-machine", title: "Time machine", text: "Our addition. Pause, play, or jump ahead to see consequences in seconds.", task: "Jump ahead one day (+1 day).", done: (c) => (c.ui.dayDelta as number ?? 0) >= 1 },
-      { target: "w-orderbook", title: "Order book", text: "Your orders and their status: open, executed or expired." },
+      { target: "time-machine", title: "Time", text: "Play moves the market day by day. Pick 1 day/s or 1 week/s.", task: "Press Play.", done: (c) => (c.ui.dayDelta as number ?? 0) >= 1 },
     ],
   },
   {
@@ -160,13 +158,13 @@ const W2: Chapter[] = [
     blurb: "A historical replay: which headlines were signal, which were noise?",
     steps: [
       { title: "A real story, date hidden", text: "This really happened. You see the company type, not the name or the date. Watch the headlines and the price." },
-      { target: "time-machine", title: "Play", text: "Headlines arrive as time moves. Big ones pause the game.", task: "Press ⏭ Next event.", done: (c) => (c.ui.day as number ?? 0) >= 1 },
+      { target: "time-machine", title: "Play", text: "Headlines arrive as time moves. Big ones pause the game.", task: "Press Play.", done: (c) => (c.ui.day as number ?? 0) >= 1 },
       { target: "w-news", title: "First headline", text: "A motor show with record crowds.",
         quiz: { q: "Is \"Motor show opens with record crowds\" a signal for one carmaker's share?", options: ["Signal: new information about the company", "Noise: nothing about the business changed"], answer: 1, why: "Nice for Frankfurt, nothing new about any carmaker's profits." } },
-      { target: "time-machine", title: "Keep going", text: "Something bigger is coming.", task: "Press ⏭ Next event until the US agency headline appears.", done: (c) => (c.ui.day as number ?? 0) >= 4 },
+      { target: "time-machine", title: "Keep going", text: "Something bigger is coming.", task: "Press Play until the US agency headline appears.", done: (c) => (c.ui.day as number ?? 0) >= 4 },
       { target: "w-chart", title: "Look at the chart", text: "The share fell about 19 % in one day.",
         quiz: { q: "\"US agency: carmaker cheated on emission tests\". Signal or noise?", options: ["Signal: fines, recalls, lost trust", "Noise: just a headline"], answer: 0, why: "Real, new and serious information about this company's future." } },
-      { target: "time-machine", title: "Two days later", text: "Watch what the TV analyst says.", task: "Press ⏭ Next event until day 6.", done: (c) => (c.ui.day as number ?? 0) >= 6 },
+      { target: "time-machine", title: "Two days later", text: "Watch what the TV analyst says.", task: "Press Play until day 6.", done: (c) => (c.ui.day as number ?? 0) >= 6 },
       { target: "w-news", title: "Opinions", text: "Now a TV analyst says the whole sector is finished.",
         quiz: { q: "\"The whole auto sector is finished\", says an analyst on TV. Signal or noise?", options: ["Signal", "Noise: a dramatic opinion"], answer: 1, why: "Other carmakers fell much less. The problem was at one company." } },
       { title: "The reveal: Volkswagen, September 2015", text: "\"Dieselgate\". The share lost about a third in a few days. Other carmakers fell much less: the signal was about one company, the TV drama was noise." },
@@ -177,10 +175,10 @@ const W2: Chapter[] = [
     blurb: "Why expected news barely moves prices.",
     steps: [
       { title: "Simulated week", text: "A simulated week with central bank news. Watch the MSCI World ETF." },
-      { target: "time-machine", title: "Play", text: "Everyone reads the same forecasts.", task: "Press ⏭ Next event until the ECB decision.", done: (c) => (c.ui.day as number ?? 0) >= 4 },
+      { target: "time-machine", title: "Play", text: "Everyone reads the same forecasts.", task: "Press Play until the ECB decision.", done: (c) => (c.ui.day as number ?? 0) >= 4 },
       { target: "w-chart", title: "Nothing happened?", text: "The decision was big news, but the price barely moved.",
         quiz: { q: "Why didn't the ECB decision move prices?", options: ["Everyone expected it: it was priced in", "Nobody read it", "Markets were closed"], answer: 0, why: "Prices react to surprises. Expected news is already in the price." } },
-      { target: "time-machine", title: "Now a surprise", text: "Keep going.", task: "Press ⏭ Next event.", done: (c) => (c.ui.day as number ?? 0) >= 7 },
+      { target: "time-machine", title: "Now a surprise", text: "Keep going.", task: "Press Play.", done: (c) => (c.ui.day as number ?? 0) >= 7 },
       { target: "w-chart", title: "A surprise moves prices", text: "Inflation fell more than expected. This time prices moved, because it was new." },
     ],
   },
@@ -189,11 +187,11 @@ const W2: Chapter[] = [
     blurb: "Buy the rumor, sell the news.",
     steps: [
       { title: "Sources say…", text: "Simulated: a rumor about a purchase bonus for electric cars. Watch the car stocks." },
-      { target: "w-watchlist", title: "Car stocks", text: "Pick a carmaker to follow.", task: "Click Volkswagen Vz. in the watchlist.", done: (c) => c.ui.sym === "VOW3" },
-      { target: "time-machine", title: "The rumor", text: "Let's hear it.", task: "Press ⏭ Next event.", done: (c) => (c.ui.day as number ?? 0) >= 2 },
+      { target: "w-search", title: "Car stocks", text: "Pick a carmaker to follow.", task: "Search for Volkswagen and pick it.", done: (c) => c.ui.sym === "VOW3" },
+      { target: "time-machine", title: "The rumor", text: "Let's hear it.", task: "Press Play.", done: (c) => (c.ui.day as number ?? 0) >= 2 },
       { target: "w-news", title: "Unconfirmed", text: "\"Sources say\" means nobody confirmed it.",
         quiz: { q: "Car stocks jump on \"sources say\". What's the risk?", options: ["None, it's in the news", "The price falls if the rumor is wrong", "The stock gets delisted"], answer: 1, why: "A rumor can be wrong. Then the hope leaves the price again." } },
-      { target: "time-machine", title: "And then", text: "Keep going.", task: "Press ⏭ Next event.", done: (c) => (c.ui.day as number ?? 0) >= 7 },
+      { target: "time-machine", title: "And then", text: "Keep going.", task: "Press Play until the government answers.", done: (c) => (c.ui.day as number ?? 0) >= 7 },
       { target: "w-chart", title: "Denied", text: "The government said no. The jump is gone, and then some. Whoever bought the rumor lost money." },
     ],
   },

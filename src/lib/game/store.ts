@@ -20,6 +20,7 @@ export type Save = {
   understanding: number; // right concept answers (Spot the habit, card quizzes)
   proUnlocked: boolean;
   proCelebrated: boolean;
+  proTrader: boolean; // the learner confirmed the switch from the simple trading area to ProTrader (offered after the World 2 mission)
   allUnlocked: boolean; // demo switch on the learning map
   active: string | null; // chapter / mission currently running
   giro: number;
@@ -31,7 +32,7 @@ export type Save = {
 const KEY = "cd-edu-v3";
 const fresh = (persona: PersonaId | null = null): Save => ({
   v: 3, persona, answers: null, xp: 0, earned: [], cards: [], done: [], stars: {}, understanding: 0,
-  proUnlocked: false, proCelebrated: false, allUnlocked: false, active: null,
+  proUnlocked: false, proCelebrated: false, proTrader: false, allUnlocked: false, active: null,
   giro: persona ? PERSONAS[persona].start : 0, sim: newSim("main", 0), tx: [], nextTx: 1,
 });
 const EMPTY = fresh();
@@ -112,6 +113,8 @@ export const actions = {
   },
   unlockPro() { update((s) => ({ ...s, proUnlocked: true })); },
   celebratePro() { update((s) => ({ ...s, proCelebrated: true })); },
+  /** The learner acknowledged the move from the simple trading area to ProTrader. */
+  switchToProTrader() { update((s) => ({ ...s, proTrader: true })); },
   setAllUnlocked(on: boolean) { update((s) => ({ ...s, allUnlocked: on, proUnlocked: s.proUnlocked || on })); },
   reset() { write(EMPTY); },
 
@@ -164,4 +167,6 @@ export const actions = {
 export function useGame(): Save {
   return useSyncExternalStore(subscribe, read, () => EMPTY);
 }
+/** ProTrader is offered once World 2 is done (its mission), or with the demo switch. */
+export const proTraderOffered = (s: Save) => s.allUnlocked || s.done.includes("w2");
 export const pricedNow = (s: Save, sym: string) => priceNow(s.sim, sym);
