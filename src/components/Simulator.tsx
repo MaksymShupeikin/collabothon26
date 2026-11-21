@@ -46,6 +46,17 @@ const TOUR: (CoachStep & { done?: (c: Ctx) => boolean })[] = [
   { target: "time", title: "Time", text: "Big news pauses the game.", task: "Press Play.", done: (c) => c.speed > 0 },
 ];
 
+/** One empty-state style for every list and panel in the trading screen. */
+function EmptyState({ icon, title, hint }: { icon: string; title: string; hint: string }) {
+  return (
+    <div className="empty-state">
+      <Icon name={icon} size={44} round />
+      <strong>{title}</strong>
+      <span>{hint}</span>
+    </div>
+  );
+}
+
 export default function Simulator({ tour = false }: { tour?: boolean }) {
   const { addXP, finishTour } = useProgress();
   const [m, setM] = useState<Market>(() => createMarket(42, COMPANIES));
@@ -169,7 +180,7 @@ export default function Simulator({ tour = false }: { tour?: boolean }) {
             <div className="panel-body">
               {tab === "news" && (
                 <div className="news" aria-live="polite">
-                  {visibleNews.length === 0 && <p className="empty">Press play to start the market.</p>}
+                  {visibleNews.length === 0 && <EmptyState icon="hanna" title="No news yet" hint="Press play — headlines arrive day by day." />}
                   {visibleNews.map((n) => (
                     <div key={n.id} className={`news-item ${n.major ? "major" : ""} ${n.day === m.day ? "fresh" : ""}`}>
                       <div className="xs muted">Day {n.day}{n.sym ? ` · ${nameOf(n.sym)}` : ""}</div>
@@ -193,7 +204,7 @@ export default function Simulator({ tour = false }: { tour?: boolean }) {
                   </table>
                   <div className="stack" style={{ gap: "var(--space-3)" }}>
                     <h3>Mistake Cam</h3>
-                    {calls.length === 0 && <p className="small muted">Rival trades on news appear here.</p>}
+                    {calls.length === 0 && <EmptyState icon="max" title="No rival trades yet" hint="When a bot trades on news, guess if it works." />}
                     {calls.map((c) => {
                       const b = botMeta(c.bot);
                       const news = m.news.find((n) => n.id === c.newsId);
@@ -237,7 +248,7 @@ export default function Simulator({ tour = false }: { tour?: boolean }) {
                 onKeyDown={(e) => { if (e.key === "Enter" && results[0]) pick(results[0].sym); if (e.key === "Escape") e.currentTarget.blur(); }} />
               {searchOpen && (
                 <ul className="search-results" role="listbox">
-                  {results.length === 0 && <li className="empty" style={{ padding: "var(--space-3) var(--space-4)" }}>No stock found.</li>}
+                  {results.length === 0 && <li><EmptyState icon="compass" title="No stock found" hint="Try a name, ticker or WKN." /></li>}
                   {results.map((c) => {
                     const p = priceOf(m, c.sym), ch = (p / priceOf(m, c.sym, Math.max(0, m.day - 1)) - 1) * 100;
                     return (
@@ -265,7 +276,7 @@ export default function Simulator({ tour = false }: { tour?: boolean }) {
               </div>
             </div>
             <div className="chart-body">
-              {m.day === 0 && <p className="empty chart-empty">Press ▶ to start the market — the chart draws itself day by day.</p>}
+              {m.day === 0 && <div className="chart-empty"><EmptyState icon="play" title="Market not started" hint="Press play — the chart draws itself day by day." /></div>}
               <CandleChart sym={selected} prices={m.prices[selected]} times={times} trades={myTrades} />
             </div>
           </section>
@@ -323,7 +334,7 @@ export default function Simulator({ tour = false }: { tour?: boolean }) {
               <button role="tab" aria-selected={bookTab === "orders"} onClick={() => setBookTab("orders")}>Orders <span className="count">{m.orders.length}</span></button>
             </div>
             <div className="panel-body">
-              {bookTab === "positions" && (positions.length === 0 ? <p className="empty">No positions yet.</p> : positions.map(([sym, h]) => {
+              {bookTab === "positions" && (positions.length === 0 ? <EmptyState icon="chart" title="No positions yet" hint="Buy a stock above and it shows up here." /> : positions.map(([sym, h]) => {
                 const v = h.qty * priceOf(m, sym);
                 return (
                   <button key={sym} className="watch-row" aria-pressed={sym === selected} onClick={() => setSelected(sym)}>
@@ -332,7 +343,7 @@ export default function Simulator({ tour = false }: { tour?: boolean }) {
                   </button>
                 );
               }))}
-              {bookTab === "orders" && (m.orders.length === 0 ? <p className="empty">No open orders. Limit and stop orders wait here.</p> : m.orders.map((o) => (
+              {bookTab === "orders" && (m.orders.length === 0 ? <EmptyState icon="hourglass" title="No open orders" hint="Limit and stop orders wait here until their price is hit." /> : m.orders.map((o) => (
                 <div key={o.id} className="watch-row">
                   <span className="watch-name"><strong>{o.side === "buy" ? "Buy" : "Sell"} {o.qty}× {nameOf(o.sym)}</strong><span className="xs muted">{o.type} @ {eur(o.limit)}</span></span>
                   <button className="btn btn-ghost btn-sm" onClick={() => setM(cancelOrder(m, o.id))}>Cancel</button>
