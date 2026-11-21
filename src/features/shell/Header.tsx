@@ -17,11 +17,9 @@ export default function Header() {
           <span className="logo-mark"><Wordmark /></span>
           <span className="logo-edu">edu</span>
         </Link>
-        {save.persona && path !== "/" && (
+        {save.persona && save.proUnlocked && path !== "/" && (
           <nav className="hnav" aria-label="comdirect edu">
-            <Link href="/">Learning map</Link>
-            <Link href="/cabinet">Web cabinet</Link>
-            {save.proUnlocked && <Link href="/pro">{save.proTrader ? "ProTrader" : "Trading area"}</Link>}
+            <Link href="/pro">{save.proTrader ? "ProTrader" : "Trading area"}</Link>
           </nav>
         )}
         <div className="user" aria-label={`Your profile: ${USER.name}, level ${rank.level} ${rank.name}, ${save.xp} XP`}>

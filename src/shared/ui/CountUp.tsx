@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 
 /** Counts from 0 up to `to` while `active`, resets to 0 when inactive (so it replays on the next activation). */
-export default function CountUp({ to, active, duration = 1100, delay = 150 }: { to: number; active: boolean; duration?: number; delay?: number }) {
+export default function CountUp({ to, active, duration = 1100, delay = 150, format = String }: { to: number; active: boolean; duration?: number; delay?: number; format?: (n: number) => string }) {
   const [v, setV] = useState(0);
   useEffect(() => {
     if (!active) { setV(0); return; }
@@ -17,5 +17,5 @@ export default function CountUp({ to, active, duration = 1100, delay = 150 }: { 
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
   }, [to, active, duration, delay]);
-  return <>{v}</>;
+  return <>{format(v)}</>;
 }
