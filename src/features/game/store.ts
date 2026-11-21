@@ -4,6 +4,7 @@ import { companyOf } from "../market/companies.ts";
 import { advance, deposit, newSim, placeOrder, priceNow, round2, withdraw, type OrderInput, type Sim, type SimEvent } from "../market/engine.ts";
 import "../market/scenarios.ts"; // registers the universes
 import { PERSONAS, type Answers, type PersonaId } from "./personas.ts";
+import { dict } from "../../shared/lib/i18n.ts";
 
 // shortcut: progress lives in this browser's localStorage only; move to the comdirect profile when a backend exists.
 
@@ -172,3 +173,20 @@ export function useGame(): Save {
 /** ProTrader is offered once Module 2 is done (its mission), or with the demo switch. */
 export const proTraderOffered = (s: Save) => s.allUnlocked || s.done.includes("w2");
 export const pricedNow = (s: Save, sym: string) => priceNow(s.sim, sym);
+
+dict({
+  Saver: "Sparer", Beginner: "Einsteiger", Investor: "Anleger", Strategist: "Stratege", "Market Reader": "Marktkenner",
+  "Enter an amount above 0,00 €.": "Bitte einen Betrag über 0,00 € eingeben.",
+  "Not enough money on the current account.": "Nicht genug Geld auf dem Girokonto.",
+  "Not enough money on the trading account.": "Nicht genug Geld auf dem Verrechnungskonto.",
+  "Transfer to trading account": "Übertrag auf Verrechnungskonto",
+  "Transfer from trading account": "Übertrag vom Verrechnungskonto",
+  "Transfer from current account": "Übertrag vom Girokonto",
+  "Transfer to current account": "Übertrag auf Girokonto",
+  "Play money added (sandbox)": "Spielgeld eingezahlt (Sandbox)",
+});
+/** Booking texts are saved in English; "Buy SAP" / "Sell SAP" carry a company name. */
+export const txText = (t: (en: string, de?: string) => string, text: string) => {
+  const m = /^(Buy|Sell) (.+)$/.exec(text);
+  return m ? t(text, `${m[1] === "Buy" ? "Kauf" : "Verkauf"} ${m[2]}`) : t(text);
+};

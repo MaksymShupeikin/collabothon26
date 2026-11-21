@@ -1,6 +1,7 @@
 import { COMPANIES, companyOf, DAX_ETF, ETF_SYM } from "./companies.ts";
 import { generateNews, type News, type NewsKind } from "./news.ts";
 import { registerUniverse, type Path, type Universe } from "./engine.ts";
+import "./scenarios.de.ts";
 
 /**
  * Every market the player can be in.

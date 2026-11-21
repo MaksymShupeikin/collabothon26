@@ -1,5 +1,6 @@
 // The 12 concept cards of the MVP (idea.md §12). Front: one sentence. Back: example + one quiz question.
 // The longer roadmap list lives in concepts.ts.
+import { dict } from "../../shared/lib/i18n.ts";
 export type Card = {
   id: string;
   world: number;
@@ -49,3 +50,60 @@ export const CARDS: Card[] = [
 ];
 
 export const cardById = (id: string) => CARDS.find((c) => c.id === id);
+
+dict({
+  Stock: "Aktie", "A stock is a small piece of a company.": "Eine Aktie ist ein kleines Stück eines Unternehmens.",
+  "Buy one share of Deutsche Telekom and you own a tiny slice of Deutsche Telekom.": "Kauf eine Aktie der Deutschen Telekom, und dir gehört ein winziges Stück der Deutschen Telekom.",
+  "You buy 1 share of Siemens. What do you own?": "Du kaufst 1 Siemens-Aktie. Was gehört dir?",
+  "A loan to Siemens": "Ein Kredit an Siemens", "A tiny piece of Siemens": "Ein winziges Stück von Siemens", "A Siemens voucher": "Ein Siemens-Gutschein",
+  "Market vs. limit order": "Market- vs. Limit-Order",
+  "A market order buys now at any price. A limit order buys only at your price or better.": "Eine Market-Order kauft sofort, zu jedem Preis. Eine Limit-Order kauft nur zu deinem Preis oder besser.",
+  "Limit 30,00 € on a share at 30,20 € → your order waits until the price is 30,00 € or lower.": "Limit 30,00 € bei einem Kurs von 30,20 € → deine Order wartet, bis der Kurs bei 30,00 € oder darunter ist.",
+  "What does a limit order protect you from?": "Wovor schützt dich eine Limit-Order?",
+  "Paying more than you planned": "Mehr zu zahlen als geplant", "Any loss": "Vor jedem Verlust", "Order fees": "Vor Ordergebühren",
+  "Fees & spread": "Gebühren & Spread",
+  "Every order costs a fee, and you buy a little above and sell a little below the mid price.": "Jede Order kostet eine Gebühr, und du kaufst etwas über und verkaufst etwas unter dem Mittelkurs.",
+  "A 4,90 € fee is almost 5 % of a 100 € order, but only 0,5 % of a 1.000 € order.": "4,90 € Gebühr sind fast 5 % einer 100-€-Order, aber nur 0,5 % einer 1.000-€-Order.",
+  "Why do small single orders hurt more?": "Warum tun kleine Einzelorders mehr weh?",
+  "The fixed fee is a bigger share of the amount": "Die feste Gebühr ist ein größerer Anteil am Betrag", "Small orders are taxed more": "Kleine Orders werden höher besteuert", "They don't": "Tun sie nicht",
+  "Profit & loss": "Gewinn & Verlust",
+  "Profit or loss is today's value minus what you paid, costs included.": "Gewinn oder Verlust ist der heutige Wert minus dem, was du bezahlt hast, inklusive Kosten.",
+  "Bought for 65,05 € incl. costs, worth 66,10 € now → +1,05 € (+1,6 %), on paper until you sell.": "Für 65,05 € inkl. Kosten gekauft, jetzt 66,10 € wert → +1,05 € (+1,6 %), auf dem Papier, bis du verkaufst.",
+  "Your position shows −3 %. Have you lost money?": "Deine Position zeigt −3 %. Hast du Geld verloren?",
+  "Only on paper, until you sell": "Nur auf dem Papier, bis du verkaufst", "Yes, it's gone": "Ja, es ist weg", "No, losses don't count": "Nein, Verluste zählen nicht",
+  "Signal vs. noise": "Signal vs. Rauschen",
+  "Most headlines are noise. A signal is new information that changes a company's future.": "Die meisten Schlagzeilen sind Rauschen. Ein Signal ist eine neue Information, die die Zukunft eines Unternehmens verändert.",
+  "\"Auditor can't confirm 1,9 bn €\" is a signal. \"Analyst on TV is excited\" is noise.": "„Wirtschaftsprüfer kann 1,9 Mrd. € nicht bestätigen“ ist ein Signal. „Analyst im TV ist begeistert“ ist Rauschen.",
+  "Which one is a signal?": "Was davon ist ein Signal?",
+  "A blogger says the chart looks weak": "Ein Blogger sagt, der Chart sieht schwach aus", "A company cuts its profit forecast": "Ein Unternehmen senkt seine Gewinnprognose", "Rainy weekend in Frankfurt": "Verregnetes Wochenende in Frankfurt",
+  "Priced in": "Eingepreist",
+  "When everyone expects a piece of news, it's already in the price before it's announced.": "Wenn alle eine Nachricht erwarten, steckt sie schon im Kurs, bevor sie verkündet wird.",
+  "The ECB keeps rates unchanged, as expected: the market barely moves.": "Die EZB lässt die Zinsen wie erwartet unverändert: Der Markt bewegt sich kaum.",
+  "Expected news is finally announced. The price usually…": "Eine erwartete Nachricht wird endlich verkündet. Der Kurs …",
+  Jumps: "springt", "Barely moves": "bewegt sich kaum", "Always falls": "fällt immer",
+  "Buy the rumor, sell the news": "Kauf Gerüchte, verkauf Fakten",
+  "Prices rise on hope and often fall when the rumor is confirmed or denied.": "Kurse steigen auf Hoffnung und fallen oft, wenn das Gerücht bestätigt oder dementiert wird.",
+  "\"Purchase bonus for e-cars, sources say\" → car stocks +6 %. \"No bonus planned\" → −8 %.": "„Kaufprämie für E-Autos, heißt es aus Kreisen“ → Autoaktien +6 %. „Keine Prämie geplant“ → −8 %.",
+  "A stock jumps on an unconfirmed rumor. The risk is…": "Eine Aktie springt wegen eines unbestätigten Gerüchts. Das Risiko ist …",
+  None: "keins", "It falls if the rumor is wrong": "dass sie fällt, wenn das Gerücht falsch ist", "It gets delisted": "dass sie von der Börse genommen wird",
+  "Volatility & drawdown": "Volatilität & Drawdown",
+  "Volatility is how wildly a price swings. Drawdown is how far it fell from its peak.": "Volatilität ist, wie stark ein Kurs schwankt. Drawdown ist, wie tief er von seinem Hoch gefallen ist.",
+  "From 1.000 € to 700 € is a 30 % drawdown. To get back, you need +43 %.": "Von 1.000 € auf 700 € ist ein Drawdown von 30 %. Um wieder hinzukommen, brauchst du +43 %.",
+  "+50 %": "+50 %", "+100 %": "+100 %", "+25 %": "+25 %",
+  "After a 50 % drop, how much do you need to get back?": "Nach einem Minus von 50 %: Wie viel brauchst du, um wieder dahin zu kommen?",
+  Diversification: "Diversifikation", "Don't put all your eggs in one basket.": "Leg nicht alle Eier in einen Korb.",
+  "One stock collapses by 90 %: all-in → −90 %. Spread over 10 → about −9 %.": "Eine Aktie bricht um 90 % ein: alles in einer → −90 %. Auf 10 verteilt → etwa −9 %.",
+  "Why diversify?": "Warum streuen?", "To guarantee profit": "Um Gewinn zu garantieren", "So one bad company can't ruin you": "Damit dich ein schlechtes Unternehmen nicht ruiniert", "To pay less tax": "Um weniger Steuern zu zahlen",
+  ETF: "ETF", "An ETF is a basket of hundreds of companies you buy in one order.": "Ein ETF ist ein Korb aus Hunderten Unternehmen, den du mit einer Order kaufst.",
+  "100 € in an MSCI World ETF spreads across about 1.400 companies, for one order fee.": "100 € in einem MSCI-World-ETF verteilen sich auf etwa 1.400 Unternehmen, für eine Ordergebühr.",
+  "One company in your world ETF crashes 50 %. Your ETF…": "Ein Unternehmen in deinem Welt-ETF stürzt um 50 % ab. Dein ETF …",
+  "Falls about 50 %": "fällt um etwa 50 %", "Is closed": "wird geschlossen",
+  "Compound interest": "Zinseszins", "Your gains earn their own gains. Over time, it snowballs.": "Deine Gewinne erzielen eigene Gewinne. Mit der Zeit wird daraus ein Schneeball.",
+  "25 €/month at 7 % for 30 years: you pay in 9.000 €, it grows to about 30.000 €.": "25 €/Monat zu 7 % über 30 Jahre: Du zahlst 9.000 € ein, es wächst auf etwa 30.000 €.",
+  "What makes compounding strongest?": "Was macht den Zinseszins am stärksten?", Time: "Zeit", "Trading often": "Häufiges Handeln", "Checking prices daily": "Täglich Kurse checken",
+  "Savings plan & cost averaging": "Sparplan & Durchschnittskosteneffekt",
+  "A savings plan invests the same amount every month. When prices are low, it buys more shares.": "Ein Sparplan investiert jeden Monat denselben Betrag. Sind die Kurse niedrig, kauft er mehr Anteile.",
+  "Price drops 30 % → your 25 € buy about 43 % more shares that month.": "Kurs fällt um 30 % → deine 25 € kaufen in dem Monat etwa 43 % mehr Anteile.",
+  "For a monthly saver, a market dip means…": "Für monatliche Sparer bedeutet ein Kursrutsch …",
+  "Buying more shares cheaply": "günstig mehr Anteile kaufen", "The plan stops": "dass der Plan stoppt", "Higher fees": "höhere Gebühren",
+});

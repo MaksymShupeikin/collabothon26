@@ -1,7 +1,8 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import { companyOf, type Company } from "@/features/market/companies";
-import { cls, eur, pct, qtyFmt } from "@/shared/lib/format";
+import { cls, dateLocale, eur, pct, qtyFmt } from "@/shared/lib/format";
+import { useT } from "@/shared/lib/i18n";
 import { setUi } from "@/features/game/ui";
 import type { News } from "@/features/market/news";
 import { ask, bid, dateOf, depotValue, fee, priceAt, round2, type OrderInput, type OrderType, type Side, type Sim, type Universe } from "@/features/market/engine";
@@ -17,7 +18,7 @@ import { MistakeCam, useBoard } from "@/features/pro/ReplayParts";
  * Module 2 runs here; ProTrader takes over from Module 3, once the learner confirms the switch.
  * Same market, same portfolio, same replays as ProTrader: only the layout is simpler.
  */
-const PACES = [{ speed: 1, label: "1 day/s" }, { speed: 5, label: "1 week/s" }];
+const PACES = [{ speed: 1, label: "1 day/s", de: "1 Tag/s" }, { speed: 5, label: "1 week/s", de: "1 Woche/s" }];
 const TOPUP_MAX = 100_000; // keeps play money in a realistic range for a beginner portfolio
 
 export type SimpleProps = {
@@ -42,6 +43,7 @@ function EmptyState({ icon, title, hint }: { icon: string; title: string; hint: 
 }
 
 export default function SimpleDesk(p: SimpleProps) {
+  const t = useT();
   const { sim, u, comps, sym, setSym, cover, coverWkn, speed, setSpeed, ended, closes, firstDay, label, news, breaking, replay } = p;
   const [pace, setPace] = useState(1); // speed to resume with
   const [side, setSide] = useState<Side>("buy");
@@ -85,7 +87,7 @@ export default function SimpleDesk(p: SimpleProps) {
     const byIso = new Map(times.map((t, i) => [t, label(firstDay + i)]));
     return (t: string) => byIso.get(t) ?? "";
   }, [u.hideDate, times, label, firstDay]);
-  const myTrades: TradeMark[] = useMemo(() => sim.acct.trades.filter((t) => t.sym === sym).map((t) => ({ i: t.day - firstDay, side: t.side, label: `${t.side === "buy" ? "B" : "S"} ${qtyFmt(t.qty)}` })), [sim.acct.trades, sym, firstDay]);
+  const myTrades: TradeMark[] = useMemo(() => sim.acct.trades.filter((x) => x.sym === sym).map((x) => ({ i: x.day - firstDay, side: x.side, label: `${x.side === "buy" ? t("B", "K") : t("S", "V")} ${qtyFmt(x.qty)}` })), [sim.acct.trades, sym, firstDay, t]);
 
   const today = dateOf(u, day);
   const play = () => { p.clearBreaking(); setSpeed(speed ? 0 : pace); };
@@ -105,13 +107,13 @@ export default function SimpleDesk(p: SimpleProps) {
             {/* Tour target is the panel: it has its own z-index, so a child can't rise above the tour overlay. */}
             <section className="panel p-watch" aria-label="Watchlist" data-tour="w-search">
               <div className="watch-search">
-                <input type="search" placeholder="Search name, ticker or WKN" value={query} aria-label="Search stocks" aria-controls="watchlist"
+                <input type="search" placeholder={t("Search name, ticker or WKN", "Name, Kürzel oder WKN suchen")} value={query} aria-label={t("Search stocks", "Aktien suchen")} aria-controls="watchlist"
                   onChange={(e) => setQuery(e.target.value)}
                   onKeyDown={(e) => { if (e.key === "Enter" && results[0]) pick(results[0].sym); if (e.key === "Escape") setQuery(""); }} />
               </div>
               {/* Every stock one click away, price and change at a glance. */}
               <div className="panel-body" id="watchlist">
-                {results.length === 0 && <EmptyState icon="compass" title="No stock found" hint="Try a name, ticker or WKN." />}
+                {results.length === 0 && <EmptyState icon="compass" title={t("No stock found", "Keine Aktie gefunden")} hint={t("Try a name, ticker or WKN.", "Versuch es mit Name, Kürzel oder WKN.")} />}
                 {results.map((c) => {
                   const pr = priceOf(c.sym), ch = (pr / priceOf(c.sym, day - 1) - 1) * 100;
                   return (
@@ -123,26 +125,26 @@ export default function SimpleDesk(p: SimpleProps) {
                 })}
               </div>
             </section>
-            <section className="panel p-feed" aria-label="News and rivals" data-tour="w-news">
+            <section className="panel p-feed" aria-label={t("News and rivals", "News und Rivalen")} data-tour="w-news">
               <div className="tabs" role="tablist">
                 <button role="tab" aria-selected={tab === "news"} onClick={() => setTab("news")}>News</button>
-                <button role="tab" aria-selected={tab === "rivals"} onClick={() => setTab("rivals")}>Rivals {replay && <span className="count hot">{replay.bots.length}</span>}</button>
+                <button role="tab" aria-selected={tab === "rivals"} onClick={() => setTab("rivals")}>{t("Rivals", "Rivalen")} {replay && <span className="count hot">{replay.bots.length}</span>}</button>
               </div>
               <div className="panel-body">
                 {tab === "news" && (
                   <div className="news" aria-live="polite">
-                    {news.length === 0 && <EmptyState icon="hanna" title="No news yet" hint="Press play — headlines arrive day by day." />}
+                    {news.length === 0 && <EmptyState icon="hanna" title={t("No news yet", "Noch keine News")} hint={t("Press play — headlines arrive day by day.", "Drück auf Play — die Schlagzeilen kommen Tag für Tag.")} />}
                     {news.map((n) => (
                       <div key={n.id} className={`news-item ${n.major ? "major" : ""} ${n.day === day ? "fresh" : ""}`}>
                         <div className="xs muted">{label(n.day)}{n.sym ? ` · ${cover(n.sym)}` : ""}</div>
-                        {n.headline}
+                        {t(n.headline)}
                       </div>
                     ))}
                   </div>
                 )}
                 {tab === "rivals" && (replay
                   ? <ReplayRivals replay={replay} sim={sim} answers={p.answers} cover={cover} />
-                  : <EmptyState icon="max" title="No rivals in this market" hint="Rival bots trade with you in boss rounds and History mode." />)}
+                  : <EmptyState icon="max" title={t("No rivals in this market", "Keine Rivalen in diesem Markt")} hint={t("Rival bots trade with you in boss rounds and History mode.", "Rivalen-Bots handeln mit dir in Bossrunden und im Geschichtsmodus.")} />)}
               </div>
             </section>
           </div>
@@ -150,17 +152,17 @@ export default function SimpleDesk(p: SimpleProps) {
           {/* Center: time controls (they drive the chart), then the chart of the selected stock */}
           <div className="trade-col">
             <div className="clock" data-tour="time-machine">
-              <button className="play-btn" onClick={play} disabled={ended} aria-label={speed ? "Pause" : "Play"}>
+              <button className="play-btn" onClick={play} disabled={ended} aria-label={speed ? t("Pause", "Pause") : t("Play", "Abspielen")}>
                 <Icon name={speed ? "pause" : "play"} size={16} />
               </button>
               <div className="clock-date">
-                <strong>{u.hideDate ? `Day ${day + 1}` : today.toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short", timeZone: "UTC" })}</strong>
-                <span className="xs muted num">Week {Math.floor(day / 5) + 1} of {Math.ceil(u.days / 5)}</span>
-                <span className="day-bar" role="progressbar" aria-label="Market progress" aria-valuemin={0} aria-valuemax={u.days} aria-valuenow={day}><span style={{ width: `${Math.min(100, (day / u.days) * 100)}%` }} /></span>
+                <strong>{u.hideDate ? t(`Day ${day + 1}`, `Tag ${day + 1}`) : today.toLocaleDateString(dateLocale(t.lang), { weekday: "short", day: "numeric", month: "short", timeZone: "UTC" })}</strong>
+                <span className="xs muted num">{t(`Week ${Math.floor(day / 5) + 1} of ${Math.ceil(u.days / 5)}`, `Woche ${Math.floor(day / 5) + 1} von ${Math.ceil(u.days / 5)}`)}</span>
+                <span className="day-bar" role="progressbar" aria-label={t("Market progress", "Marktfortschritt")} aria-valuemin={0} aria-valuemax={u.days} aria-valuenow={day}><span style={{ width: `${Math.min(100, (day / u.days) * 100)}%` }} /></span>
               </div>
-              <div className="seg" role="group" aria-label="Speed">
+              <div className="seg" role="group" aria-label={t("Speed", "Tempo")}>
                 {PACES.map((x) => (
-                  <button key={x.speed} aria-pressed={pace === x.speed} onClick={() => { setPace(x.speed); if (speed) setSpeed(x.speed); }}>{x.label}</button>
+                  <button key={x.speed} aria-pressed={pace === x.speed} onClick={() => { setPace(x.speed); if (speed) setSpeed(x.speed); }}>{t(x.label, x.de)}</button>
                 ))}
               </div>
             </div>
@@ -168,7 +170,7 @@ export default function SimpleDesk(p: SimpleProps) {
               <div className="chart-head">
                 <div>
                   <h2>{cover(sym)}</h2>
-                  <div className="xs muted">{masked(sym) ? "" : `${sym} · `}WKN {coverWkn(sym)} · {company.sector}</div>
+                  <div className="xs muted">{masked(sym) ? "" : `${sym} · `}WKN {coverWkn(sym)} · {t(company.sector)}</div>
                 </div>
                 <div className="chart-price">
                   <strong className="num">{eur(price)}</strong>
@@ -184,28 +186,28 @@ export default function SimpleDesk(p: SimpleProps) {
           {/* Right: account, order ticket, positions/orders */}
           <div className="trade-col">
             <div className="acct" data-tour="w-account">
-              <div className="acct-main"><span>Total value</span><strong className="num">{eur(total)}</strong></div>
+              <div className="acct-main"><span>{t("Total value", "Gesamtwert")}</span><strong className="num">{eur(total)}</strong></div>
               <div className="acct-sub xs num">
-                <span>Cash <b>{eur(sim.acct.cash)}</b></span>
-                <span>P/L <b className={cls(pl)}>{eur(pl)} ({pct(paidIn ? (pl / paidIn) * 100 : 0)})</b></span>
+                <span>{t("Cash", "Guthaben")} <b>{eur(sim.acct.cash)}</b></span>
+                <span>{t("P/L", "G/V")} <b className={cls(pl)}>{eur(pl)} ({pct(paidIn ? (pl / paidIn) * 100 : 0)})</b></span>
               </div>
-              <button className="btn btn-outline btn-sm" onClick={() => setTopUpOpen(true)}>Top up +</button>
+              <button className="btn btn-outline btn-sm" onClick={() => setTopUpOpen(true)}>{t("Top up +", "Aufladen +")}</button>
             </div>
             <section className="panel p-order" data-tour="w-ticket" aria-label="Order">
               <div className="ticket">
-                <div className="side-toggle" role="group" aria-label="Buy or sell">
-                  <button className="buy" aria-pressed={side === "buy"} onClick={() => setSide("buy")}>Buy</button>
-                  <button className="sell" aria-pressed={side === "sell"} onClick={() => setSide("sell")}>Sell</button>
+                <div className="side-toggle" role="group" aria-label={t("Buy or sell", "Kauf oder Verkauf")}>
+                  <button className="buy" aria-pressed={side === "buy"} onClick={() => setSide("buy")}>{t("Buy", "Kauf")}</button>
+                  <button className="sell" aria-pressed={side === "sell"} onClick={() => setSide("sell")}>{t("Sell", "Verkauf")}</button>
                 </div>
                 <div className="order-grid">
-                  <label className="field">Quantity
+                  <label className="field">{t("Quantity", "Stückzahl")}
                     <span className="stepper">
-                      <button type="button" aria-label="One share less" onClick={() => setQty(Math.max(1, (qty || 1) - 1))} disabled={(qty || 1) <= 1}><Glyph name="minus" /></button>
+                      <button type="button" aria-label={t("One share less", "Ein Stück weniger")} onClick={() => setQty(Math.max(1, (qty || 1) - 1))} disabled={(qty || 1) <= 1}><Glyph name="minus" /></button>
                       <input type="number" min={1} step={1} value={qty || ""} onChange={(e) => setQty(Math.floor(Number(e.target.value)))} />
-                      <button type="button" aria-label="One share more" onClick={() => setQty((qty || 0) + 1)}><Glyph name="plus" /></button>
+                      <button type="button" aria-label={t("One share more", "Ein Stück mehr")} onClick={() => setQty((qty || 0) + 1)}><Glyph name="plus" /></button>
                     </span>
                   </label>
-                  <label className="field">Order type
+                  <label className="field">{t("Order type", "Orderart")}
                     <select value={type} onChange={(e) => setType(e.target.value as OrderType)}>
                       <option value="market">Market</option>
                       <option value="limit">Limit</option>
@@ -213,31 +215,31 @@ export default function SimpleDesk(p: SimpleProps) {
                     </select>
                   </label>
                   {type !== "market" && (
-                    <label className="field" style={{ gridColumn: "1 / -1" }}>{type === "limit" ? "Limit price (€)" : "Stop price (€)"}
+                    <label className="field" style={{ gridColumn: "1 / -1" }}>{type === "limit" ? t("Limit price (€)", "Limitkurs (€)") : t("Stop price (€)", "Stoppkurs (€)")}
                       <input type="number" min={0} step={0.01} value={limit} onChange={(e) => setLimit(e.target.value)} placeholder={price.toFixed(2)} />
                     </label>
                   )}
                 </div>
                 <div>
-                  <div className="kv"><span className="muted">Price ({side === "buy" ? "ask" : "bid"})</span><span className="num">{eur(execPrice)}</span></div>
-                  <div className="kv"><span className="muted">Fee</span><span className="num">{eur(orderFee)}</span></div>
-                  <div className="kv total"><strong>{side === "buy" ? "Total" : "You receive"}</strong><strong className="num">{eur(side === "buy" ? volume + orderFee : volume - orderFee)}</strong></div>
-                  {side === "sell" && <div className="kv xs muted"><span>You own</span><span className="num">{qtyFmt(holding?.qty ?? 0)}</span></div>}
+                  <div className="kv"><span className="muted">{t("Price", "Kurs")} ({side === "buy" ? t("ask", "Brief") : t("bid", "Geld")})</span><span className="num">{eur(execPrice)}</span></div>
+                  <div className="kv"><span className="muted">{t("Fee", "Gebühr")}</span><span className="num">{eur(orderFee)}</span></div>
+                  <div className="kv total"><strong>{side === "buy" ? t("Total", "Gesamt") : t("You receive", "Du erhältst")}</strong><strong className="num">{eur(side === "buy" ? volume + orderFee : volume - orderFee)}</strong></div>
+                  {side === "sell" && <div className="kv xs muted"><span>{t("You own", "Dein Bestand")}</span><span className="num">{qtyFmt(holding?.qty ?? 0)}</span></div>}
                 </div>
-                {err && <p className="error" role="alert">{err}</p>}
+                {err && <p className="error" role="alert">{t(err)}</p>}
                 <button className={`btn btn-lg ${side === "buy" ? "btn-primary" : "btn-dark"}`} onClick={submit} disabled={ended}>
-                  {side === "buy" ? "Buy" : "Sell"} {qty || 0} × {cover(sym)}
+                  {side === "buy" ? t("Buy", "Kaufen") : t("Sell", "Verkaufen")} {qty || 0} × {cover(sym)}
                 </button>
               </div>
             </section>
 
-            <section className="panel p-book" aria-label="Positions and orders" data-tour="w-depot">
+            <section className="panel p-book" aria-label={t("Positions and orders", "Positionen und Orders")} data-tour="w-depot">
               <div className="tabs" role="tablist">
-                <button role="tab" aria-selected={bookTab === "positions"} onClick={() => setBookTab("positions")}>Positions <span className="count">{positions.length}</span></button>
-                <button role="tab" aria-selected={bookTab === "orders"} onClick={() => setBookTab("orders")}>Orders <span className="count">{orders.length}</span></button>
+                <button role="tab" aria-selected={bookTab === "positions"} onClick={() => setBookTab("positions")}>{t("Positions", "Positionen")} <span className="count">{positions.length}</span></button>
+                <button role="tab" aria-selected={bookTab === "orders"} onClick={() => setBookTab("orders")}>{t("Orders", "Orders")} <span className="count">{orders.length}</span></button>
               </div>
               <div className="panel-body">
-                {bookTab === "positions" && (positions.length === 0 ? <EmptyState icon="chart" title="No positions yet" hint="Buy a stock above and it shows up here." /> : positions.map(([s, h]) => {
+                {bookTab === "positions" && (positions.length === 0 ? <EmptyState icon="chart" title={t("No positions yet", "Noch keine Positionen")} hint={t("Buy a stock above and it shows up here.", "Kauf oben eine Aktie, dann erscheint sie hier.")} /> : positions.map(([s, h]) => {
                   const v = h.qty * priceOf(s);
                   return (
                     <button key={s} className="watch-row" aria-pressed={s === sym} onClick={() => setSym(s)}>
@@ -246,10 +248,10 @@ export default function SimpleDesk(p: SimpleProps) {
                     </button>
                   );
                 }))}
-                {bookTab === "orders" && (orders.length === 0 ? <EmptyState icon="hourglass" title="No open orders" hint="Limit and stop orders wait here until their price is hit." /> : orders.map((o) => (
+                {bookTab === "orders" && (orders.length === 0 ? <EmptyState icon="hourglass" title={t("No open orders", "Keine offenen Orders")} hint={t("Limit and stop orders wait here until their price is hit.", "Limit- und Stop-Orders warten hier, bis ihr Kurs erreicht ist.")} /> : orders.map((o) => (
                   <div key={o.id} className="watch-row">
-                    <span className="watch-name"><strong>{o.side === "buy" ? "Buy" : "Sell"} {qtyFmt(o.qty)}× {cover(o.sym)}</strong><span className="xs muted">{o.type} @ {eur(o.limit)}</span></span>
-                    <button className="btn btn-ghost btn-sm" onClick={() => p.cancel(o.id)}>Cancel</button>
+                    <span className="watch-name"><strong>{o.side === "buy" ? t("Buy", "Kauf") : t("Sell", "Verkauf")} {qtyFmt(o.qty)}× {cover(o.sym)}</strong><span className="xs muted">{t(o.type, o.type === "limit" ? "Limit" : o.type === "stop" ? "Stop" : "Market")} @ {eur(o.limit)}</span></span>
+                    <button className="btn btn-ghost btn-sm" onClick={() => p.cancel(o.id)}>{t("Cancel", "Streichen")}</button>
                   </div>
                 )))}
               </div>
@@ -259,18 +261,18 @@ export default function SimpleDesk(p: SimpleProps) {
 
         {/* Free play only: chapters and missions bring their own questions on big news. */}
         {breaking && p.freePlay && (
-          <div className="overlay" role="dialog" aria-modal="true" aria-label="Breaking news">
+          <div className="overlay" role="dialog" aria-modal="true" aria-label={t("Breaking news", "Eilmeldung")}>
             <div className="modal">
-              <span className="badge badge-accent" style={{ alignSelf: "flex-start" }}>Breaking</span>
-              <h2>{breaking.headline}</h2>
+              <span className="badge badge-accent" style={{ alignSelf: "flex-start" }}>{t("Breaking", "Eilmeldung")}</span>
+              <h2>{t(breaking.headline)}</h2>
               <div className="row">
                 {breaking.sym && (
                   <>
-                    <button className="btn btn-primary" onClick={() => { setSym(breaking.sym!); setSide("buy"); p.clearBreaking(); }}>Buy {cover(breaking.sym)}</button>
-                    <button className="btn btn-outline" onClick={() => { setSym(breaking.sym!); setSide("sell"); p.clearBreaking(); }}>Sell {cover(breaking.sym)}</button>
+                    <button className="btn btn-primary" onClick={() => { setSym(breaking.sym!); setSide("buy"); p.clearBreaking(); }}>{t("Buy", "Kaufen")} {cover(breaking.sym)}</button>
+                    <button className="btn btn-outline" onClick={() => { setSym(breaking.sym!); setSide("sell"); p.clearBreaking(); }}>{t("Sell", "Verkaufen")} {cover(breaking.sym)}</button>
                   </>
                 )}
-                <button className="btn btn-dark" onClick={() => { p.clearBreaking(); setSpeed(pace); }}>Hold</button>
+                <button className="btn btn-dark" onClick={() => { p.clearBreaking(); setSpeed(pace); }}>{t("Hold", "Halten")}</button>
               </div>
             </div>
           </div>
@@ -283,29 +285,29 @@ export default function SimpleDesk(p: SimpleProps) {
           return (
             <div className="overlay" role="dialog" aria-modal="true" aria-labelledby="topup-title" onClick={close}>
               <div className="modal topup" onClick={(e) => e.stopPropagation()}>
-                <h2 id="topup-title">Add play money</h2>
-                <p className="small muted">Practice money only. It doesn&apos;t count as profit.</p>
-                <div className="topup-amounts" role="radiogroup" aria-label="Amount">
+                <h2 id="topup-title">{t("Add play money", "Spielgeld einzahlen")}</h2>
+                <p className="small muted">{t("Practice money only. It doesn't count as profit.", "Nur Übungsgeld. Es zählt nicht als Gewinn.")}</p>
+                <div className="topup-amounts" role="radiogroup" aria-label={t("Amount", "Betrag")}>
                   {[1000, 5000, 10000].map((a) => (
                     <button key={a} role="radio" aria-checked={!topUpCustom && topUpAmt === a} className="topup-amount num" onClick={() => { setTopUpAmt(a); setTopUpCustom(""); }}>+{eur(a)}</button>
                   ))}
                 </div>
                 <label className="field">
-                  <span className="xs muted">Or enter an amount (max {eur(TOPUP_MAX)})</span>
+                  <span className="xs muted">{t(`Or enter an amount (max ${eur(TOPUP_MAX)})`, `Oder gib einen Betrag ein (max. ${eur(TOPUP_MAX)})`)}</span>
                   <span className="input-prefix">
                     <span aria-hidden>€</span>
-                    <input type="number" inputMode="numeric" min={1} max={TOPUP_MAX} step={1} placeholder="e.g. 2500" value={topUpCustom}
+                    <input type="number" inputMode="numeric" min={1} max={TOPUP_MAX} step={1} placeholder={t("e.g. 2500", "z. B. 2500")} value={topUpCustom}
                       aria-invalid={!!topUpCustom && !valid} onChange={(e) => setTopUpCustom(e.target.value)} />
                   </span>
                 </label>
-                {topUpCustom && !valid && <p className="error" role="alert">Enter a whole amount from 1 to {eur(TOPUP_MAX)}.</p>}
+                {topUpCustom && !valid && <p className="error" role="alert">{t(`Enter a whole amount from 1 to ${eur(TOPUP_MAX)}.`, `Gib einen ganzen Betrag von 1 bis ${eur(TOPUP_MAX)} ein.`)}</p>}
                 <div className="topup-sum">
-                  <div className="kv"><span className="muted">Cash now</span><span className="num">{eur(sim.acct.cash)}</span></div>
-                  <div className="kv total"><strong>Cash after</strong><strong className="num">{valid ? eur(sim.acct.cash + amount) : "—"}</strong></div>
+                  <div className="kv"><span className="muted">{t("Cash now", "Guthaben jetzt")}</span><span className="num">{eur(sim.acct.cash)}</span></div>
+                  <div className="kv total"><strong>{t("Cash after", "Guthaben danach")}</strong><strong className="num">{valid ? eur(sim.acct.cash + amount) : "—"}</strong></div>
                 </div>
                 <div className="row topup-actions">
-                  <button className="btn btn-ghost" onClick={close}>Cancel</button>
-                  <button className="btn btn-primary" disabled={!valid} onClick={() => { p.addMoney(amount); close(); }}>{valid ? `Add ${eur(amount)}` : "Add"}</button>
+                  <button className="btn btn-ghost" onClick={close}>{t("Cancel", "Abbrechen")}</button>
+                  <button className="btn btn-primary" disabled={!valid} onClick={() => { p.addMoney(amount); close(); }}>{valid ? t(`Add ${eur(amount)}`, `${eur(amount)} einzahlen`) : t("Add", "Einzahlen")}</button>
                 </div>
               </div>
             </div>
@@ -318,6 +320,7 @@ export default function SimpleDesk(p: SimpleProps) {
 
 /** Rivals tab in a replay: the same scores and Mistake Cam as ProTrader, in the simple screen's table. */
 function ReplayRivals({ replay, sim, answers, cover }: { replay: Replay; sim: Sim; answers: Record<string, number>; cover: (s: string) => string }) {
+  const t = useT();
   const board = useBoard(replay, sim);
   return (
     <div className="rivals">
@@ -326,14 +329,14 @@ function ReplayRivals({ replay, sim, answers, cover }: { replay: Replay; sim: Si
           {board.map((r, i) => (
             <tr key={r.id} aria-selected={r.id === "you"}>
               <td className="num xs">{i + 1}</td>
-              <td className="small"><Icon name={r.id} size={28} round /> {r.name}</td>
+              <td className="small"><Icon name={r.id} size={28} round /> {t(r.name)}</td>
               <td className={`r num small ${cls(r.ret)}`}>{pct(r.ret)}</td>
             </tr>
           ))}
         </tbody>
       </table>
       <div className="stack" style={{ gap: "var(--space-3)" }}>
-        <h3>Mistake Cam</h3>
+        <h3>{t("Mistake Cam", "Fehler-Cam")}</h3>
         <MistakeCam replay={replay} sim={sim} answers={answers} name={cover} compact />
       </div>
     </div>

@@ -1,5 +1,6 @@
 "use client";
 import { createContext, useContext, useState } from "react";
+import { dict, useT } from "@/shared/lib/i18n";
 
 /**
  * Pro mode has two layouts on the same market:
@@ -44,17 +45,49 @@ export const GLOSSARY = {
 } as const;
 export type TermKey = keyof typeof GLOSSARY;
 
+dict({
+  [GLOSSARY["depot-value"]]: "Depotwert: was alles in deinem Depot zum heutigen Kurs wert ist.",
+  [GLOSSARY.available]: "Verfügbar: Guthaben auf deinem Verrechnungskonto, das du noch ausgeben kannst. Geld, das für offene Kauforders reserviert ist, ist schon abgezogen.",
+  [GLOSSARY.intraday]: "Intraday-Kredit: ein Kredit für Trades, die am selben Tag eröffnet und geschlossen werden. Ein Werkzeug für erfahrene Trader; in der Sandbox bleibt er bei 0.",
+  [GLOSSARY.total]: "Gesamt: Guthaben plus Depotwert. Alles, was du hier hast.",
+  [GLOSSARY["depot-number"]]: "Depotnummer: die Kennung deines Wertpapierdepots, wie eine IBAN für Aktien.",
+  [GLOSSARY.workspaces]: "Arbeitsbereiche: gespeicherte Anordnungen von Widgets. Wechsle zwischen Depotübersicht und Fokus auf einen Einzelwert.",
+  [GLOSSARY.widgets]: "Widgets: die Fenster auf diesem Bildschirm. Hier blendest du sie ein oder aus.",
+  [GLOSSARY.exchange]: "Handelsplatz: wo dein Trade stattfindet. Xetra ist Deutschlands wichtigste Börse (9:00–17:30), Tradegate handelt auch abends (8:00–22:00).",
+  [GLOSSARY.last]: "Letzter: der Kurs des jüngsten Trades.",
+  [GLOSSARY["diff-prev"]]: "Diff. Vortag: Veränderung seit dem Schlusskurs von gestern.",
+  [GLOSSARY["purchase-value"]]: "Kaufwert: was du für die Positionen bezahlt hast, die du jetzt hältst.",
+  [GLOSSARY["diff-purchase"]]: "Heutiger Wert minus dem, was du bezahlt hast. Ein echter Gewinn oder Verlust wird es erst, wenn du verkaufst.",
+  [GLOSSARY.pnl]: "Gewinn / Verlust: heutiger Wert minus dem, was du bezahlt hast. Echt wird er erst, wenn du verkaufst.",
+  [GLOSSARY.wkn]: "WKN: die 6-stellige deutsche Kennung eines Wertpapiers. Gleiches Unternehmen, keine Verwechslung.",
+  [GLOSSARY.weight]: "Gewicht: wie viel deines gesamten Kontos in dieser einen Position steckt. Ein großes Gewicht heißt: Ein Unternehmen kann alles bewegen.",
+  [GLOSSARY.qty]: "Stückzahl: wie viele Aktien. Immer ganze Stück, außer im Sparplan.",
+  [GLOSSARY.ask]: "Brief: der Kurs, den du beim Kaufen zahlst. Er liegt etwas über dem Geldkurs; die Lücke ist der Spread.",
+  [GLOSSARY.bid]: "Geld: der Kurs, den du beim Verkaufen bekommst.",
+  [GLOSSARY["order-type"]]: "Market kauft oder verkauft sofort zum besten verfügbaren Kurs. Limit nur zu deinem Kurs oder besser. Stop wird ausgelöst, sobald der Kurs deine Marke kreuzt.",
+  [GLOSSARY.validity]: "Gültigkeit: wie lange eine Order wartet, wenn sie nicht ausgeführt wird.",
+  [GLOSSARY.fee]: "Gebühr: was die Bank pro Order berechnet. Ein fixer Anteil macht kleine Orders relativ teuer.",
+  [GLOSSARY.orderbook]: "Orderbuch: deine Orders und ihr Status: offen, ausgeführt oder verfallen.",
+  [GLOSSARY.candles]: "Jede Kerze ist ein Tag: Der Körper reicht von Eröffnung bis Schluss, grün bei höherem Schluss, rot bei tieferem. Die dünnen Linien sind Hoch und Tief des Tages.",
+  [GLOSSARY.volume]: "Volumen: wie viele Aktien an dem Tag gehandelt wurden. Große Bewegungen kommen meist mit großem Volumen.",
+  [GLOSSARY.bollinger]: "Bollinger-Bänder: ein Band um den 20-Tage-Durchschnitt. Ein breites Band bedeutet große Schwankungen.",
+  [GLOSSARY["savings-plan"]]: "Sparplan: investiert jeden Monat automatisch denselben Betrag.",
+  [GLOSSARY.watchlist]: "Watchlist: Aktien, denen du folgst. Auf der Liste zu stehen heißt nicht, dass sie dir gehören.",
+  [GLOSSARY.news]: "News: simulierte Schlagzeilen. Die meisten sind Rauschen; die großen halten die Zeitmaschine an.",
+});
+
 /** A label that explains itself on hover or focus, when explaining is on. */
 export function Term({ k, children }: { k: TermKey; children: React.ReactNode }) {
+  const t = useT();
   const { lv, explain, setTip } = useProView();
   if (!lv && !explain) return <>{children}</>;
   const show = (el: HTMLElement) => {
     const r = el.getBoundingClientRect();
     const above = r.bottom + 120 > window.innerHeight;
-    setTip({ text: GLOSSARY[k], x: Math.max(8, Math.min(r.left, window.innerWidth - 288)), y: above ? r.top - 6 : r.bottom + 6, above });
+    setTip({ text: t(GLOSSARY[k]), x: Math.max(8, Math.min(r.left, window.innerWidth - 288)), y: above ? r.top - 6 : r.bottom + 6, above });
   };
   return (
-    <span className="term" tabIndex={0} aria-description={GLOSSARY[k]}
+    <span className="term" tabIndex={0} aria-description={t(GLOSSARY[k])}
       onMouseEnter={(e) => show(e.currentTarget)} onFocus={(e) => show(e.currentTarget)}
       onMouseLeave={() => setTip(null)} onBlur={() => setTip(null)}>
       {children}

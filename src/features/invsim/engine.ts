@@ -1,4 +1,5 @@
 import { gauss, rng } from "../../shared/lib/rng.ts";
+import { L } from "../../shared/lib/i18n.ts";
 
 /**
  * Investor Simulator: 30 years of a life, one turn per year.
@@ -151,11 +152,12 @@ export function pay(g: Game, amount: number, count = true): Game {
     const sold = Math.min(w.etf + w.stock, due);
     const fromEtf = Math.min(w.etf, sold);
     w.etf = r2(w.etf - fromEtf); w.stock = r2(w.stock - (sold - fromEtf)); due = r2(due - sold);
-    if (sold > 0) { flags.forced++; alert = `Your cushion was short, so you had to sell ${Math.round(sold).toLocaleString("de-DE")} € of investments, whatever the price.`; }
+    if (sold > 0) { flags.forced++; const n = Math.round(sold).toLocaleString("de-DE"); alert = L(`Your cushion was short, so you had to sell ${n} € of investments, whatever the price.`, `Dein Polster hat nicht gereicht, also musstest du Anlagen für ${n} € verkaufen, egal zu welchem Kurs.`); }
   }
   if (due > 0) {
     w.debt = r2(w.debt + due); flags.borrowed++;
-    alert = `Nothing left to sell: you borrowed ${Math.round(due).toLocaleString("de-DE")} € at 9 % interest.`;
+    const n = Math.round(due).toLocaleString("de-DE");
+    alert = L(`Nothing left to sell: you borrowed ${n} € at 9 % interest.`, `Nichts mehr zu verkaufen: Du hast ${n} € zu 9 % Zinsen geliehen.`);
   }
   return { ...g, wallet: w, flags, alert: alert ?? g.alert, flows: count ? { ...g.flows, bills: r2(g.flows.bills + amount) } : g.flows };
 }

@@ -7,6 +7,7 @@ import { actions } from "@/features/game/store";
 import { setUi } from "@/features/game/ui";
 import CardArt from "@/features/learn/CardArt";
 import CountUp from "@/shared/ui/CountUp";
+import { dict, useT } from "@/shared/lib/i18n";
 import s from "./Onboarding.module.css";
 
 type Opt = { label: string; art: ReactNode };
@@ -35,10 +36,21 @@ const CHECK = [
   { q: "4,90 € fee on a 100 € order is about…", options: ["0,5 %", "5 %", "49 %"], answer: 1 },
 ];
 
+dict({
+  "What are you saving for?": "Wofür sparst du?", "First steps": "Erste Schritte", "Kids & a home": "Kinder & Zuhause", Retirement: "Rente",
+  "When do you need the money?": "Wann brauchst du das Geld?", years: "Jahre",
+  "Bought a stock before?": "Schon mal eine Aktie gekauft?", Never: "Nie", "Once or twice": "Ein-, zweimal", Regularly: "Regelmäßig",
+  "Limit buy at 50 €, price is 55 €. The order…": "Limit-Kauf bei 50 €, der Kurs steht bei 55 €. Die Order …",
+  "Buys at 55 €": "Kauft zu 55 €", "Waits for ≤ 50 €": "Wartet auf ≤ 50 €", "Is cancelled": "Wird gestrichen",
+  "Money for stocks has to be on…": "Wo muss das Geld für Aktien liegen?", "Trading account": "Verrechnungskonto", "Credit card": "Kreditkarte", "Any account": "Egal, auf welchem Konto",
+  "4,90 € fee on a 100 € order is about…": "4,90 € Gebühr auf eine 100-€-Order sind etwa …", "0,5 %": "0,5 %", "5 %": "5 %", "49 %": "49 %",
+});
+
 const PERSONA_ART: Record<PersonaId, string> = { starter: "goal-start", builder: "goal-home", retiree: "goal-retire" };
 
 /** Max. 4 screens, about 60 seconds: welcome + 3 questions → persona. */
 export default function Onboarding() {
+  const t = useT();
   const router = useRouter();
   const [screen, setScreen] = useState(0);
   const [a, setA] = useState<Partial<Answers>>({});
@@ -84,10 +96,10 @@ export default function Onboarding() {
       <section className={s.stage} aria-live="polite">
         {screen > 0 && (
           <div className={s.top}>
-            <button className={s.back} onClick={() => setScreen(screen === 5 && expert ? 4 : screen === 5 ? 3 : screen - 1)} aria-label="Back">
+            <button className={s.back} onClick={() => setScreen(screen === 5 && expert ? 4 : screen === 5 ? 3 : screen - 1)} aria-label={t("Back", "Zurück")}>
               <Arrow left />
             </button>
-            <ol className={s.rail} aria-label={`Step ${step} of 4`} style={{ "--p": (step - 1) / 3 } as CSSProperties}>
+            <ol className={s.rail} aria-label={t(`Step ${step} of 4`, `Schritt ${step} von 4`)} style={{ "--p": (step - 1) / 3 } as CSSProperties}>
               {[1, 2, 3, 4].map((i) => (
                 <li key={i} className={i < step ? s.done : i === step ? s.now : ""}>
                   {i < step ? <Check /> : i === 4 ? <StarGlyph /> : i}
@@ -100,9 +112,9 @@ export default function Onboarding() {
         {screen === 0 && (
           <div className={s.welcome} key="w">
             <div className={s.welcomeText}>
-              <h1>Learn to invest.<br /><mark>Risk nothing.</mark></h1>
+              <h1>{t("Learn to invest.", "Investieren lernen.")}<br /><mark>{t("Risk nothing.", "Ohne Risiko.")}</mark></h1>
               <button className={`btn btn-primary btn-lg ${s.go}`} onClick={() => setScreen(1)}>
-                Let’s go <span className={s.goSub}>60 sec</span><Arrow />
+                {t("Let’s go", "Los geht’s")} <span className={s.goSub}>{t("60 sec", "60 Sek.")}</span><Arrow />
               </button>
             </div>
           </div>
@@ -112,14 +124,14 @@ export default function Onboarding() {
           const Q = QUESTIONS[screen - 1];
           return (
             <div className={s.body} key={Q.key}>
-              <h1>{Q.q}</h1>
+              <h1>{t(Q.q)}</h1>
               <div className={s.options}>
                 {Q.options.map((o, i) => (
                   <button key={i} className={s.option} aria-pressed={a[Q.key] === i} onClick={() => answer(Q.key, i)}
-                    aria-label={Q.key === "horizon" ? `${["Less than 5", "5 to 15", "More than 15"][i]} years` : o.label}>
+                    aria-label={Q.key === "horizon" ? t(`${["Less than 5", "5 to 15", "More than 15"][i]} years`, `${["Weniger als 5", "5 bis 15", "Mehr als 15"][i]} Jahre`) : t(o.label)}>
                     <kbd className={s.key} aria-hidden>{i + 1}</kbd>
                     <span className={s.optArt}>{o.art}</span>
-                    <span className={s.optLabel}>{o.label}</span>
+                    <span className={s.optLabel}>{t(o.label)}</span>
                   </button>
                 ))}
               </div>
@@ -129,14 +141,14 @@ export default function Onboarding() {
 
         {screen === 4 && (
           <div className={s.body} key="check">
-            <h1>Prove it, skip Module 1.</h1>
+            <h1>{t("Prove it, skip Module 1.", "Zeig, was du kannst, und überspring Modul 1.")}</h1>
             <div className={s.quiz}>
               {CHECK.map((c, i) => (
                 <fieldset key={c.q} className={s.qRow}>
-                  <legend>{c.q}</legend>
+                  <legend>{t(c.q)}</legend>
                   <div className={s.seg}>
                     {c.options.map((o, k) => (
-                      <button key={o} aria-pressed={check[i] === k} onClick={() => { const n = [...check]; n[i] = k; setCheck(n); }}>{o}</button>
+                      <button key={o} aria-pressed={check[i] === k} onClick={() => { const n = [...check]; n[i] = k; setCheck(n); }}>{t(o)}</button>
                     ))}
                   </div>
                 </fieldset>
@@ -144,7 +156,7 @@ export default function Onboarding() {
             </div>
             <button className={`btn btn-primary btn-lg ${s.go}`} disabled={!checkDone}
               onClick={() => { setPersona(personaFor(a as Answers)); setScreen(5); }}>
-              See my path <Arrow />
+              {t("See my path", "Meinen Weg zeigen")} <Arrow />
             </button>
           </div>
         )}
@@ -152,30 +164,30 @@ export default function Onboarding() {
         {screen === 5 && P && (
           <div className={s.result} key="r">
             <div className={s.resultMain}>
-              <h1>You’re a <mark>{P.label}</mark></h1>
+              <h1>{t("You’re a", "Dein Typ:")} <mark>{t(P.label)}</mark></h1>
               <div className={s.who}>
                 <span className={s.chip}><CardArt id={PERSONA_ART[P.id]} size={40} /></span>
-                <span><strong>{P.who}</strong><span>{P.goal}</span></span>
+                <span><strong>{t(P.who)}</strong><span>{t(P.goal)}</span></span>
               </div>
               <div className="row">
-                <button className={`btn btn-primary btn-lg ${s.go}`} onClick={() => go(false)}>Let’s start <Arrow /></button>
-                {expert && checkPassed && <button className={`btn btn-lg ${s.ghost}`} onClick={() => go(true)}>Skip to Pro</button>}
+                <button className={`btn btn-primary btn-lg ${s.go}`} onClick={() => go(false)}>{t("Let’s start", "Los geht’s")} <Arrow /></button>
+                {expert && checkPassed && <button className={`btn btn-lg ${s.ghost}`} onClick={() => go(true)}>{t("Skip to Pro", "Direkt zu Pro")}</button>}
               </div>
-              {expert && !checkPassed && <p className={s.note}>Not quite. Module 1 is a good warm-up.</p>}
+              {expert && !checkPassed && <p className={s.note}>{t("Not quite. Module 1 is a good warm-up.", "Nicht ganz. Modul 1 ist ein gutes Aufwärmen.")}</p>}
             </div>
             <div className={s.wallet}>
-              <span className={s.walletLabel}>Play money</span>
+              <span className={s.walletLabel}>{t("Play money", "Spielgeld")}</span>
               <strong className="num"><CountUp to={P.start} active format={(n) => num(n, 0)} delay={250} /> €</strong>
-              <span className={s.walletLabel}>{P.horizon}</span>
+              <span className={s.walletLabel}>{t(P.horizon)}</span>
             </div>
           </div>
         )}
         {screen === 5 && (
-          <div className={s.switch} role="group" aria-label="Pick another path">
+          <div className={s.switch} role="group" aria-label={t("Pick another path", "Einen anderen Weg wählen")}>
             {(Object.keys(PERSONAS) as PersonaId[]).map((id) => (
               <button key={id} aria-pressed={id === persona} onClick={() => setPersona(id)}>
                 <span className={s.chip}><CardArt id={PERSONA_ART[id]} size={28} /></span>
-                <span><strong>{PERSONAS[id].label}</strong><span className="num">{num(PERSONAS[id].start, 0)} €</span></span>
+                <span><strong>{t(PERSONAS[id].label)}</strong><span className="num">{num(PERSONAS[id].start, 0)} €</span></span>
               </button>
             ))}
           </div>

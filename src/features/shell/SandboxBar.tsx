@@ -3,22 +3,26 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { rankOf, useGame } from "@/features/game/store";
 import ProgressRing from "@/shared/ui/ProgressRing";
+import { useT } from "@/shared/lib/i18n";
+import LangSwitch from "@/features/shell/LangSwitch";
 
 /** Thin bar above the copied comdirect screens: makes clear this is the training sandbox (🆕, not comdirect). */
 export default function SandboxBar({ clock, dark = false }: { clock?: string; dark?: boolean }) {
   const save = useGame();
   const rank = rankOf(save.xp);
+  const t = useT();
   return (
-    <div className={`sbar ${dark ? "dark" : ""}`} role="region" aria-label="Training sandbox">
-      <span className="sbar-tag">Training sandbox</span>
-      <span className="sbar-note">Play money · nothing here is real</span>
-      {clock && <span className="sbar-clock num" aria-label="Simulated time">{clock}</span>}
+    <div className={`sbar ${dark ? "dark" : ""}`} role="region" aria-label={t("Training sandbox", "Trainings-Sandbox")}>
+      <span className="sbar-tag">{t("Training sandbox", "Trainings-Sandbox")}</span>
+      <span className="sbar-note">{t("Play money · nothing here is real", "Spielgeld · hier ist nichts echt")}</span>
+      {clock && <span className="sbar-clock num" aria-label={t("Simulated time", "Simulierte Zeit")}>{clock}</span>}
       <span className="sbar-right">
         <span className="sbar-rank" title={`${save.xp} XP`} data-xp-target>
-          <ProgressRing value={rank.progress} size={24} label={`Rank ${rank.name}, ${Math.round(rank.progress * 100)} % to the next rank`} center={rank.level} />
-          <span><strong>{rank.name}</strong> <span className="num sbar-xp"><TickingXp value={save.xp} /> XP</span></span>
+          <ProgressRing value={rank.progress} size={24} label={t(`Rank ${rank.name}, ${Math.round(rank.progress * 100)} % to the next rank`, `Rang ${t(rank.name)}, ${Math.round(rank.progress * 100)} % bis zum nächsten Rang`)} center={rank.level} />
+          <span><strong>{t(rank.name)}</strong> <span className="num sbar-xp"><TickingXp value={save.xp} /> XP</span></span>
         </span>
-        <Link href="/" className="sbar-link">Learning map</Link>
+        <LangSwitch />
+        <Link href="/" className="sbar-link">{t("Learning map", "Lernpfad")}</Link>
       </span>
     </div>
   );

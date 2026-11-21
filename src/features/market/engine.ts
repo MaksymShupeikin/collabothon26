@@ -1,6 +1,7 @@
 import { ALL_COMPANIES, type Company } from "./companies.ts";
 import type { News } from "./news.ts";
 import { gauss, rng } from "../../shared/lib/rng.ts";
+import { dict } from "../../shared/lib/i18n.ts";
 
 /**
  * Deterministic market + one player account.
@@ -307,3 +308,13 @@ export function riskScore(series: number[]) {
   return round2((ret - 0.5 * maxDrawdown(series)) * 100);
 }
 export const returnPct = (series: number[]) => round2((series[series.length - 1] / series[0] - 1) * 100);
+
+// Order errors are returned in English and translated where they are shown.
+dict({
+  "Quantity must be a whole number above 0.": "Die Stückzahl muss eine ganze Zahl über 0 sein.",
+  "Not enough money on your trading account for this order (incl. costs).": "Nicht genug Geld auf dem Verrechnungskonto für diese Order (inkl. Kosten).",
+  "You can't sell more than you own.": "Mehr als den Bestand kann man nicht verkaufen.",
+  "Enter a whole number of shares.": "Bitte eine ganze Stückzahl eingeben.",
+  "Enter a limit price.": "Bitte einen Limitkurs eingeben.",
+  "Enter a stop price.": "Bitte einen Stoppkurs eingeben.",
+});

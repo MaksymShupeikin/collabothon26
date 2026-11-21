@@ -3,6 +3,9 @@ import { useEffect, useRef } from "react";
 import { CandlestickSeries, createChart, createSeriesMarkers, HistogramSeries, LineSeries, type IChartApi, type ISeriesApi, type ISeriesMarkersPluginApi, type SeriesMarker, type Time, type UTCTimestamp } from "lightweight-charts";
 import { rng } from "@/shared/lib/rng";
 import { css } from "@/shared/charts/PriceLine";
+import { dict, tr, useLang } from "@/shared/lib/i18n";
+
+dict({ "Last price": "Letzter Kurs" });
 
 export type ChartMark = { day: number; kind: "you-buy" | "you-sell" | "bot" | "news"; text: string };
 const BASE = 1_600_000_000; // fake epoch: one "day" per 86400 s, so real dates never leak into hidden replays
@@ -56,6 +59,13 @@ export default function ProChart({ sym, closes, firstDay, label, marks, type, bo
     chart.current = c;
     return () => { c.remove(); chart.current = null; };
   }, []);
+
+  const lang = useLang();
+  useEffect(() => {
+    const title = tr("Last price", lang);
+    candles.current?.applyOptions({ title });
+    line.current?.applyOptions({ title });
+  }, [lang]);
 
   useEffect(() => {
     if (!candles.current) return;

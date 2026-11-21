@@ -12,6 +12,7 @@ import ProgressRing from "@/shared/ui/ProgressRing";
 import CountUp from "@/shared/ui/CountUp";
 import { Wordmark } from "@/shared/ui/Wordmark";
 import CardArt, { CARD_SHORT } from "@/features/learn/CardArt";
+import { dict, tr, useT } from "@/shared/lib/i18n";
 import s from "./LearningMap.module.css";
 
 const STARS_MAX = 21;
@@ -20,6 +21,7 @@ export const BOSS_ICON: Record<string, string> = { b2: "max", b3: "alex", b4: "p
 
 /** The hub after onboarding: next-up hero with rank, the world path, side modes, concept cards. */
 export default function LearningMap() {
+  const t = useT();
   const save = useGame();
   const router = useRouter();
   const rank = rankOf(save.xp);
@@ -54,9 +56,9 @@ export default function LearningMap() {
   if (!persona) return (
     <main className="container stack">
       <div className="card stack">
-        <h1>Welcome</h1>
-        <p>Answer three quick questions first, so the examples fit your life.</p>
-        <Link className="btn btn-primary" style={{ alignSelf: "flex-start" }} href="/start">Start ›</Link>
+        <h1>{t("Welcome", "Willkommen")}</h1>
+        <p>{t("Answer three quick questions first, so the examples fit your life.", "Beantworte zuerst drei kurze Fragen, damit die Beispiele zu deinem Leben passen.")}</p>
+        <Link className="btn btn-primary" style={{ alignSelf: "flex-start" }} href="/start">{t("Start ›", "Starten ›")}</Link>
       </div>
     </main>
   );
@@ -69,14 +71,14 @@ export default function LearningMap() {
 
   return (
     <main className={`container ${s.page}`}>
-      <section className={s.hero} aria-label="Next up">
+      <section className={s.hero} aria-label={t("Next up", "Als Nächstes")}>
         <div className={s.next}>
           {next ? (
             <>
               <Quote />
               <button className={`btn btn-primary btn-lg ${s.go}`} onClick={() => launch(next)}>
-                {started ? "Continue" : "Start"}
-                <span className="btn-context">{next.title}</span>
+                {started ? t("Continue", "Weiter") : t("Start", "Starten")}
+                <span className="btn-context">{t(next.title)}</span>
                 <Arrow />
               </button>
             </>
@@ -84,8 +86,8 @@ export default function LearningMap() {
             <>
               <Quote />
               <Link className={`btn btn-primary btn-lg ${s.go}`} href="/ready">
-                Open your portfolio
-                <span className="btn-context">All cleared</span>
+                {t("Open your portfolio", "Dein Depot eröffnen")}
+                <span className="btn-context">{t("All cleared", "Alles geschafft")}</span>
                 <Arrow />
               </Link>
             </>
@@ -94,32 +96,32 @@ export default function LearningMap() {
 
         <div className={s.hud}>
           <div className={s.rank} ref={rankRef}>
-            <ProgressRing value={rankShown ? rank.progress : 0} size={72} label={`Rank ${rank.level} of ${RANKS.length}, ${Math.round(rank.progress * 100)}% to the next rank`} center={rank.level} />
+            <ProgressRing value={rankShown ? rank.progress : 0} size={72} label={t(`Rank ${rank.level} of ${RANKS.length}, ${Math.round(rank.progress * 100)}% to the next rank`, `Rang ${rank.level} von ${RANKS.length}, ${Math.round(rank.progress * 100)} % bis zum nächsten Rang`)} center={rank.level} />
             <div className={s.rankText}>
-              <strong>{rank.name}</strong>
+              <strong>{t(rank.name)}</strong>
               <div className={s.xpBar} aria-hidden><span style={{ width: `${rankShown ? rank.progress * 100 : 0}%` }} /></div>
-              <span className="num xs"><CountUp to={save.xp} active={rankShown} />{rank.nextAt ? ` / ${rank.nextAt} XP · next ${rank.next}` : " XP · top rank"}</span>
+              <span className="num xs"><CountUp to={save.xp} active={rankShown} />{rank.nextAt ? t(` / ${rank.nextAt} XP · next ${rank.next}`, ` / ${rank.nextAt} XP · nächster: ${t(rank.next!)}`) : t(" XP · top rank", " XP · höchster Rang")}</span>
             </div>
           </div>
           <dl className={s.tally}>
-            <div><dt>Stars <Star /></dt><dd className="num"><CountUp to={stars} active={rankShown} /><small>/{STARS_MAX}</small></dd></div>
-            <div><dt>Cards <CardGlyph /></dt><dd className="num"><CountUp to={save.cards.length} active={rankShown} /><small>/{CARDS.length}</small></dd></div>
-            <div><dt>Modules <Layers /></dt><dd className="num"><CountUp to={worldsOpen} active={rankShown} /><small>/{WORLDS.length}</small></dd></div>
+            <div><dt>{t("Stars", "Sterne")} <Star /></dt><dd className="num"><CountUp to={stars} active={rankShown} /><small>/{STARS_MAX}</small></dd></div>
+            <div><dt>{t("Cards", "Karten")} <CardGlyph /></dt><dd className="num"><CountUp to={save.cards.length} active={rankShown} /><small>/{CARDS.length}</small></dd></div>
+            <div><dt>{t("Modules", "Module")} <Layers /></dt><dd className="num"><CountUp to={worldsOpen} active={rankShown} /><small>/{WORLDS.length}</small></dd></div>
           </dl>
         </div>
       </section>
 
-      <section className={s.modes} aria-label="Play modes">
-        <ModeTile open={proOpen} lockText="After Module 1" icon="chart" title="Real Market" line="Simple or Pro view. Beat the bots."
+      <section className={s.modes} aria-label={t("Play modes", "Spielmodi")}>
+        <ModeTile open={proOpen} lockText={t("After Module 1", "Nach Modul 1")} icon="chart" title={t("Real Market", "Echter Markt")} line={t("Simple or Pro view.", "Einfache oder Pro-Ansicht.")}
           onOpen={() => { actions.start(null); setUi({}); router.push("/pro"); }} />
-        <ModeTile open icon="sprout" title="Investor Simulator" line="30 years of life in 10 minutes." onOpen={() => router.push("/invest")} />
+        <ModeTile open icon="sprout" title={t("Investor Simulator", "Anleger-Simulator")} line={t("30 years of life in 10 minutes.", "30 Jahre Leben in 10 Minuten.")} onOpen={() => router.push("/invest")} />
         {/* always open: History mode is separate from the modules */}
-        <ModeTile open icon="hourglass" title="History Mode" line="Real crashes, hidden dates."
+        <ModeTile open icon="hourglass" title={t("History Mode", "Geschichtsmodus")} line={t("Real crashes, hidden dates.", "Echte Crashs, verdeckte Daten.")}
           onOpen={() => router.push("/history")} />
       </section>
 
       <section aria-labelledby="worlds-h">
-        <h2 id="worlds-h" className={s.sectionHead}>Learning path</h2>
+        <h2 id="worlds-h" className={s.sectionHead}>{t("Learning path", "Lernpfad")}</h2>
         <ol className={s.path}>
           {WORLDS.map((w) => (
             <WorldTile key={w.n} w={w} save={save} next={next} launch={launch} />
@@ -130,9 +132,9 @@ export default function LearningMap() {
           <Link href="/ready" className={s.finish}>
             <span className={s.flag} aria-hidden><Icon name="flag" size={30} /></span>
             <span className={s.finishText}>
-              <span className={`xs ${s.kicker}`}>Finish line</span>
-              <strong>Ready for real</strong>
-              <span className="xs">You’re ready. Same portfolio, real money.</span>
+              <span className={`xs ${s.kicker}`}>{t("Finish line", "Ziellinie")}</span>
+              <strong>{t("Ready for real", "Bereit für echt")}</strong>
+              <span className="xs">{t("You’re ready. Same portfolio, real money.", "Du bist bereit. Gleiches Depot, echtes Geld.")}</span>
             </span>
             {/* Sandbox → real platform: every module segment lit. */}
             <span className={s.bridge} aria-hidden>
@@ -147,18 +149,18 @@ export default function LearningMap() {
 
 
       <section aria-labelledby="cards-h">
-        <h2 id="cards-h" className={s.sectionHead}>Concept cards</h2>
+        <h2 id="cards-h" className={s.sectionHead}>{t("Concept cards", "Wissenskarten")}</h2>
         <ul className={s.cards}>
           {CARDS.map((c) => {
             const has = save.cards.includes(c.id);
             return (
               <li key={c.id} className={`${s.mini} ${has ? s.has : s.sealed}`}>
-                <span className={s.miniTop}>Module {c.world}</span>
+                <span className={s.miniTop}>{t("Module", "Modul")} {c.world}</span>
                 <span className={s.art}>
                   <CardArt id={c.id} size={88} />
                   {!has && <span className={s.seal}><Lock /></span>}
                 </span>
-                <span className={s.miniName}>{CARD_SHORT[c.id] ?? c.title}</span>
+                <span className={s.miniName}>{t(CARD_SHORT[c.id] ?? c.title)}</span>
               </li>
             );
           })}
@@ -166,10 +168,10 @@ export default function LearningMap() {
       </section>
 
       <details className={s.demo}>
-        <summary className="xs">Demo tools</summary>
+        <summary className="xs">{t("Demo tools", "Demo-Werkzeuge")}</summary>
         <div className={s.demoBody}>
-          <label className="xs"><input type="checkbox" checked={save.allUnlocked} onChange={(e) => actions.setAllUnlocked(e.target.checked)} /> Unlock all worlds</label>
-          <button className="btn btn-ghost btn-sm" onClick={() => { if (confirm("Reset all progress and start over?")) { actions.reset(); router.push("/start"); } }}>Reset progress</button>
+          <label className="xs"><input type="checkbox" checked={save.allUnlocked} onChange={(e) => actions.setAllUnlocked(e.target.checked)} /> {t("Unlock all worlds", "Alle Welten freischalten")}</label>
+          <button className="btn btn-ghost btn-sm" onClick={() => { if (confirm(t("Reset all progress and start over?", "Gesamten Fortschritt zurücksetzen und neu beginnen?"))) { actions.reset(); router.push("/start"); } }}>{t("Reset progress", "Fortschritt zurücksetzen")}</button>
         </div>
       </details>
     </main>
@@ -185,6 +187,14 @@ const QUOTES = [
   { q: "In investing, what is comfortable is rarely profitable", by: "Robert Arnott" },
   { q: "Be fearful when others are greedy, and greedy when others are fearful", by: "Warren Buffett" },
 ];
+dict({
+  "Risk comes from not knowing what you’re doing": "Risiko entsteht, wenn man nicht weiß, was man tut",
+  "Know what you own, and know why you own it": "Wisse, was du besitzt, und wisse, warum du es besitzt",
+  "The investor’s chief problem is likely to be himself": "Das größte Problem des Anlegers ist wahrscheinlich er selbst",
+  "Don’t look for the needle in the haystack. Just buy the haystack": "Such nicht die Nadel im Heuhaufen. Kauf einfach den Heuhaufen",
+  "In investing, what is comfortable is rarely profitable": "Beim Investieren ist das Bequeme selten profitabel",
+  "Be fearful when others are greedy, and greedy when others are fearful": "Sei ängstlich, wenn andere gierig sind, und gierig, wenn andere ängstlich sind",
+});
 const QUOTE_MS = 20_000;
 const QUOTE_OUT_MS = 300; // matches .quoteLeaving in the CSS
 
@@ -201,6 +211,7 @@ function keyDelay(ch: string) {
  * (untyped letters are hidden, not missing), so wrapping never jumps while it types.
  */
 function Quote() {
+  const t = useT();
   const [i, setI] = useState(0);
   const [n, setN] = useState(0);
   const [busy, setBusy] = useState(true);
@@ -215,7 +226,7 @@ function Quote() {
     (async () => {
       await wait(still ? 0 : 250);
       while (alive) {
-        const q = QUOTES[idx].q;
+        const q = tr(QUOTES[idx].q);
         setI(idx); setLeaving(false);
         if (still) setN(q.length);
         else {
@@ -234,8 +245,9 @@ function Quote() {
       }
     })();
     return () => { alive = false; clearTimeout(timer); };
-  }, []);
-  const { q, by } = QUOTES[i];
+  }, [t.lang]); // a language switch types the line again
+  const { by } = QUOTES[i];
+  const q = t(QUOTES[i].q);
   // The caret lives inside the last typed letter (never after a just-typed space), so it can't drop to a new line on its own.
   const end = q.slice(0, n).trimEnd().length;
   const caret = <span key={busy ? "busy" : `idle${i}`} className={`${s.caret} ${busy ? s.caretBusy : ""}`} />;
@@ -260,6 +272,7 @@ function Quote() {
 }
 
 function WorldTile({ w, save, next, launch }: { w: World; save: Save; next: Chapter | undefined; launch: (c: Chapter) => void }) {
+  const t = useT();
   const open = worldOpen(save, w.n);
   const items = CHAPTERS.filter((c) => c.world === w.n);
   const doneCount = items.filter((c) => save.done.includes(c.id)).length;
@@ -277,9 +290,9 @@ function WorldTile({ w, save, next, launch }: { w: World; save: Save; next: Chap
       <div className={s.worldTop}>
         <span className={s.badge} aria-hidden>{complete ? <Check /> : !open ? <Lock /> : w.n}</span>
         <div className={s.worldText}>
-          <h3>{w.title}</h3>
+          <h3>{t(w.title)}</h3>
           {/* Hovering a node peeks at that level. */}
-          <span className={`xs ${s.caption}`}>{open ? caption.title : `Unlocks after ${prev?.title ?? `Module ${w.n - 1}`}`}</span>
+          <span className={`xs ${s.caption}`}>{open ? t(caption.title) : t(`Unlocks after ${prev?.title ?? `Module ${w.n - 1}`}`, `Öffnet nach ${prev ? t(prev.title) : `Modul ${w.n - 1}`}`)}</span>
         </div>
       </div>
       </div>
@@ -296,7 +309,7 @@ function WorldTile({ w, save, next, launch }: { w: World; save: Save; next: Chap
             return (
               <button key={c.id} className={cls} disabled={!can} onClick={() => launch(c)}
                 onMouseEnter={() => setPeek(c)} onFocus={() => setPeek(c)} onBlur={() => setPeek(null)}
-                aria-label={`${c.kind === "chapter" ? c.n + " " : ""}${c.title}${done ? ", done" : can ? "" : ", locked"}${st ? `, ${st} of 3 stars` : ""}`}>
+                aria-label={`${c.kind === "chapter" ? c.n + " " : ""}${t(c.title)}${done ? t(", done", ", erledigt") : can ? "" : t(", locked", ", gesperrt")}${st ? t(`, ${st} of 3 stars`, `, ${st} von 3 Sternen`) : ""}`}>
                 {c.kind === "boss" ? <Icon name={BOSS_ICON[c.id] ?? "max"} size={40} round />
                   : c.kind === "mission" ? <Star />
                   : done ? <Check /> : <span className="num">{c.n.split(".")[1]}</span>}
@@ -307,14 +320,14 @@ function WorldTile({ w, save, next, launch }: { w: World; save: Save; next: Chap
         </div>
       </div>
 
-      {!open && <p className={`xs ${s.teaser}`}>{w.blurb}</p>}
+      {!open && <p className={`xs ${s.teaser}`}>{t(w.blurb)}</p>}
       {open && <div className={s.actions}>
         {todo ? (
           <button className={`btn ${current ? "btn-primary" : "btn-outline"} ${s.cta}`} onClick={() => launch(todo)}>
-            Start lesson <Arrow />
+            {t("Start lesson", "Lektion starten")} <Arrow />
           </button>
         ) : (
-          <button className={`btn btn-outline ${s.cta}`} onClick={() => launch(items[0])}>Replay</button>
+          <button className={`btn btn-outline ${s.cta}`} onClick={() => launch(items[0])}>{t("Replay", "Wiederholen")}</button>
         )}
       </div>}
     </li>

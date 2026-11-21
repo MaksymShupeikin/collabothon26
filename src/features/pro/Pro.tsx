@@ -2,7 +2,8 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { companyOf, ETF_SYM } from "@/features/market/companies";
-import { cls, dateDE, eur, num, pct, qtyFmt, shortDay, signed } from "@/shared/lib/format";
+import { cls, dateDE, dateLocale, eur, num, pct, qtyFmt, shortDay, signed } from "@/shared/lib/format";
+import { dict, useT } from "@/shared/lib/i18n";
 import { KIND_LABEL, type News } from "@/features/market/news";
 import { chapterById, isHistory, worldOpen, type Chapter } from "@/features/tour/chapters";
 import { PERSONAS } from "@/features/game/personas";
@@ -26,15 +27,19 @@ export type Mode =
   | { kind: "lesson"; id: string }
   | { kind: "replay"; replay: Replay };
 
+// Widget names stay English as ids; this is what people read.
+dict({ Watchlist: "Watchlist", Portfolio: "Depot", Chart: "Chart", Orderbook: "Orderbuch", News: "News", Rivals: "Rivalen" });
+
 const BUDGET = 1000; // replays and simulated lessons: the same round budget for you and the bots (scores are in %)
 const TIME = "17:35:00";
 
 export default function Pro() {
+  const t = useT();
   const save = useGame();
   const ch = save.active ? chapterById(save.active) : undefined;
   const pro = ch?.surface === "pro" ? ch : undefined;
-  if (!save.persona) return <Gate text="Answer three quick questions first." href="/start" cta="Start" />;
-  if (!save.proUnlocked && !save.allUnlocked && !(pro && isHistory(pro))) return <Gate text="The trading area unlocks after the Module 1 mission: your first stock." href="/" cta="Learning map" />;
+  if (!save.persona) return <Gate text={t("Answer three quick questions first.", "Beantworte zuerst drei kurze Fragen.")} href="/start" cta={t("Start", "Starten")} />;
+  if (!save.proUnlocked && !save.allUnlocked && !(pro && isHistory(pro))) return <Gate text={t("The trading area unlocks after the Module 1 mission: your first stock.", "Der Handelsbereich wird nach der Mission von Modul 1 freigeschaltet: deine erste Aktie.")} href="/" cta={t("Learning map", "Lernpfad")} />;
   const mode: Mode = pro?.replay ? { kind: "replay", replay: REPLAYS[pro.replay] } : pro?.lesson ? { kind: "lesson", id: SIM_LESSONS[pro.lesson as keyof typeof SIM_LESSONS].id } : { kind: "main" };
   // The learner starts on the simple trading area. Module 2 always runs there; ProTrader takes over
   // from Module 3 (and in free play) only after the learner has confirmed the switch.
@@ -47,16 +52,17 @@ type Layout = "simple" | "pro";
 
 /** The move from the simple trading area to ProTrader is a moment: the learner sees what changes and confirms it. */
 function ProTraderSwitch({ chapter, onLater }: { chapter?: Chapter; onLater: () => void }) {
+  const t = useT();
   return (
     <div className="overlay overlay-dark" role="dialog" aria-modal="true" aria-labelledby="switch-title">
       <div className="unlock">
-        <p className="unlock-kicker">Module 2 complete · ProTrader unlocked</p>
-        <h1 id="switch-title">Ready for the full trading desk?</h1>
+        <p className="unlock-kicker">{t("Module 2 complete · ProTrader unlocked", "Modul 2 abgeschlossen · ProTrader freigeschaltet")}</p>
+        <h1 id="switch-title">{t("Ready for the full trading desk?", "Bereit für den vollen Handelsplatz?")}</h1>
         <div className="row" style={{ justifyContent: "center" }}>
           {chapter
-            ? <Link className="btn btn-outline-light" href="/" onClick={() => actions.start(null)}>Not yet, back to the map</Link>
-            : <button className="btn btn-outline-light" onClick={onLater}>Not yet, keep the simple view</button>}
-          <button className="btn btn-primary btn-lg" onClick={() => { actions.switchToProTrader(); setUi({}); }}>Switch to ProTrader →</button>
+            ? <Link className="btn btn-outline-light" href="/" onClick={() => actions.start(null)}>{t("Not yet, back to the map", "Noch nicht, zurück zum Lernpfad")}</Link>
+            : <button className="btn btn-outline-light" onClick={onLater}>{t("Not yet, keep the simple view", "Noch nicht, einfache Ansicht behalten")}</button>}
+          <button className="btn btn-primary btn-lg" onClick={() => { actions.switchToProTrader(); setUi({}); }}>{t("Switch to ProTrader →", "Zum ProTrader wechseln →")}</button>
         </div>
       </div>
     </div>
@@ -76,6 +82,7 @@ function Gate({ text, href, cta }: { text: string; href: string; cta: string }) 
 type Toast = { id: number; text: string };
 
 function Desk({ mode, chapter, layout, offerSwitch }: { mode: Mode; chapter?: Chapter; layout: Layout; offerSwitch: boolean }) {
+  const t = useT();
   const save = useGame();
   const replay = mode.kind === "replay" ? mode.replay : undefined;
   const universeId = mode.kind === "main" ? "main" : mode.kind === "lesson" ? mode.id : mode.replay.universe.id;
@@ -92,7 +99,7 @@ function Desk({ mode, chapter, layout, offerSwitch }: { mode: Mode; chapter?: Ch
   const heroDays = replay ? u.news.filter((n) => n.sym === replay.hero).map((n) => n.day) : [];
   const storyEnd = heroDays.length ? Math.max(...heroDays) : u.days;
   const masked = (s: Sim) => !!replay && (chapter?.kind === "chapter" ? !tourFinished : s.day < storyEnd);
-  const cover = (sym: string) => (replay && sym === replay.hero && masked(sim) ? replay.cover : companyOf(sym).short);
+  const cover = (sym: string) => (replay && sym === replay.hero && masked(sim) ? t(replay.cover) : companyOf(sym).short);
   const coverWkn = (sym: string) => (replay && sym === replay.hero && masked(sim) ? replay.coverWkn : companyOf(sym).wkn);
   const [sym, setSym] = useState<string>(replay ? replay.hero : mode.kind === "lesson" && mode.id === "w4-plan" ? ETF_SYM : mode.kind === "lesson" ? ETF_SYM : "DTE");
   const [speed, setSpeed] = useState(0);
@@ -138,8 +145,8 @@ function Desk({ mode, chapter, layout, offerSwitch }: { mode: Mode; chapter?: Ch
     const events = res.events;
     let paused = false;
     for (const e of events) {
-      if (e.kind === "fill") toast(`Your ${e.order.type} order was executed: ${e.trade.side === "buy" ? "bought" : "sold"} ${qtyFmt(e.trade.qty)} × ${cover(e.trade.sym)} at ${num(e.trade.price)} €`);
-      if (e.kind === "expired") { setExpired((x) => [...x, e]); toast(`Your order for ${cover(e.order.sym)} expired without execution.`); }
+      if (e.kind === "fill") toast(t(`Your ${e.order.type} order was executed: ${e.trade.side === "buy" ? "bought" : "sold"} ${qtyFmt(e.trade.qty)} × ${cover(e.trade.sym)} at ${num(e.trade.price)} €`, `${e.order.type === "stop" ? "Stop" : "Limit"}-Order ausgeführt: ${qtyFmt(e.trade.qty)} × ${cover(e.trade.sym)} zu ${num(e.trade.price)} € ${e.trade.side === "buy" ? "gekauft" : "verkauft"}`));
+      if (e.kind === "expired") { setExpired((x) => [...x, e]); toast(t(`Your order for ${cover(e.order.sym)} expired without execution.`, `Deine Order für ${cover(e.order.sym)} ist ohne Ausführung verfallen.`)); }
       if (e.kind === "news" && stopAtMajor) {
         setBreaking(e.news); setSelNews(e.news.id); setSpeed(0); paused = true;
         if (mode.kind === "lesson" && mode.id === "w2-mission" && !decided[e.news.id]) setDecision(e.news);
@@ -176,7 +183,7 @@ function Desk({ mode, chapter, layout, offerSwitch }: { mode: Mode; chapter?: Ch
   function addMoney(a: number) {
     if (mode.kind === "main") { actions.addPlayMoney(a); actions.transfer(a, true); }
     else { const s = deposit(local, a); setLocal(s); simRef.current = s; }
-    toast(`${eur(a)} play money added to your trading account.`);
+    toast(t(`${eur(a)} play money added to your trading account.`, `${eur(a)} Spielgeld auf dein Verrechnungskonto eingezahlt.`));
   }
   function cancel(id: number) {
     if (mode.kind === "main") actions.setSim(cancelOrder(save.sim, id));
@@ -187,13 +194,13 @@ function Desk({ mode, chapter, layout, offerSwitch }: { mode: Mode; chapter?: Ch
   const prices = pricesOf(u);
   const priceOf = (s: string, d = sim.day) => priceAt(u, s, d);
   const dv = depotValue(sim), total = round2(sim.acct.cash + dv);
-  const label = (d: number) => (u.hideDate ? (d >= 0 ? `Day ${d + 1}` : `−${-d} d`) : (() => { const x = dateOf(u, d); return `${String(x.getUTCDate()).padStart(2, "0")} ${x.toLocaleDateString("en-GB", { month: "short", timeZone: "UTC" })}${x.getUTCMonth() === 0 && x.getUTCDate() <= 7 ? ` ${x.getUTCFullYear()}` : ""}`; })());
-  const clock = u.hideDate ? `Day ${sim.day + 1} · ${shortDay(dateOf(u, sim.day))} · date hidden` : `${dateDE(dateOf(u, sim.day))} · ${TIME}`;
+  const label = (d: number) => (u.hideDate ? (d >= 0 ? t(`Day ${d + 1}`, `Tag ${d + 1}`) : t(`−${-d} d`, `−${-d} T`)) : (() => { const x = dateOf(u, d); return `${String(x.getUTCDate()).padStart(2, "0")} ${x.toLocaleDateString(dateLocale(t.lang), { month: "short", timeZone: "UTC" })}${x.getUTCMonth() === 0 && x.getUTCDate() <= 7 ? ` ${x.getUTCFullYear()}` : ""}`; })());
+  const clock = u.hideDate ? `${t("Day", "Tag")} ${sim.day + 1} · ${shortDay(dateOf(u, sim.day), t.lang)} · ${t("date hidden", "Datum verdeckt")}` : `${dateDE(dateOf(u, sim.day))} · ${TIME}`;
   const firstDay = mode.kind === "main" ? Math.max(-u.history, sim.day - (layout === "simple" ? 60 : 400)) : -Math.min(u.history, replay ? 40 : 120);
   const closes = prices[sym].slice(u.history + firstDay, u.history + sim.day + 1);
   const visibleNews = u.news.filter((n) => n.day <= sim.day && n.day > sim.day - 120).slice().reverse();
   const marks: ChartMark[] = (() => {
-    const m: ChartMark[] = sim.acct.trades.filter((t) => t.sym === sym).map((t) => ({ day: t.day, kind: t.side === "buy" ? "you-buy" : "you-sell", text: `You ${t.side === "buy" ? "B" : "S"} ${qtyFmt(t.qty)}` }));
+    const m: ChartMark[] = sim.acct.trades.filter((tr) => tr.sym === sym).map((tr) => ({ day: tr.day, kind: tr.side === "buy" ? "you-buy" : "you-sell", text: t(`You ${tr.side === "buy" ? "B" : "S"} ${qtyFmt(tr.qty)}`, `Du ${tr.side === "buy" ? "K" : "V"} ${qtyFmt(tr.qty)}`) }));
     for (const mv of replay?.moves ?? []) if (mv.day <= sim.day && (mv.buys?.some(([s]) => s === sym) || mv.sells?.includes(sym))) m.push({ day: mv.day, kind: "bot", text: BOTS[mv.bot].name.split(" ")[1] ?? BOTS[mv.bot].name });
     for (const n of u.news) if (n.major && n.day <= sim.day && n.day >= firstDay && (!n.sym || n.sym === sym)) m.push({ day: n.day, kind: "news", text: "N" });
     return m;
@@ -205,7 +212,7 @@ function Desk({ mode, chapter, layout, offerSwitch }: { mode: Mode; chapter?: Ch
   const overlays = (
     <>
       <div className="toasts" aria-live="polite">
-        {toasts.map((t) => <div key={t.id} className="toast" role="status"><span>{t.text}</span><button className="link" onClick={() => setToasts((x) => x.filter((y) => y.id !== t.id))} aria-label="Dismiss">✕</button></div>)}
+        {toasts.map((x) => <div key={x.id} className="toast" role="status"><span>{x.text}</span><button className="link" onClick={() => setToasts((l) => l.filter((y) => y.id !== x.id))} aria-label={t("Dismiss", "Schließen")}>✕</button></div>)}
       </div>
 
       {intro && replay && chapter && <BossIntro replay={replay} chapter={chapter} onStart={() => setIntro(false)} />}
@@ -256,55 +263,55 @@ function Desk({ mode, chapter, layout, offerSwitch }: { mode: Mode; chapter?: Ch
         <span className="pt-logo"><Wordmark width={96} /></span>
         <span className="pt-icon" aria-hidden>☰</span>
         <span className="pt-icon" aria-hidden>🔔︎</span>
-        <label className="pt-field"><span>Workspaces</span>
+        <label className="pt-field"><span>{t("Workspaces", "Arbeitsbereiche")}</span>
           <select value={workspace} onChange={(e) => setWorkspace(e.target.value as "depot" | "focus")}>
-            <option value="depot">My depot</option><option value="focus">Single stock focus</option>
+            <option value="depot">{t("My depot", "Mein Depot")}</option><option value="focus">{t("Single stock focus", "Fokus Einzelwert")}</option>
           </select>
         </label>
-        <div className="pt-field"><span>Order</span><button className="pt-yellow" data-tour="pt-order" onClick={() => setOrderOpen(true)} aria-label="Open order window">⇄</button></div>
-        <div className="pt-field pt-widgets"><span>Widgets</span><button className="pt-yellow" onClick={() => setWidgetsOpen(!widgetsOpen)} aria-label="Show or hide widgets" aria-expanded={widgetsOpen}>+</button>
+        <div className="pt-field"><span>Order</span><button className="pt-yellow" data-tour="pt-order" onClick={() => setOrderOpen(true)} aria-label={t("Open order window", "Orderfenster öffnen")}>⇄</button></div>
+        <div className="pt-field pt-widgets"><span>Widgets</span><button className="pt-yellow" onClick={() => setWidgetsOpen(!widgetsOpen)} aria-label={t("Show or hide widgets", "Widgets ein- oder ausblenden")} aria-expanded={widgetsOpen}>+</button>
           {widgetsOpen && (
             <div className="pt-menu" role="menu">
               {["Watchlist", "Portfolio", "Chart", "Orderbook", "News", ...(replay ? ["Rivals"] : [])].map((w) => (
-                <label key={w} className="xs"><input type="checkbox" checked={show(w)} onChange={() => setHidden({ ...hidden, [w]: !hidden[w] })} /> {w}</label>
+                <label key={w} className="xs"><input type="checkbox" checked={show(w)} onChange={() => setHidden({ ...hidden, [w]: !hidden[w] })} /> {t(w)}</label>
               ))}
             </div>
           )}
         </div>
         <div className="pt-figs num">
-          <span><small>Portfolio value (EUR)</small>{num(dv)}</span>
-          <span><small>Available (EUR)</small>{num(round2(sim.acct.cash - sim.acct.orders.filter((o) => o.side === "buy").reduce((v, o) => v + o.qty * o.limit + fee(o.qty * o.limit), 0)))}</span>
-          <span className="hide-sm"><small>Intraday credit (EUR)</small>0,00</span>
-          <span className="hide-sm"><small>Total (EUR)</small>{num(total)}</span>
+          <span><small>{t("Portfolio value (EUR)", "Depotwert (EUR)")}</small>{num(dv)}</span>
+          <span><small>{t("Available (EUR)", "Verfügbar (EUR)")}</small>{num(round2(sim.acct.cash - sim.acct.orders.filter((o) => o.side === "buy").reduce((v, o) => v + o.qty * o.limit + fee(o.qty * o.limit), 0)))}</span>
+          <span className="hide-sm"><small>{t("Intraday credit (EUR)", "Intraday-Kredit (EUR)")}</small>0,00</span>
+          <span className="hide-sm"><small>{t("Total (EUR)", "Gesamt (EUR)")}</small>{num(total)}</span>
         </div>
-        <div className="pt-field pt-widgets"><span>Sandbox</span><button className="pt-play" onClick={() => setMoneyOpen(!moneyOpen)} aria-expanded={moneyOpen}>+ Play money</button>
+        <div className="pt-field pt-widgets"><span>Sandbox</span><button className="pt-play" onClick={() => setMoneyOpen(!moneyOpen)} aria-expanded={moneyOpen}>{t("+ Play money", "+ Spielgeld")}</button>
           {moneyOpen && (
             <div className="pt-menu" role="menu">
-              <span className="xs muted">Straight to your trading account. Never counts as profit.</span>
+              <span className="xs muted">{t("Straight to your trading account. Never counts as profit.", "Direkt auf dein Verrechnungskonto. Zählt nie als Gewinn.")}</span>
               {[100, 500, 1000].map((a) => <button key={a} className="btn btn-outline btn-sm" onClick={() => { addMoney(a); setMoneyOpen(false); }}>+{num(a, 0)} €</button>)}
             </div>
           )}
         </div>
         <div className="pt-right">
-          <span className="pt-figs num"><span><small>Portfolio number</small>{mode.kind === "main" ? "1234567" : replay && !replay.sim ? "Replay" : "Practice"}</span></span>
-          <Link className="pt-logout" href="/">Exit</Link>
+          <span className="pt-figs num"><span><small>{t("Portfolio number", "Depotnummer")}</small>{mode.kind === "main" ? "1234567" : replay && !replay.sim ? "Replay" : t("Practice", "Übung")}</span></span>
+          <Link className="pt-logout" href="/">{t("Exit", "Beenden")}</Link>
         </div>
       </header>
 
       <TimeBar clock={clock} speed={speed} setSpeed={(s) => { setBreaking(null); setSpeed(s); }} ended={isEnded} years={years}
         jump={(n) => { setBreaking(null); stepTime(n, mode.kind === "replay"); }}
         next={() => { setBreaking(null); const nx = u.news.find((n) => n.major && n.day > simRef.current.day); const mv = replay?.moves.find((m) => m.day > simRef.current.day); const to = Math.min(nx?.day ?? u.days, mv?.day ?? u.days); stepTime(Math.max(1, to - simRef.current.day), true); }}
-        progress={mode.kind === "main" ? undefined : `${sim.day} / ${u.days} days`}
-        label={replay && !replay.sim ? "Historical replay · headlines retold, prices shaped like the real curve" : "Simulated market"}
+        progress={mode.kind === "main" ? undefined : `${sim.day} / ${u.days} ${t("days", "Tage")}`}
+        label={replay && !replay.sim ? t("Historical replay · headlines retold, prices shaped like the real curve", "Historisches Replay · Schlagzeilen nacherzählt, Kurse wie die echte Kurve geformt") : t("Simulated market", "Simulierter Markt")}
         breaking={breaking}
-        reveal={isEnded && replay ? replay.reveal : undefined}
+        reveal={isEnded && replay ? t(replay.reveal) : undefined}
         onReveal={replay && chapter?.kind !== "chapter" ? () => setRevealOpen(true) : undefined} />
 
       <main className={`pt-grid ${workspace} ${replay ? "with-rivals" : ""}`}>
         {show("Watchlist") && (
-          <Widget id="w-watchlist" title="Watchlist" sub="Practice list" className="g-watch">
+          <Widget id="w-watchlist" title="Watchlist" sub={t("Practice list", "Übungsliste")} className="g-watch">
             <table className="pt-table">
-              <thead><tr><th>Name</th><th>Exch.</th><th className="r">Last</th><th className="r">Diff. prev.</th></tr></thead>
+              <thead><tr><th>Name</th><th>{t("Exch.", "Börse")}</th><th className="r">{t("Last", "Letzter")}</th><th className="r">{t("Diff. prev.", "Diff. Vortag")}</th></tr></thead>
               <tbody>
                 {comps.map((c) => {
                   const p = priceOf(c.sym), pp = priceOf(c.sym, sim.day - 1), ch = (p / pp - 1) * 100;
@@ -319,22 +326,22 @@ function Desk({ mode, chapter, layout, offerSwitch }: { mode: Mode; chapter?: Ch
                 })}
               </tbody>
             </table>
-            <div className="pt-foot xs">{comps.length} instruments</div>
+            <div className="pt-foot xs">{comps.length} {t("instruments", "Werte")}</div>
           </Widget>
         )}
 
         {show("Portfolio") && (
-          <Widget id="w-depot" title="Portfolio" className="g-depot">
+          <Widget id="w-depot" title={t("Portfolio")} className="g-depot">
             <div className="pt-depot-sum num">
-              <span>Portfolio value (EUR) <strong>{num(dv)}</strong></span>
-              <span>Purchase value (EUR) <strong>{num(costBasis(sim))}</strong></span>
-              <span>Diff. since purchase <strong className={cls(dv - costBasis(sim))}>{signed(dv - costBasis(sim))}</strong></span>
+              <span>{t("Portfolio value (EUR)", "Depotwert (EUR)")} <strong>{num(dv)}</strong></span>
+              <span>{t("Purchase value (EUR)", "Kaufwert (EUR)")} <strong>{num(costBasis(sim))}</strong></span>
+              <span>{t("Diff. since purchase", "Diff. seit Kauf")} <strong className={cls(dv - costBasis(sim))}>{signed(dv - costBasis(sim))}</strong></span>
             </div>
             {Object.keys(sim.acct.holdings).length === 0 ? (
-              <div className="pt-empty"><Icon name="chart" size={36} round /><strong>No positions</strong><span className="xs muted">Open the yellow Order button to buy.</span></div>
+              <div className="pt-empty"><Icon name="chart" size={36} round /><strong>{t("No positions", "Keine Positionen")}</strong><span className="xs muted">{t("Open the yellow Order button to buy.", "Zum Kaufen den gelben Order-Button öffnen.")}</span></div>
             ) : (
               <table className="pt-table">
-                <thead><tr><th>WKN</th><th>Name</th><th className="r">Qty</th><th className="r">Price</th><th className="r">Value</th><th className="r">Weight</th><th className="r">Diff.</th></tr></thead>
+                <thead><tr><th>WKN</th><th>Name</th><th className="r">{t("Qty", "Stück")}</th><th className="r">{t("Price", "Kurs")}</th><th className="r">{t("Value", "Wert")}</th><th className="r">{t("Weight", "Gewicht")}</th><th className="r">Diff.</th></tr></thead>
                 <tbody>
                   {Object.entries(sim.acct.holdings).map(([s, h]) => {
                     const v = h.qty * priceOf(s);
@@ -349,8 +356,8 @@ function Desk({ mode, chapter, layout, offerSwitch }: { mode: Mode; chapter?: Ch
                 </tbody>
               </table>
             )}
-            {sim.acct.plans.length > 0 && <div className="pt-foot xs">Savings plan: {sim.acct.plans.map((p) => `${eur(p.amount)}/month on ${cover(p.sym)}`).join(", ")} · {sim.acct.trades.filter((t) => t.exchange === "Sparplan").length} executions</div>}
-            <div className="pt-foot xs">{Object.keys(sim.acct.holdings).length} positions · cash {eur(sim.acct.cash)}</div>
+            {sim.acct.plans.length > 0 && <div className="pt-foot xs">{t("Savings plan", "Sparplan")}: {sim.acct.plans.map((p) => t(`${eur(p.amount)}/month on ${cover(p.sym)}`, `${eur(p.amount)}/Monat auf ${cover(p.sym)}`)).join(", ")} · {sim.acct.trades.filter((x) => x.exchange === "Sparplan").length} {t("executions", "Ausführungen")}</div>}
+            <div className="pt-foot xs">{Object.keys(sim.acct.holdings).length} {t("positions · cash", "Positionen · Guthaben")} {eur(sim.acct.cash)}</div>
           </Widget>
         )}
 
@@ -388,27 +395,28 @@ function TimeBar({ clock, speed, setSpeed, jump, next, ended, years, progress, l
   clock: string; speed: number; setSpeed: (s: number) => void; jump: (n: number) => void; next: () => void; ended: boolean; years: boolean;
   progress?: string; label: string; breaking: News | null; reveal?: string; onReveal?: () => void;
 }) {
+  const t = useT();
   return (
-    <div className="tm" data-tour="time-machine" aria-label="Time machine">
-      <span className="tm-tag">Time machine</span>
+    <div className="tm" data-tour="time-machine" aria-label={t("Time machine", "Zeitmaschine")}>
+      <span className="tm-tag">{t("Time machine", "Zeitmaschine")}</span>
       <span className="tm-clock num">{clock}</span>
-      <div className="tm-btns" role="group" aria-label="Speed">
-        <button aria-pressed={speed === 0} onClick={() => setSpeed(0)} title="Pause">⏸</button>
-        <button aria-pressed={speed === 1} onClick={() => setSpeed(1)} disabled={ended} title="Play 1×">▶ 1×</button>
-        <button aria-pressed={speed === 5} onClick={() => setSpeed(5)} disabled={ended} title="Play 5×">⏩ 5×</button>
-        <button onClick={next} disabled={ended} title="Jump to the next event">⏭ Next event</button>
+      <div className="tm-btns" role="group" aria-label={t("Speed", "Tempo")}>
+        <button aria-pressed={speed === 0} onClick={() => setSpeed(0)} title={t("Pause", "Pause")}>⏸</button>
+        <button aria-pressed={speed === 1} onClick={() => setSpeed(1)} disabled={ended} title={t("Play 1×", "Abspielen 1×")}>▶ 1×</button>
+        <button aria-pressed={speed === 5} onClick={() => setSpeed(5)} disabled={ended} title={t("Play 5×", "Abspielen 5×")}>⏩ 5×</button>
+        <button onClick={next} disabled={ended} title={t("Jump to the next event", "Zum nächsten Ereignis springen")}>{t("⏭ Next event", "⏭ Nächstes Ereignis")}</button>
       </div>
-      <div className="tm-btns" role="group" aria-label="Jump ahead">
-        <button onClick={() => jump(1)} disabled={ended}>+1 day</button>
-        <button onClick={() => jump(5)} disabled={ended}>+1 week</button>
-        <button onClick={() => jump(21)} disabled={ended}>+1 month</button>
-        <button onClick={() => jump(252)} disabled={ended || !years} title={years ? "" : "Unlocks in Module 4"}>{years ? "" : "🔒 "}+1 year</button>
-        <button onClick={() => jump(2520)} disabled={ended || !years} title={years ? "" : "Unlocks in Module 4"}>{years ? "" : "🔒 "}+10 years</button>
+      <div className="tm-btns" role="group" aria-label={t("Jump ahead", "Vorspringen")}>
+        <button onClick={() => jump(1)} disabled={ended}>{t("+1 day", "+1 Tag")}</button>
+        <button onClick={() => jump(5)} disabled={ended}>{t("+1 week", "+1 Woche")}</button>
+        <button onClick={() => jump(21)} disabled={ended}>{t("+1 month", "+1 Monat")}</button>
+        <button onClick={() => jump(252)} disabled={ended || !years} title={years ? "" : t("Unlocks in Module 4", "Wird in Modul 4 freigeschaltet")}>{years ? "" : "🔒 "}{t("+1 year", "+1 Jahr")}</button>
+        <button onClick={() => jump(2520)} disabled={ended || !years} title={years ? "" : t("Unlocks in Module 4", "Wird in Modul 4 freigeschaltet")}>{years ? "" : "🔒 "}{t("+10 years", "+10 Jahre")}</button>
       </div>
       {progress && <span className="xs tm-prog num">{progress}</span>}
       <span className="tm-label xs">{label}</span>
-      {breaking && !reveal && <span className="tm-break" role="status">⏸ Paused on news: <strong>{breaking.headline}</strong></span>}
-      {reveal && <span className="tm-break reveal" data-tour="reveal-banner" role="status"><strong>{reveal}</strong>{onReveal && <button className="btn btn-primary btn-sm" onClick={onReveal}>Results ›</button>}</span>}
+      {breaking && !reveal && <span className="tm-break" role="status">{t("⏸ Paused on news:", "⏸ Pause wegen News:")} <strong>{t(breaking.headline)}</strong></span>}
+      {reveal && <span className="tm-break reveal" data-tour="reveal-banner" role="status"><strong>{reveal}</strong>{onReveal && <button className="btn btn-primary btn-sm" onClick={onReveal}>{t("Results ›", "Ergebnisse ›")}</button>}</span>}
     </div>
   );
 }
@@ -416,18 +424,19 @@ function TimeBar({ clock, speed, setSpeed, jump, next, ended, years, progress, l
 function ChartWidget({ sym, name, wkn, closes, firstDay, label, marks, span, bubble }: {
   sym: string; name: string; wkn: string; closes: number[]; firstDay: number; label: (d: number) => string; marks: ChartMark[]; span: number; bubble: React.ReactNode;
 }) {
+  const t = useT();
   const [type, setType] = useState<"candles" | "line">("candles");
   const [bb, setBb] = useState(false);
   return (
-    <Widget id="w-chart" title="Chart" className="g-chart" actionsSlot={<><span className="pt-chip-sel">Since start</span><span className="pt-chip-sel">1 day</span></>}>
+    <Widget id="w-chart" title="Chart" className="g-chart" actionsSlot={<><span className="pt-chip-sel">{t("Since start", "Seit Start")}</span><span className="pt-chip-sel">{t("1 day", "1 Tag")}</span></>}>
       <div className="pt-chart-top">
         <span className="pt-instr"><span className="ok-dot" aria-hidden /> <span className="num">{wkn}</span> · Xetra · <strong>{name}</strong></span>
       </div>
       <div className="pt-tools">
-        <label><span>Chart type</span><select value={type} onChange={(e) => setType(e.target.value as "candles" | "line")}><option value="candles">Candles</option><option value="line">Line</option></select></label>
-        <label><span>Indicator</span><select value={bb ? "bb" : ""} onChange={(e) => setBb(e.target.value === "bb")}><option value="">Add…</option><option value="bb">Bollinger (20, 2)</option></select></label>
-        <label><span>Drawing</span><select disabled><option>Add…</option></select></label>
-        <span className="pt-legend xs"><span className="lg-you" /> You <span className="lg-bot" /> Bots <span className="lg-news" /> News</span>
+        <label><span>{t("Chart type", "Chartart")}</span><select value={type} onChange={(e) => setType(e.target.value as "candles" | "line")}><option value="candles">{t("Candles", "Kerzen")}</option><option value="line">{t("Line", "Linie")}</option></select></label>
+        <label><span>{t("Indicator", "Indikator")}</span><select value={bb ? "bb" : ""} onChange={(e) => setBb(e.target.value === "bb")}><option value="">{t("Add…", "Hinzufügen …")}</option><option value="bb">Bollinger (20, 2)</option></select></label>
+        <label><span>{t("Drawing", "Zeichnen")}</span><select disabled><option>{t("Add…", "Hinzufügen …")}</option></select></label>
+        <span className="pt-legend xs"><span className="lg-you" /> {t("You", "Du")} <span className="lg-bot" /> Bots <span className="lg-news" /> News</span>
       </div>
       <div className="pt-chart-body">
         <ProChart sym={sym} closes={closes} firstDay={firstDay} label={label} marks={marks} type={type} bollinger={bb} span={span} />
@@ -438,33 +447,34 @@ function ChartWidget({ sym, name, wkn, closes, firstDay, label, marks, span, bub
 }
 
 function OrderBook({ sim, expired, cover, coverWkn, label, cancel }: { sim: Sim; expired: SimEvent[]; cover: (s: string) => string; coverWkn: (s: string) => string; label: (d: number) => string; cancel: (id: number) => void }) {
+  const t = useT();
   const [tab, setTab] = useState<"all" | "open" | "done">("all");
   type Row = { key: string; day: number; sym: string; side: string; qty: number; type: string; limit?: number; status: "open" | "executed" | "expired"; id?: number };
   const rows: Row[] = [
     ...sim.acct.orders.map((o) => ({ key: `o${o.id}`, day: o.placed, sym: o.sym, side: o.side, qty: o.qty, type: o.type, limit: o.limit, status: "open" as const, id: o.id })),
-    ...sim.acct.trades.map((t, i) => ({ key: `t${i}`, day: t.day, sym: t.sym, side: t.side, qty: t.qty, type: t.exchange === "Sparplan" ? "savings plan" : t.type, limit: t.price, status: "executed" as const })),
+    ...sim.acct.trades.map((x, i) => ({ key: `t${i}`, day: x.day, sym: x.sym, side: x.side, qty: x.qty, type: x.exchange === "Sparplan" ? "savings plan" : x.type, limit: x.price, status: "executed" as const })),
     ...expired.flatMap((e) => (e.kind === "expired" ? [{ key: `e${e.order.id}`, day: e.day, sym: e.order.sym, side: e.order.side, qty: e.order.qty, type: e.order.type, limit: e.order.limit, status: "expired" as const }] : [])),
   ].sort((a, b) => b.day - a.day).filter((r) => tab === "all" || (tab === "open" ? r.status === "open" : r.status !== "open"));
   return (
-    <Widget id="w-orderbook" title="Orderbook" className="g-book">
+    <Widget id="w-orderbook" title={t("Orderbook")} className="g-book">
       <div className="pt-tabs" role="tablist">
-        {(["all", "open", "done"] as const).map((t) => <button key={t} role="tab" aria-selected={tab === t} onClick={() => setTab(t)}>{t === "all" ? "All" : t === "open" ? "Open" : "Completed"}</button>)}
+        {(["all", "open", "done"] as const).map((k) => <button key={k} role="tab" aria-selected={tab === k} onClick={() => setTab(k)}>{k === "all" ? t("All", "Alle") : k === "open" ? t("Open", "Offen") : t("Completed", "Erledigt")}</button>)}
       </div>
-      {rows.length === 0 ? <div className="pt-empty"><Icon name="hourglass" size={36} round /><strong>No orders yet</strong><span className="xs muted">Orders and their status show up here.</span></div> : (
+      {rows.length === 0 ? <div className="pt-empty"><Icon name="hourglass" size={36} round /><strong>{t("No orders yet", "Noch keine Orders")}</strong><span className="xs muted">{t("Orders and their status show up here.", "Orders und ihr Status erscheinen hier.")}</span></div> : (
         <table className="pt-table">
-          <thead><tr><th>Date</th><th>WKN</th><th>Name</th><th>Type</th><th className="r">Qty</th><th>Order type</th><th className="r">Limit/price</th><th>Status</th></tr></thead>
+          <thead><tr><th>{t("Date", "Datum")}</th><th>WKN</th><th>Name</th><th>{t("Type", "Art")}</th><th className="r">{t("Qty", "Stück")}</th><th>{t("Order type", "Orderart")}</th><th className="r">{t("Limit/price", "Limit/Kurs")}</th><th>Status</th></tr></thead>
           <tbody>
             {rows.slice(0, 60).map((r) => (
               <tr key={r.key}>
-                <td className="num">{label(r.day)}</td><td className="num">{coverWkn(r.sym)}</td><td>{cover(r.sym)}</td><td>{r.side === "buy" ? "Buy" : "Sell"}</td><td className="r num">{qtyFmt(r.qty)}</td>
-                <td>{r.type === "market" ? "best price" : r.type}</td><td className="r num">{r.limit ? num(r.limit) : ""}</td>
-                <td><span className={`status ${r.status}`}>● {r.status}</span>{r.status === "open" && r.id && <button className="pt-link xs" onClick={() => cancel(r.id!)}> cancel</button>}</td>
+                <td className="num">{label(r.day)}</td><td className="num">{coverWkn(r.sym)}</td><td>{cover(r.sym)}</td><td>{r.side === "buy" ? t("Buy", "Kauf") : t("Sell", "Verkauf")}</td><td className="r num">{qtyFmt(r.qty)}</td>
+                <td>{r.type === "market" ? t("best price", "bestens") : t(r.type, r.type === "savings plan" ? "Sparplan" : r.type === "limit" ? "Limit" : "Stop")}</td><td className="r num">{r.limit ? num(r.limit) : ""}</td>
+                <td><span className={`status ${r.status}`}>● {t(r.status, r.status === "open" ? "offen" : r.status === "executed" ? "ausgeführt" : "verfallen")}</span>{r.status === "open" && r.id && <button className="pt-link xs" onClick={() => cancel(r.id!)}> {t("cancel", "streichen")}</button>}</td>
               </tr>
             ))}
           </tbody>
         </table>
       )}
-      <div className="pt-foot xs">{rows.length} orders</div>
+      <div className="pt-foot xs">{rows.length} {t("orders", "Orders")}</div>
     </Widget>
   );
 }
@@ -472,23 +482,24 @@ function OrderBook({ sim, expired, cover, coverWkn, label, cancel }: { sim: Sim;
 function NewsWidget({ news, day, sel, setSel, label, simulated, cover, breaking }: {
   news: News[]; day: number; sel: string | null; setSel: (id: string) => void; label: (d: number) => string; simulated: boolean; cover: (s: string) => string; breaking?: string;
 }) {
+  const t = useT();
   const [q, setQ] = useState("");
   const [card, setCard] = useState<string | null>(null);
-  const list = news.filter((n) => !q || n.headline.toLowerCase().includes(q.toLowerCase()));
+  const list = news.filter((n) => !q || t(n.headline).toLowerCase().includes(q.toLowerCase()));
   const item = news.find((n) => n.id === sel) ?? null;
   const revealed = (n: News) => day >= n.day + 2 || day >= 1e9;
   return (
-    <Widget id="w-news" title="News" className="g-news" actionsSlot={<span className="sim-label">{simulated ? "Simulated" : "Retold history"}</span>}>
-      <div className="pt-search"><input placeholder="WKN, ISIN, name" value={q} onChange={(e) => setQ(e.target.value)} aria-label="Search news" /></div>
+    <Widget id="w-news" title="News" className="g-news" actionsSlot={<span className="sim-label">{simulated ? t("Simulated", "Simuliert") : t("Retold history", "Nacherzählte Geschichte")}</span>}>
+      <div className="pt-search"><input placeholder={t("WKN, ISIN, name", "WKN, ISIN, Name")} value={q} onChange={(e) => setQ(e.target.value)} aria-label={t("Search news", "News durchsuchen")} /></div>
       <div className="pt-news-list">
         <table className="pt-table">
-          <thead><tr><th>Date, time</th><th>Headline</th></tr></thead>
+          <thead><tr><th>{t("Date, time", "Datum, Zeit")}</th><th>{t("Headline", "Schlagzeile")}</th></tr></thead>
           <tbody>
-            {list.length === 0 && <tr><td colSpan={2} className="muted">No news yet. Press play.</td></tr>}
+            {list.length === 0 && <tr><td colSpan={2} className="muted">{t("No news yet. Press play.", "Noch keine News. Drück auf Play.")}</td></tr>}
             {list.map((n) => (
               <tr key={n.id} className={`clickable ${sel === n.id ? "sel" : ""} ${n.major ? "major" : ""} ${breaking === n.id ? "breaking" : ""}`} onClick={() => setSel(n.id)}>
                 <td className="num nowrap">{label(n.day)} {n.time.slice(0, 5)}</td>
-                <td>{n.sym ? <span className="muted">{cover(n.sym)}: </span> : null}{n.headline}{n.major && revealed(n) && <span className={`kind k-${n.kind}`}>{KIND_LABEL[n.kind]}</span>}</td>
+                <td>{n.sym ? <span className="muted">{cover(n.sym)}: </span> : null}{t(n.headline)}{n.major && revealed(n) && <span className={`kind k-${n.kind}`}>{t(KIND_LABEL[n.kind])}</span>}</td>
               </tr>
             ))}
           </tbody>
@@ -496,19 +507,19 @@ function NewsWidget({ news, day, sel, setSel, label, simulated, cover, breaking 
       </div>
       {item && (
         <div className="pt-news-detail">
-          <strong>{item.sym ? `${cover(item.sym)}: ` : ""}{item.headline}</strong>
-          <span className="xs muted">From {item.source} | {label(item.day)} {item.time}</span>
-          {item.body && <p className="small">{item.body}</p>}
+          <strong>{item.sym ? `${cover(item.sym)}: ` : ""}{t(item.headline)}</strong>
+          <span className="xs muted">{t("From", "Von")} {t(item.source)} | {label(item.day)} {item.time}</span>
+          {item.body && <p className="small">{t(item.body)}</p>}
           {item.major ? (revealed(item) ? (
-            <p className="small reveal-why"><span className={`kind k-${item.kind}`}>{KIND_LABEL[item.kind]}</span> {item.explain} <button className="pt-link" onClick={() => setCard(item.concept)}>Concept card ›</button></p>
-          ) : <p className="xs muted">What kind of news is this? The type is revealed after the price reaction.</p>) : null}
+            <p className="small reveal-why"><span className={`kind k-${item.kind}`}>{t(KIND_LABEL[item.kind])}</span> {t(item.explain)} <button className="pt-link" onClick={() => setCard(item.concept)}>{t("Concept card ›", "Wissenskarte ›")}</button></p>
+          ) : <p className="xs muted">{t("What kind of news is this? The type is revealed after the price reaction.", "Welche Art von News ist das? Die Art wird nach der Kursreaktion aufgedeckt.")}</p>) : null}
         </div>
       )}
       {card && (
-        <div className="overlay" role="dialog" aria-modal="true" aria-label="Concept card" onClick={() => setCard(null)}>
+        <div className="overlay" role="dialog" aria-modal="true" aria-label={t("Concept card", "Wissenskarte")} onClick={() => setCard(null)}>
           <div className="modal modal-mid" onClick={(e) => e.stopPropagation()}>
             <div className="card-row"><ConceptCard id={card} /></div>
-            <button className="btn btn-outline" style={{ alignSelf: "center" }} onClick={() => setCard(null)}>Close</button>
+            <button className="btn btn-outline" style={{ alignSelf: "center" }} onClick={() => setCard(null)}>{t("Close", "Schließen")}</button>
           </div>
         </div>
       )}
@@ -520,6 +531,7 @@ function OrderWindow({ sim, comps, sym: initial, setSym, cover, coverWkn, order,
   sim: Sim; comps: ReturnType<typeof companiesOf>; sym: string; setSym: (s: string) => void; cover: (s: string) => string; coverWkn: (s: string) => string;
   order: (o: OrderInput) => { error: string | null; filled: unknown }; onClose: () => void; planAllowed: boolean; planAmount: number; setPlan: (sym: string, amount: number) => void; disabled: boolean;
 }) {
+  const t = useT();
   const [side, setSide] = useState<"buy" | "sell">("buy");
   const [sym, setLocalSym] = useState(initial);
   const [qty, setQty] = useState("");
@@ -540,54 +552,54 @@ function OrderWindow({ sim, comps, sym: initial, setSym, cover, coverWkn, order,
   const pick = (s: string) => { setLocalSym(s); setSym(s); setMsg(null); };
   function submit() {
     const res = order({ sym, side, qty: n, type, limit: lim, validity, exchange: "Xetra" });
-    setMsg(res.error ? { ok: false, text: res.error } : { ok: true, text: res.filled ? `Executed: ${side === "buy" ? "bought" : "sold"} ${n} × ${cover(sym)}.` : `Order placed in the orderbook (${type} ${num(lim)} €).` });
+    setMsg(res.error ? { ok: false, text: t(res.error) } : { ok: true, text: res.filled ? t(`Executed: ${side === "buy" ? "bought" : "sold"} ${n} × ${cover(sym)}.`, `Ausgeführt: ${n} × ${cover(sym)} ${side === "buy" ? "gekauft" : "verkauft"}.`) : t(`Order placed in the orderbook (${type} ${num(lim)} €).`, `Order ins Orderbuch gelegt (${type === "stop" ? "Stop" : "Limit"} ${num(lim)} €).`) });
   }
   return (
     <div className="ow" role="dialog" aria-label="Order" data-tour="w-order">
-      <div className="pt-w-head"><strong>⇄ Order</strong><span className="pt-w-tools"><button className="pt-close" onClick={onClose} aria-label="Close order window">✕</button></span></div>
+      <div className="pt-w-head"><strong>⇄ Order</strong><span className="pt-w-tools"><button className="pt-close" onClick={onClose} aria-label={t("Close order window", "Orderfenster schließen")}>✕</button></span></div>
       <div className="ow-body">
-        <div className="ow-side" role="group" aria-label="Buy or sell">
-          <button className="buy" aria-pressed={side === "buy"} onClick={() => setSide("buy")}>✓ Buy</button>
-          <button className="sell" aria-pressed={side === "sell"} onClick={() => setSide("sell")}>✕ Sell</button>
+        <div className="ow-side" role="group" aria-label={t("Buy or sell", "Kauf oder Verkauf")}>
+          <button className="buy" aria-pressed={side === "buy"} onClick={() => setSide("buy")}>✓ {t("Buy", "Kauf")}</button>
+          <button className="sell" aria-pressed={side === "sell"} onClick={() => setSide("sell")}>✕ {t("Sell", "Verkauf")}</button>
         </div>
         <div className="ow-row">
-          <label><span>Instrument</span><select value={sym} onChange={(e) => pick(e.target.value)}>{comps.map((c) => <option key={c.sym} value={c.sym}>{coverWkn(c.sym)} · {cover(c.sym)}</option>)}</select></label>
-          <label><span>Exchange</span><select defaultValue="Xetra"><option>Xetra</option></select></label>
+          <label><span>{t("Instrument", "Wertpapier")}</span><select value={sym} onChange={(e) => pick(e.target.value)}>{comps.map((c) => <option key={c.sym} value={c.sym}>{coverWkn(c.sym)} · {cover(c.sym)}</option>)}</select></label>
+          <label><span>{t("Exchange", "Handelsplatz")}</span><select defaultValue="Xetra"><option>Xetra</option></select></label>
         </div>
         <strong className="ow-name"><span className="ok-dot" aria-hidden /> {cover(sym)}</strong>
         <div className="ow-quote num">
-          <div><span className="xs muted">Ask (EUR)</span><strong>{num(ask(mid))}</strong><button className="ow-as" onClick={() => { setType("limit"); setLimit(num(ask(mid))); }}>As limit</button></div>
-          <div className="r"><span className="xs muted">Bid (EUR)</span><strong>{num(bid(mid))}</strong><button className="ow-as" onClick={() => { setType("limit"); setLimit(num(bid(mid))); }}>As limit</button></div>
+          <div><span className="xs muted">{t("Ask (EUR)", "Brief (EUR)")}</span><strong>{num(ask(mid))}</strong><button className="ow-as" onClick={() => { setType("limit"); setLimit(num(ask(mid))); }}>{t("As limit", "Als Limit")}</button></div>
+          <div className="r"><span className="xs muted">{t("Bid (EUR)", "Geld (EUR)")}</span><strong>{num(bid(mid))}</strong><button className="ow-as" onClick={() => { setType("limit"); setLimit(num(bid(mid))); }}>{t("As limit", "Als Limit")}</button></div>
         </div>
         <div className="pt-tabs" role="tablist">
-          <button role="tab" aria-selected={tab === "std"} onClick={() => setTab("std")}>Standard order</button>
-          <button role="tab" aria-selected={tab === "plan"} onClick={() => setTab("plan")} data-tour="w-order-plan" disabled={!planAllowed} title={planAllowed ? "" : "Unlocks in Module 4"}>{planAllowed ? "" : "🔒 "}Savings plan</button>
+          <button role="tab" aria-selected={tab === "std"} onClick={() => setTab("std")}>{t("Standard order", "Standardorder")}</button>
+          <button role="tab" aria-selected={tab === "plan"} onClick={() => setTab("plan")} data-tour="w-order-plan" disabled={!planAllowed} title={planAllowed ? "" : t("Unlocks in Module 4", "Wird in Modul 4 freigeschaltet")}>{planAllowed ? "" : "🔒 "}{t("Savings plan", "Sparplan")}</button>
         </div>
         {tab === "std" ? (
           <>
             <div className="ow-row">
-              <label><span>Qty</span><input inputMode="numeric" value={qty} onChange={(e) => setQty(e.target.value.replace(/\D/g, ""))} placeholder="0" /></label>
-              <span className="xs muted ow-avail num">Available: {eur(sim.acct.cash)}<br />Est. amount: {eur(side === "buy" ? vol + f : vol - f)}</span>
+              <label><span>{t("Qty", "Stück")}</span><input inputMode="numeric" value={qty} onChange={(e) => setQty(e.target.value.replace(/\D/g, ""))} placeholder="0" /></label>
+              <span className="xs muted ow-avail num">{t("Available", "Verfügbar")}: {eur(sim.acct.cash)}<br />{t("Est. amount", "Vorauss. Betrag")}: {eur(side === "buy" ? vol + f : vol - f)}</span>
             </div>
             <div className="ow-grid">
-              <span>Order type</span><select value={type} onChange={(e) => setType(e.target.value as OrderType)}><option value="market">Market</option><option value="limit">Limit</option><option value="stop">Stop</option></select>
+              <span>{t("Order type", "Orderart")}</span><select value={type} onChange={(e) => setType(e.target.value as OrderType)}><option value="market">Market</option><option value="limit">Limit</option><option value="stop">Stop</option></select>
               {type !== "market" && <><span>{type === "limit" ? "Limit (EUR)" : "Stop (EUR)"}</span><input inputMode="decimal" value={limit} onChange={(e) => setLimit(e.target.value)} placeholder={num(px)} /></>}
-              <span>Validity</span><select value={validity} onChange={(e) => setValidity(e.target.value as Validity)}><option value="day">Good for day</option><option value="ultimo">Until end of month</option><option value="max">Maximum</option></select>
+              <span>{t("Validity", "Gültigkeit")}</span><select value={validity} onChange={(e) => setValidity(e.target.value as Validity)}><option value="day">{t("Good for day", "Tagesgültig")}</option><option value="ultimo">{t("Until end of month", "Ultimo (Monatsende)")}</option><option value="max">{t("Maximum", "Maximal")}</option></select>
             </div>
-            <button className="pt-link xs ow-costs" onClick={() => setCosts(!costs)}>{costs ? "Hide" : "Show"} order costs ›</button>
-            {costs && <div className="ow-costs-box xs num">Price value {eur(vol)} · Fee {eur(f)} {vol ? `(${num((f / vol) * 100)} %)` : ""}</div>}
+            <button className="pt-link xs ow-costs" onClick={() => setCosts(!costs)}>{costs ? t("Hide order costs", "Orderkosten ausblenden") : t("Show order costs", "Orderkosten anzeigen")} ›</button>
+            {costs && <div className="ow-costs-box xs num">{t("Price value", "Kurswert")} {eur(vol)} · {t("Fee", "Gebühr")} {eur(f)} {vol ? `(${num((f / vol) * 100)} %)` : ""}</div>}
             {msg && <p className={`xs ${msg.ok ? "up" : "error"}`} role="status">{msg.text}</p>}
-            <button className={`ow-go ${side}`} onClick={submit} disabled={disabled}>{side === "buy" ? "Buy (with costs)" : "Sell"}</button>
+            <button className={`ow-go ${side}`} onClick={submit} disabled={disabled}>{side === "buy" ? t("Buy (with costs)", "Kostenpflichtig kaufen") : t("Sell", "Verkaufen")}</button>
           </>
         ) : (
           <>
-            <p className="xs muted">Invests the same amount every month, automatically. No fixed fee, 1,5 % per execution; fractional shares allowed.</p>
+            <p className="xs muted">{t("Invests the same amount every month, automatically. No fixed fee, 1,5 % per execution; fractional shares allowed.", "Investiert jeden Monat automatisch denselben Betrag. Keine fixe Gebühr, 1,5 % pro Ausführung; Bruchstücke möglich.")}</p>
             <div className="ow-grid">
-              <span>Amount per month (EUR)</span><input inputMode="decimal" value={amount} onChange={(e) => setAmount(e.target.value.replace(/[^\d]/g, ""))} />
-              <span>Start</span><select defaultValue="next"><option value="next">Next trading day</option></select>
+              <span>{t("Amount per month (EUR)", "Betrag pro Monat (EUR)")}</span><input inputMode="decimal" value={amount} onChange={(e) => setAmount(e.target.value.replace(/[^\d]/g, ""))} />
+              <span>{t("Start", "Start")}</span><select defaultValue="next"><option value="next">{t("Next trading day", "Nächster Handelstag")}</option></select>
             </div>
             {msg && <p className={`xs ${msg.ok ? "up" : "error"}`} role="status">{msg.text}</p>}
-            <button className="ow-go buy" disabled={disabled || !(Number(amount) >= 1)} onClick={() => { setPlan(sym, Number(amount)); setMsg({ ok: true, text: `Savings plan set up: ${eur(Number(amount))} every month on ${cover(sym)}.` }); }}>Set up savings plan</button>
+            <button className="ow-go buy" disabled={disabled || !(Number(amount) >= 1)} onClick={() => { setPlan(sym, Number(amount)); setMsg({ ok: true, text: t(`Savings plan set up: ${eur(Number(amount))} every month on ${cover(sym)}.`, `Sparplan eingerichtet: ${eur(Number(amount))} jeden Monat auf ${cover(sym)}.`) }); }}>{t("Set up savings plan", "Sparplan einrichten")}</button>
           </>
         )}
       </div>

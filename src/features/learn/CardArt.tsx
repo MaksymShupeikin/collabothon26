@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { dict } from "@/shared/lib/i18n";
 
 /** Short names that fit on a collectible tile. The full title stays on the card itself. */
 export const CARD_SHORT: Record<string, string> = {
@@ -15,6 +16,9 @@ export const CARD_SHORT: Record<string, string> = {
   compound: "Compounding",
   "savings-plan": "Savings plan",
 };
+
+// Card short names render without cards.ts loaded (Investor Simulator), so they carry their own German.
+dict({ Stock: "Aktie", "Fees & spread": "Gebühren & Spread", "Profit & loss": "Gewinn & Verlust", "Signal vs. noise": "Signal vs. Rauschen", "Priced in": "Eingepreist", ETF: "ETF", "Order types": "Orderarten", "Buy the rumor": "Gerüchte kaufen", Volatility: "Volatilität", Diversify: "Streuen", Compounding: "Zinseszins", "Savings plan": "Sparplan" });
 
 const FILL = "var(--art-fill, none)";
 const SOFT = 0.45;

@@ -1,3 +1,5 @@
+import { dict } from "../../shared/lib/i18n.ts";
+
 // Real, widely known companies. Prices are mock values in EUR, not live data.
 // WKN/ISIN are the real identifiers so the search behaves like comdirect's (WKN, ISIN, Name).
 export type Company = {
@@ -41,3 +43,9 @@ export const REPLAY_COMPANIES: Company[] = [
 
 export const ALL_COMPANIES = [...COMPANIES, ...REPLAY_COMPANIES];
 export const companyOf = (sym: string) => ALL_COMPANIES.find((c) => c.sym === sym)!;
+
+// Sectors stay English as filter values and in news effects ("sector:Auto"); this is what people read.
+dict({
+  Telecom: "Telekommunikation", Tech: "Technologie", Consumer: "Konsum", Industry: "Industrie", Finance: "Finanzen", Auto: "Automobil",
+  Payments: "Zahlungsdienste", Retail: "Einzelhandel", Travel: "Reisen",
+});

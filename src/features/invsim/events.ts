@@ -1,4 +1,8 @@
 import { addJoy, COLLAPSE, CRASH, DIP, gain, income, move, pay, shock, START_AGE, type Game, type Tone } from "./engine.ts";
+import { L } from "../../shared/lib/i18n.ts";
+import "./events.de.ts";
+
+// Static texts are English and translated where they render; functions that build numbers into text return the current language (they only run after a click).
 
 /**
  * What happens in a year. Every event teaches one thing; choices show their effect right away,
@@ -31,21 +35,21 @@ const crashLike = (kind: "crash" | "dip"): Choice[] => [
 ];
 
 const raise = (amount: number): Choice[] => [
-  { id: "save", label: "Save the raise", hint: `+${eur(amount)} a year to split`, tone: "good",
+  { id: "save", label: "Save the raise", hint: L(`+${eur(amount)} a year to split`, `+${eur(amount)} pro Jahr zum Aufteilen`), tone: "good",
     apply: (g) => addJoy({ ...g, extra: g.extra + amount }, 3), note: "Same lifestyle, more money working. That gap compounds for decades." },
-  { id: "spend", label: "Upgrade my lifestyle", hint: `Nicer flat, nicer car: +${eur(amount * 0.25)} a year to split`, tone: "neutral",
+  { id: "spend", label: "Upgrade my lifestyle", hint: L(`Nicer flat, nicer car: +${eur(amount * 0.25)} a year to split`, `Schönere Wohnung, schöneres Auto: +${eur(amount * 0.25)} pro Jahr zum Aufteilen`), tone: "neutral",
     apply: (g) => addJoy({ ...g, extra: g.extra + amount * 0.25 }, 12), note: "Life feels better. Most of the raise is gone each month, though, and lifestyle rarely shrinks back." },
 ];
 
 export const EVENTS: Record<string, EventDef> = {
   "first-pay": {
     id: "first-pay", title: "Your first real salary", icon: "you", tone: "neutral",
-    body: (g) => `After rent and groceries, ${eur(income(g))} a year are yours to plan. You also have ${eur(g.wallet.cushion)} on the side. Split this year's money on the right, then start the year.`,
+    body: (g) => L(`After rent and groceries, ${eur(income(g))} a year are yours to plan. You also have ${eur(g.wallet.cushion)} on the side. Split this year's money on the right, then start the year.`, `Nach Miete und Einkäufen kannst du ${eur(income(g))} pro Jahr verplanen. Außerdem hast du ${eur(g.wallet.cushion)} zur Seite gelegt. Teil das Geld dieses Jahres rechts auf und starte dann das Jahr.`),
     note: () => "Tip: a cushion of a few months' costs keeps a broken car from forcing you to sell investments at a bad moment.",
   },
   crash: {
     id: "crash", title: "Crash: markets −34 %", icon: "chart", tone: "bad", concept: "volatility",
-    body: (g) => `A banking crisis. Your ETF fell by a third in a few weeks${g.wallet.stock > 0 ? ", your single stocks by half" : ""}. Every headline says it's getting worse.`,
+    body: (g) => L(`A banking crisis. Your ETF fell by a third in a few weeks${g.wallet.stock > 0 ? ", your single stocks by half" : ""}. Every headline says it's getting worse.`, `Eine Bankenkrise. Dein ETF fiel in wenigen Wochen um ein Drittel${g.wallet.stock > 0 ? ", deine Einzelaktien um die Hälfte" : ""}. Jede Schlagzeile sagt, es wird schlimmer.`),
     onShow: (g) => shock(g, CRASH.etf, CRASH.stock),
     choices: crashLike("crash"),
   },
@@ -77,8 +81,8 @@ export const EVENTS: Record<string, EventDef> = {
   collapse: {
     id: "collapse", title: "The hype stock collapses", icon: "paula", tone: "bad", concept: "diversification",
     body: (g) => g.wallet.stock > 0
-      ? `Accounting fraud. The share loses ${Math.round(COLLAPSE * 100)} % in a week. Your single stocks drop from ${eur(g.wallet.stock / (1 - COLLAPSE))} to ${eur(g.wallet.stock)}.`
-      : `Accounting fraud. The share loses ${Math.round(COLLAPSE * 100)} % in a week. You don't own single stocks, so it's just a headline for you.`,
+      ? L(`Accounting fraud. The share loses ${Math.round(COLLAPSE * 100)} % in a week. Your single stocks drop from ${eur(g.wallet.stock / (1 - COLLAPSE))} to ${eur(g.wallet.stock)}.`, `Bilanzbetrug. Die Aktie verliert in einer Woche ${Math.round(COLLAPSE * 100)} %. Deine Einzelaktien fallen von ${eur(g.wallet.stock / (1 - COLLAPSE))} auf ${eur(g.wallet.stock)}.`)
+      : L(`Accounting fraud. The share loses ${Math.round(COLLAPSE * 100)} % in a week. You don't own single stocks, so it's just a headline for you.`, `Bilanzbetrug. Die Aktie verliert in einer Woche ${Math.round(COLLAPSE * 100)} %. Du hast keine Einzelaktien, für dich ist es nur eine Schlagzeile.`),
     onShow: (g) => shock(g, 0, COLLAPSE),
     note: (g) => g.wallet.stock > 0 ? "One company can go to almost zero. An ETF of 1.400 companies barely notices." : "One basket of hundreds of companies: a single fraud barely moves it.",
   },
@@ -183,7 +187,7 @@ export const EVENTS: Record<string, EventDef> = {
   },
   pension: {
     id: "pension", title: "Your pension letter arrives", icon: "hanna", tone: "neutral", concept: "compound",
-    body: (g) => `The state pension estimate: about 1.400 € a month from ${START_AGE + 37}. Your depot today: ${eur(invested(g))}.`,
+    body: (g) => L(`The state pension estimate: about 1.400 € a month from ${START_AGE + 37}. Your depot today: ${eur(invested(g))}.`, `Die Renteninformation: etwa 1.400 € im Monat ab ${START_AGE + 37}. Dein Depot heute: ${eur(invested(g))}.`),
     note: () => "For most people the state pension alone won't cover the life they're used to. That gap is what this depot is for.",
   },
 };

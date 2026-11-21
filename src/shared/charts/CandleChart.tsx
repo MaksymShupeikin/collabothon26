@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import { CandlestickSeries, LineSeries, createChart, createSeriesMarkers, type IChartApi, type ISeriesApi, type ISeriesMarkersPluginApi, type Time } from "lightweight-charts";
 import { rng } from "@/shared/lib/rng";
+import { useT } from "@/shared/lib/i18n";
 
 export type TradeMark = { i: number; side: "buy" | "sell"; label: string };
 type Mode = "line" | "candles";
@@ -27,6 +28,7 @@ export default function CandleChart({ sym, prices, times, trades, format }: { sy
   const series = useRef<ISeriesApi<"Candlestick"> | ISeriesApi<"Line"> | null>(null);
   const marks = useRef<ISeriesMarkersPluginApi<Time> | null>(null);
   const [mode, setMode] = useState<Mode>("line");
+  const t = useT();
 
   useEffect(() => {
     const c = createChart(box.current!, {
@@ -68,9 +70,9 @@ export default function CandleChart({ sym, prices, times, trades, format }: { sy
   return (
     <>
       <div className="chart-tools">
-        <div className="seg" role="group" aria-label="Chart type">
-          <button aria-pressed={mode === "line"} onClick={() => setMode("line")}>Line</button>
-          <button aria-pressed={mode === "candles"} onClick={() => setMode("candles")}>Candles</button>
+        <div className="seg" role="group" aria-label={t("Chart type", "Chartart")}>
+          <button aria-pressed={mode === "line"} onClick={() => setMode("line")}>{t("Line", "Linie")}</button>
+          <button aria-pressed={mode === "candles"} onClick={() => setMode("candles")}>{t("Candles", "Kerzen")}</button>
         </div>
       </div>
       <div ref={box} className="candle-chart" />

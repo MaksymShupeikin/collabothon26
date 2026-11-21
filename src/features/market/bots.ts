@@ -1,5 +1,6 @@
 import { execute, FEE_FIXED, FEE_RATE, newAccount, priceAt, round2, SPREAD, universeOf, type Account } from "./engine.ts";
 import type { BotId, Replay } from "./scenarios.ts";
+import { dict } from "../../shared/lib/i18n.ts";
 
 export const BOTS: Record<BotId, { name: string; habit: string; concept: string }> = {
   max: { name: "FOMO Max", habit: "Buys every rumor and hype", concept: "rumor" },
@@ -36,3 +37,11 @@ export function runBots(r: Replay): BotRun[] {
     return { id, acct: a };
   });
 }
+
+dict({
+  "FOMO Max": "FOMO Max", "Panic Paula": "Panik-Paula", "All-in Alex": "All-in-Alex", "Steady Sam": "Stetiger Sam",
+  "Buys every rumor and hype": "Kauft jedes Gerücht und jeden Hype", "Sells on every drop": "Verkauft bei jedem Rückgang",
+  "Puts everything in one stock": "Setzt alles auf eine Aktie", "Monthly ETF savings plan, never sells": "Monatlicher ETF-Sparplan, verkauft nie",
+  // replay covers that are real names
+  NVIDIA: "NVIDIA", adidas: "adidas", "MSCI World ETF": "MSCI World ETF",
+});

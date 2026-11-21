@@ -4,25 +4,29 @@ import { usePathname } from "next/navigation";
 import { rankOf, useGame } from "@/features/game/store";
 import { Wordmark } from "@/shared/ui/Wordmark";
 import { USER } from "@/shared/lib/user";
+import { useT } from "@/shared/lib/i18n";
+import LangSwitch from "@/features/shell/LangSwitch";
 
-/** Header of our own (🆕) pages, as on main: logo block + edu, signed-in user. The hub (/) shows no tabs. */
+/** Header of our own (🆕) pages, as on main: logo block + edu, signed-in user. The hub (/), History mode, the Investor Simulator and the trading area itself show no tabs. */
 export default function Header() {
   const save = useGame();
   const path = usePathname();
   const rank = rankOf(save.xp);
+  const t = useT();
   return (
     <header className="header">
       <div className="header-inner">
-        <Link href="/" className="logo" aria-label="comdirect edu home">
+        <Link href="/" className="logo" aria-label={t("comdirect edu home", "comdirect edu Startseite")}>
           <span className="logo-mark"><Wordmark /></span>
           <span className="logo-edu">edu</span>
         </Link>
-        {save.persona && save.proUnlocked && path !== "/" && (
+        <LangSwitch />
+        {save.persona && save.proUnlocked && !["/", "/history", "/invest", "/pro"].includes(path) && (
           <nav className="hnav" aria-label="comdirect edu">
-            <Link href="/pro">{save.proTrader ? "ProTrader" : "Trading area"}</Link>
+            <Link href="/pro">{save.proTrader ? "ProTrader" : t("Trading area", "Handelsbereich")}</Link>
           </nav>
         )}
-        <div className="user" aria-label={`Your profile: ${USER.name}, level ${rank.level} ${rank.name}, ${save.xp} XP`}>
+        <div className="user" aria-label={t(`Your profile: ${USER.name}, level ${rank.level} ${rank.name}, ${save.xp} XP`, `Dein Profil: ${USER.name}, Level ${rank.level} ${t(rank.name)}, ${save.xp} XP`)}>
           <span className="user-text">
             <strong className="small">{USER.name}</strong>
             <span className="user-rank xs">{USER.email}</span>

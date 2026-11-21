@@ -3,8 +3,11 @@ import { costBasis, depotValue, priceNow, totalValue } from "../market/engine.ts
 import { PERSONAS } from "../game/personas.ts";
 import type { Save } from "../game/store.ts";
 import type { Ui } from "../game/ui.ts";
+import { L, tr } from "../../shared/lib/i18n.ts";
+import "./chapters.de.ts";
 
 export type Ctx = { save: Save; ui: Ui };
+// Static texts are English and translated where they render; text functions return the current language themselves (they only run after hydration).
 export type Step = {
   target?: string;
   title: string;
@@ -58,7 +61,7 @@ const W1: Chapter[] = [
     blurb: "Current account, trading account and portfolio: what each one is for.",
     steps: [
       { title: "Welcome to your sandbox", text: "This is the comdirect overview, copied 1:1. Everything here runs on play money." },
-      { target: "acc-giro", title: "Current account", text: (c) => `Your current account. Your ${PERSONAS[c.save.persona ?? "starter"].start} € of play money starts here.` },
+      { target: "acc-giro", title: "Current account", text: (c) => { const n = PERSONAS[c.save.persona ?? "starter"].start; return L(`Your current account. Your ${n} € of play money starts here.`, `Dein Girokonto. Hier starten deine ${n} € Spielgeld.`); } },
       { target: "acc-verrechnung", title: "Trading account", text: "This is your cash for trading. It's separate from your current account, and it's empty for now." },
       { target: "acc-depot", title: "Portfolio", text: "Your portfolio holds the stocks and ETFs you own. Nothing yet." },
       { target: "nav-depot", title: "Look inside", text: "Every account has its own page.", task: "Open your portfolio.", done: (c) => c.ui.view === "depot" },
@@ -107,7 +110,7 @@ const W1: Chapter[] = [
     id: "1.5", world: 1, n: "1.5", kind: "chapter", title: "Place an order", surface: "cabinet", start: { view: "stock", sym: "DTE" }, card: ["order-types", "fees"],
     blurb: "Buy or sell, quantity, exchange, market vs. limit, costs.",
     steps: [
-      { target: "stock-buy", title: "Open the order form", text: "From any stock page you can go straight to the order form.", task: (c) => (c.ui.view === "stock" ? "Click \"Buy\"." : "Open the Deutsche Telekom page, then click \"Buy\"."), done: (c) => c.ui.view === "order" },
+      { target: "stock-buy", title: "Open the order form", text: "From any stock page you can go straight to the order form.", task: (c) => tr(c.ui.view === "stock" ? "Click \"Buy\"." : "Open the Deutsche Telekom page, then click \"Buy\"."), done: (c) => c.ui.view === "order" },
       { target: "of-side", title: "Buy or sell", text: "You can only sell what you own. We want to buy." },
       { target: "of-qty", title: "Quantity", text: "How many shares. Always whole shares here.", task: "Enter 2.", done: (c) => c.ui.qty === 2 },
       { target: "of-exchange", title: "Exchange", text: "Where the trade happens. Xetra and Tradegate are the big ones, with tight prices." },
@@ -115,7 +118,7 @@ const W1: Chapter[] = [
       { target: "of-limit", title: "Your limit", text: "The most you're willing to pay per share.", task: "Enter a limit, for example today's price.", done: (c) => (c.ui.limit ?? 0) > 0 },
       { target: "of-validity", title: "Validity", text: "How long your order waits if the price isn't reached. \"Good for day\" ends at today's close." },
       { target: "of-costs-link", title: "Costs", text: "Every order has a fee, plus a small spread.", task: "Click \"Show order costs\".", done: (c) => !!c.ui.costsOpen },
-      { target: "of-costs", title: "Look at the fee", text: (c) => (PERSONAS[c.save.persona ?? "starter"].start <= 100
+      { target: "of-costs", title: "Look at the fee", text: (c) => tr(PERSONAS[c.save.persona ?? "starter"].start <= 100
         ? "A fixed 4,90 € plus 0,25 %. On a 100 € order that's almost 5 %, so fewer, bigger orders are cheaper."
         : "A fixed 4,90 € plus 0,25 %. On 1.000 € that's under 1 %, on 100 € almost 5 %. Fewer, bigger orders are cheaper.") },
       { target: "of-submit", title: "That's the form", text: "You know every field now. In the mission you'll do it for real, on your own." },
@@ -125,8 +128,8 @@ const W1: Chapter[] = [
     id: "w1", world: 1, n: "★", kind: "mission", title: "Your first stock", surface: "cabinet", card: ["pnl"],
     blurb: "Top up and buy, on your own. Then ⏩ one week later.",
     mission: {
-      goal: (c) => persona(c).w1.text,
-      hint: (c) => persona(c).w1.hint + " On the order form choose \"Limit\" and set the limit at or a bit above the current price.",
+      goal: (c) => tr(persona(c).w1.text),
+      hint: (c) => tr(persona(c).w1.hint) + L(" On the order form choose \"Limit\" and set the limit at or a bit above the current price.", " Wähle im Orderformular „Limit“ und setze das Limit auf den aktuellen Kurs oder etwas darüber."),
       check: (c) => Object.values(c.save.sim.acct.holdings).some((h) => h.qty > 0), // sandbox is reset on start, so any position is theirs
       smart: (c) => c.save.sim.acct.trades.some((t) => t.type === "limit"),
       smartLabel: "Used a limit order",
@@ -199,8 +202,8 @@ const W2: Chapter[] = [
     id: "w2", world: 2, n: "★", kind: "mission", title: "Read before you click", surface: "pro", lesson: "w2",
     blurb: "Three headlines in one simulated week. Act or ignore?",
     mission: {
-      goal: () => "Three headlines come in over one simulated week. For each one, decide: act or ignore.",
-      hint: () => "Ask: is this new information about the business, or an opinion or something everyone already expected?",
+      goal: () => tr("Three headlines come in over one simulated week. For each one, decide: act or ignore."),
+      hint: () => tr("Ask: is this new information about the business, or an opinion or something everyone already expected?"),
       check: (c) => (c.ui.w2Answered as number ?? 0) >= 3,
       smart: (c) => (c.ui.w2Right as number ?? 0) >= 3,
       smartLabel: "All three right",
@@ -252,8 +255,8 @@ const W3: Chapter[] = [
     id: "w3", world: 3, n: "★", kind: "mission", title: "Don't put all eggs in one basket", surface: "pro",
     blurb: "Spread your money so no single stock is above 30 %.",
     mission: {
-      goal: () => "Invest at least half of your money so that no single stock is above 30 % of your portfolio. An ETF counts as diversified. Watch the fees.",
-      hint: () => "One ETF order is the cheapest way: Order → MSCI World ETF (A0RPWH). Not enough money for one share? The sandbox \"+ Play money\" button tops up your trading account. Selling a single stock also frees money.",
+      goal: () => tr("Invest at least half of your money so that no single stock is above 30 % of your portfolio. An ETF counts as diversified. Watch the fees."),
+      hint: () => tr("One ETF order is the cheapest way: Order → MSCI World ETF (A0RPWH). Not enough money for one share? The sandbox \"+ Play money\" button tops up your trading account. Selling a single stock also frees money."),
       check: (c) => {
         const s = c.save.sim, total = totalValue(s), dep = depotValue(s);
         if (!(total > 0) || dep < total * 0.5) return false;
@@ -285,7 +288,7 @@ const W4: Chapter[] = [
     steps: [
       { title: "A savings plan", text: "Same amount every month, automatically. No timing, no stress." },
       { target: "pt-order", title: "Open the order window", text: "Savings plans are set up in the order window.", task: "Open the order window.", done: (c) => !!c.ui.orderOpen },
-      { target: "w-order-plan", zone: "w-order", title: "Savings plan tab", text: "Switch to the savings plan tab.", task: (c) => `Set up a ${PERSONAS[c.save.persona ?? "starter"].plan} €/month plan on the ETF.`, done: (c) => !!c.ui.planSet },
+      { target: "w-order-plan", zone: "w-order", title: "Savings plan tab", text: "Switch to the savings plan tab.", task: (c) => { const n = PERSONAS[c.save.persona ?? "starter"].plan; return L(`Set up a ${n} €/month plan on the ETF.`, `Richte einen Sparplan über ${n} €/Monat auf den ETF ein.`); }, done: (c) => !!c.ui.planSet },
       { target: "time-machine", title: "Fast-forward", text: "Now let time work.", task: "Jump +1 year three times.", done: (c) => (c.ui.day as number ?? 0) >= 750 },
       { target: "w-depot", title: "Cost averaging", text: "In the bad year your plan bought more shares for the same money. That's the cost-average effect." },
     ],
@@ -294,8 +297,8 @@ const W4: Chapter[] = [
     id: "w4", world: 4, n: "★", kind: "mission", title: "Set and forget", surface: "pro", lesson: "plan",
     blurb: "Savings plan on an ETF, then ⏩ 10 years.",
     mission: {
-      goal: (c) => `Set up a ${persona(c).plan} €/month savings plan on the MSCI World ETF, then fast-forward 10 years.`,
-      hint: () => "Order → \"Savings plan\" tab → amount → Set up. Then press +10 years in the time machine.",
+      goal: (c) => L(`Set up a ${persona(c).plan} €/month savings plan on the MSCI World ETF, then fast-forward 10 years.`, `Richte einen Sparplan über ${persona(c).plan} €/Monat auf den MSCI-World-ETF ein und spul dann 10 Jahre vor.`),
+      hint: () => tr("Order → \"Savings plan\" tab → amount → Set up. Then press +10 years in the time machine."),
       check: (c) => (c.ui.day as number ?? 0) >= 2500 && (c.ui.planSet as boolean),
       smart: (c) => !c.save.sim.acct.trades.some((t) => t.side === "sell"),
       smartLabel: "Never sold",

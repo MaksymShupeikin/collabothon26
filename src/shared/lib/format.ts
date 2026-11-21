@@ -7,5 +7,7 @@ export const pct = (n: number) => `${signed(n)} %`;
 export const cls = (n: number) => (n > 0.0001 ? "up" : n < -0.0001 ? "down" : "");
 export const qtyFmt = (q: number) => (Number.isInteger(q) ? q.toLocaleString("de-DE") : num(q, 4));
 export const dateDE = (d: Date) => d.toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit", year: "numeric", timeZone: "UTC" });
-export const weekday = (d: Date) => d.toLocaleDateString("en-GB", { weekday: "long", timeZone: "UTC" });
-export const shortDay = (d: Date) => d.toLocaleDateString("en-GB", { weekday: "short", timeZone: "UTC" });
+/** Locale for words in dates (weekday, month); numbers stay de-DE in both languages, as on comdirect. */
+export const dateLocale = (lang: "en" | "de") => (lang === "de" ? "de-DE" : "en-GB");
+export const weekday = (d: Date, lang: "en" | "de" = "en") => d.toLocaleDateString(dateLocale(lang), { weekday: "long", timeZone: "UTC" });
+export const shortDay = (d: Date, lang: "en" | "de" = "en") => d.toLocaleDateString(dateLocale(lang), { weekday: "short", timeZone: "UTC" });

@@ -14,6 +14,9 @@ import LineChart from "@/shared/charts/LineChart";
 import ConceptCard from "@/features/learn/ConceptCard";
 import { Stars } from "@/features/tour/TourRunner";
 import Widget from "@/features/pro/Widget";
+import { dict, useT } from "@/shared/lib/i18n";
+
+dict({ You: "Du" });
 
 // ── Scores ────────────────────────────────────────────────────────────────
 
@@ -51,81 +54,85 @@ const COLORS = ["var(--color-ink-2)", "var(--color-border)", "var(--color-bg-dar
 // ── Pieces ────────────────────────────────────────────────────────────────
 
 export function BotBubble({ move, name }: { move: BotMove; name: (s: string) => string }) {
-  const what = move.side === "buy" ? `bought ${move.buys!.map(([s]) => name(s)).join(", ")}` : `sold ${move.sells!.map(name).join(", ")}`;
+  const t = useT();
+  const what = move.side === "buy" ? t(`bought ${move.buys!.map(([s]) => name(s)).join(", ")}`, `kauft ${move.buys!.map(([s]) => name(s)).join(", ")}`) : t(`sold ${move.sells!.map(name).join(", ")}`, `verkauft ${move.sells!.map(name).join(", ")}`);
   return (
     <div className="bot-bubble" role="status">
-      <Icon name={move.bot} size={34} round label={BOTS[move.bot].name} />
-      <div><strong className="xs">{BOTS[move.bot].name} {what}</strong><p className="small">“{move.say}”</p></div>
+      <Icon name={move.bot} size={34} round label={t(BOTS[move.bot].name)} />
+      <div><strong className="xs">{t(BOTS[move.bot].name)} {what}</strong><p className="small">{t("“", "„")}{t(move.say)}{t("”", "“")}</p></div>
     </div>
   );
 }
 
 export function BossIntro({ replay, chapter, onStart }: { replay: Replay; chapter: Chapter; onStart: () => void }) {
+  const t = useT();
   const boss = replay.boss!;
   return (
-    <div className="overlay overlay-dark" role="dialog" aria-modal="true" aria-label={chapter.title}>
+    <div className="overlay overlay-dark" role="dialog" aria-modal="true" aria-label={t(chapter.title)}>
       <div className="boss">
-        <span className="unlock-kicker">👾 Boss round{chapter.world ? ` · Module ${chapter.world}` : ""}</span>
-        <Icon name={boss} size={96} round label={BOTS[boss].name} />
-        <h1>{BOTS[boss].name}</h1>
-        <p className="unlock-sub">{BOTS[boss].habit}.</p>
+        <span className="unlock-kicker">👾 {t("Boss round", "Bossrunde")}{chapter.world ? ` · ${t("Module", "Modul")} ${chapter.world}` : ""}</span>
+        <Icon name={boss} size={96} round label={t(BOTS[boss].name)} />
+        <h1>{t(BOTS[boss].name)}</h1>
+        <p className="unlock-sub">{t(BOTS[boss].habit)}.</p>
         <div className="boss-rules">
           {replay.sim
-            ? <p><strong>A simulated market.</strong> Made-up headlines, real companies, real lessons.</p>
-            : <p><strong>A historical replay.</strong> A real company and real events, but the name and the date stay hidden until the end.</p>}
-          <p><strong>Budget:</strong> 1.000 € play money, the same for you and every bot. Scores are in %.</p>
-          <p><strong>To win:</strong> {replay.win}</p>
-          <p className="xs">Score = return − ½ × worst drawdown. When a bot trades, name the habit behind it: XP for the right concept, no matter how the trade ends.</p>
+            ? <p><strong>{t("A simulated market.", "Ein simulierter Markt.")}</strong> {t("Made-up headlines, real companies, real lessons.", "Erfundene Schlagzeilen, echte Unternehmen, echte Lektionen.")}</p>
+            : <p><strong>{t("A historical replay.", "Ein historisches Replay.")}</strong> {t("A real company and real events, but the name and the date stay hidden until the end.", "Ein echtes Unternehmen und echte Ereignisse, aber Name und Datum bleiben bis zum Ende verdeckt.")}</p>}
+          <p><strong>{t("Budget:", "Budget:")}</strong> {t("1.000 € play money, the same for you and every bot. Scores are in %.", "1.000 € Spielgeld, gleich viel für dich und jeden Bot. Die Scores sind in %.")}</p>
+          <p><strong>{t("To win:", "Zum Sieg:")}</strong> {t(replay.win)}</p>
+          <p className="xs">{t("Score = return − ½ × worst drawdown. When a bot trades, name the habit behind it: XP for the right concept, no matter how the trade ends.", "Score = Rendite − ½ × größter Drawdown. Wenn ein Bot handelt, benenne die Gewohnheit dahinter: XP für das richtige Konzept, egal wie der Trade ausgeht.")}</p>
         </div>
-        <button className="btn btn-primary btn-lg" onClick={onStart} autoFocus>Start the round ›</button>
+        <button className="btn btn-primary btn-lg" onClick={onStart} autoFocus>{t("Start the round ›", "Runde starten ›")}</button>
       </div>
     </div>
   );
 }
 
 export function SpotCard({ move, name, picked, onPick, onClose }: { move: BotMove; name: (s: string) => string; picked?: number; onPick: (k: number) => void; onClose: () => void }) {
+  const t = useT();
   const q = move.spot!;
   return (
-    <div className="overlay" role="dialog" aria-modal="true" aria-label="Spot the habit">
+    <div className="overlay" role="dialog" aria-modal="true" aria-label={t("Spot the habit", "Erkenne die Gewohnheit")}>
       <div className="modal spot">
-        <span className="badge badge-accent">Spot the habit</span>
+        <span className="badge badge-accent">{t("Spot the habit", "Erkenne die Gewohnheit")}</span>
         <BotBubble move={move} name={name} />
-        <h3>What&apos;s the risk here?</h3>
+        <h3>{t("What's the risk here?", "Was ist hier das Risiko?")}</h3>
         <div className="stack-sm">
           {q.options.map((o, k) => (
-            <button key={o} className={`option ${picked !== undefined && k === q.answer ? "right" : picked === k ? "wrong" : ""}`} disabled={picked !== undefined} onClick={() => onPick(k)}>{o}</button>
+            <button key={o} className={`option ${picked !== undefined && k === q.answer ? "right" : picked === k ? "wrong" : ""}`} disabled={picked !== undefined} onClick={() => onPick(k)}>{t(o)}</button>
           ))}
         </div>
         {picked !== undefined && (
           <>
-            <p className="small">{picked === q.answer ? "Right, +15 XP. " : "Not quite. "}{q.why}</p>
-            <p className="xs muted">We judge the decision, not the outcome: the XP doesn&apos;t depend on how this trade ends.</p>
-            <button className="btn btn-primary" style={{ alignSelf: "flex-end" }} onClick={onClose} autoFocus>Continue ›</button>
+            <p className="small">{picked === q.answer ? t("Right, +15 XP. ", "Richtig, +15 XP. ") : t("Not quite. ", "Nicht ganz. ")}{t(q.why)}</p>
+            <p className="xs muted">{t("We judge the decision, not the outcome: the XP doesn't depend on how this trade ends.", "Wir bewerten die Entscheidung, nicht das Ergebnis: Die XP hängen nicht davon ab, wie dieser Trade ausgeht.")}</p>
+            <button className="btn btn-primary" style={{ alignSelf: "flex-end" }} onClick={onClose} autoFocus>{t("Continue ›", "Weiter ›")}</button>
           </>
         )}
-        {picked === undefined && <p className="xs muted">You&apos;re not guessing whether the trade will work. You&apos;re naming the habit.</p>}
+        {picked === undefined && <p className="xs muted">{t("You're not guessing whether the trade will work. You're naming the habit.", "Du rätst nicht, ob der Trade aufgeht. Du benennst die Gewohnheit.")}</p>}
       </div>
     </div>
   );
 }
 
 export function DecisionCard({ news, onDecide, onClose }: { news: News; onDecide: (act: boolean) => boolean; onClose: () => void }) {
+  const t = useT();
   const [res, setRes] = useState<boolean | null>(null);
   return (
-    <div className="overlay" role="dialog" aria-modal="true" aria-label="Act or ignore">
+    <div className="overlay" role="dialog" aria-modal="true" aria-label={t("Act or ignore", "Handeln oder ignorieren")}>
       <div className="modal">
-        <span className="badge badge-accent">Read before you click</span>
-        <h2>{news.headline}</h2>
-        <p className="small">Is this new information that changes the picture, or something to ignore?</p>
+        <span className="badge badge-accent">{t("Read before you click")}</span>
+        <h2>{t(news.headline)}</h2>
+        <p className="small">{t("Is this new information that changes the picture, or something to ignore?", "Ist das neue Information, die das Bild verändert, oder etwas zum Ignorieren?")}</p>
         {res === null ? (
           <div className="row">
-            <button className="btn btn-dark" onClick={() => setRes(onDecide(true))}>Act: it&apos;s new information</button>
-            <button className="btn btn-outline" onClick={() => setRes(onDecide(false))}>Ignore</button>
+            <button className="btn btn-dark" onClick={() => setRes(onDecide(true))}>{t("Act: it's new information", "Handeln: Das ist neue Information")}</button>
+            <button className="btn btn-outline" onClick={() => setRes(onDecide(false))}>{t("Ignore", "Ignorieren")}</button>
           </div>
         ) : (
           <>
-            <p className="small"><strong>{res ? "Good call." : "Not quite."}</strong> Watch the price for two days: then the news widget reveals what kind of news it was.</p>
-            <button className="btn btn-primary" style={{ alignSelf: "flex-end" }} onClick={onClose} autoFocus>Continue ›</button>
+            <p className="small"><strong>{res ? t("Good call.", "Gut entschieden.") : t("Not quite.", "Nicht ganz.")}</strong> {t("Watch the price for two days: then the news widget reveals what kind of news it was.", "Beobachte den Kurs zwei Tage lang: Dann zeigt das News-Widget, welche Art von News es war.")}</p>
+            <button className="btn btn-primary" style={{ alignSelf: "flex-end" }} onClick={onClose} autoFocus>{t("Continue ›", "Weiter ›")}</button>
           </>
         )}
       </div>
@@ -134,10 +141,11 @@ export function DecisionCard({ news, onDecide, onClose }: { news: News; onDecide
 }
 
 export function MistakeCam({ replay, sim, answers, name, compact }: { replay: Replay; sim: Sim; answers: Record<string, number>; name: (s: string) => string; compact?: boolean }) {
+  const t = useT();
   const u = universeOf(replay.universe.id);
   const done = sim.day >= u.days;
   const moves = replay.moves.filter((m) => m.spot && (done || sim.day >= m.day + 3));
-  if (!moves.length) return <p className="xs muted">When a bot&apos;s trade plays out, the Mistake Cam replays it here.</p>;
+  if (!moves.length) return <p className="xs muted">{t("When a bot's trade plays out, the Mistake Cam replays it here.", "Wenn sich der Trade eines Bots entwickelt hat, zeigt die Fehler-Cam ihn hier noch einmal.")}</p>;
   return (
     <div className="mcam">
       {moves.map((m) => {
@@ -148,11 +156,11 @@ export function MistakeCam({ replay, sim, answers, name, compact }: { replay: Re
         const a = answers[m.bot + m.day];
         return (
           <div key={m.bot + m.day} className="mcam-item">
-            <div className="row"><Icon name={m.bot} size={28} round /> <strong className="small">{BOTS[m.bot].name}</strong> <span className="xs muted">Day {m.day + 1}</span></div>
-            <p className="xs">“{m.say}”</p>
-            <p className="xs">{m.side === "buy" ? "Bought" : "Sold"} {name(s)} at {num(from)} € → now {num(to)} € (<span className={move >= 0 ? "up" : "down"}>{pct(move)}</span>).</p>
-            <p className="xs"><strong>{worked ? "It worked, in spite of the strategy, not because of it." : "It went wrong."}</strong> Habit: {m.spot!.options[m.spot!.answer].toLowerCase()}.</p>
-            {!compact && <p className="xs muted">{a === undefined ? "Not answered." : a === m.spot!.answer ? "✓ You spotted it." : "✗ You missed it."} Concept: {cardById(replay.concept)?.title}</p>}
+            <div className="row"><Icon name={m.bot} size={28} round /> <strong className="small">{t(BOTS[m.bot].name)}</strong> <span className="xs muted">{t("Day", "Tag")} {m.day + 1}</span></div>
+            <p className="xs">{t("“", "„")}{t(m.say)}{t("”", "“")}</p>
+            <p className="xs">{t(m.side === "buy" ? "Bought" : "Sold", m.side === "buy" ? "Gekauft:" : "Verkauft:")} {name(s)} {t("at", "zu")} {num(from)} € → {t("now", "jetzt")} {num(to)} € (<span className={move >= 0 ? "up" : "down"}>{pct(move)}</span>).</p>
+            <p className="xs"><strong>{worked ? t("It worked, in spite of the strategy, not because of it.", "Es hat geklappt, trotz der Strategie, nicht wegen ihr.") : t("It went wrong.", "Es ging schief.")}</strong> {t("Habit", "Gewohnheit")}: {t.lang === "de" ? t(m.spot!.options[m.spot!.answer]) : m.spot!.options[m.spot!.answer].toLowerCase()}.</p>
+            {!compact && <p className="xs muted">{a === undefined ? t("Not answered.", "Nicht beantwortet.") : a === m.spot!.answer ? t("✓ You spotted it.", "✓ Erkannt.") : t("✗ You missed it.", "✗ Nicht erkannt.")} {t("Concept", "Konzept")}: {t(cardById(replay.concept)?.title ?? "")}</p>}
           </div>
         );
       })}
@@ -161,23 +169,24 @@ export function MistakeCam({ replay, sim, answers, name, compact }: { replay: Re
 }
 
 export function Rivals({ replay, sim, answers, cover }: { replay: Replay; sim: Sim; answers: Record<string, number>; cover: (s: string) => string }) {
+  const t = useT();
   const board = useBoard(replay, sim);
   return (
-    <Widget id="w-rivals" title="Rivals" sub="Mock bots · scripted" className="g-rivals">
+    <Widget id="w-rivals" title={t("Rivals", "Rivalen")} sub={t("Mock bots · scripted", "Test-Bots · geskriptet")} className="g-rivals">
       <table className="pt-table">
-        <thead><tr><th>#</th><th>Trader</th><th className="r">Return</th><th className="r">Score</th></tr></thead>
+        <thead><tr><th>#</th><th>Trader</th><th className="r">{t("Return", "Rendite")}</th><th className="r">Score</th></tr></thead>
         <tbody>
           {board.map((r, i) => (
             <tr key={r.id} className={r.id === "you" ? "sel" : ""}>
               <td className="num">{i + 1}</td>
-              <td><span className="row nowrap"><Icon name={r.id} size={22} round /> {r.name}</span></td>
+              <td><span className="row nowrap"><Icon name={r.id} size={22} round /> {t(r.name)}</span></td>
               <td className={`r num ${r.ret >= 0 ? "up" : "down"}`}>{pct(r.ret)}</td>
               <td className="r num"><strong>{num(r.score)}</strong></td>
             </tr>
           ))}
         </tbody>
       </table>
-      <div className="pt-sub-title xs">Mistake Cam</div>
+      <div className="pt-sub-title xs">{t("Mistake Cam", "Fehler-Cam")}</div>
       <MistakeCam replay={replay} sim={sim} answers={answers} name={cover} compact />
     </Widget>
   );
@@ -185,6 +194,7 @@ export function Rivals({ replay, sim, answers, cover }: { replay: Replay; sim: S
 
 /** End of a replay: the reveal, the Mistake Cam, the leaderboard and (for bosses) the verdict. */
 export function RevealModal({ replay, chapter, sim, answers, name, onClose }: { replay: Replay; chapter?: Chapter; sim: Sim; answers: Record<string, number>; name: (s: string) => string; onClose: () => void }) {
+  const t = useT();
   const board = useBoard(replay, sim);
   const you = board.find((r) => r.id === "you")!;
   const boss = replay.boss ? board.find((r) => r.id === replay.boss)! : undefined;
@@ -205,33 +215,33 @@ export function RevealModal({ replay, chapter, sim, answers, name, onClose }: { 
     }
   }, [replay.id, won, chapter, stars]);
 
-  const series = board.map((r, i) => ({ values: r.series.map((v) => v * 100), color: r.id === "you" ? "var(--color-accent)" : r.id === replay.boss ? "var(--color-ink)" : COLORS[i % COLORS.length], label: r.name, width: r.id === "you" ? 4 : r.id === replay.boss ? 3 : 1.5 }));
+  const series = board.map((r, i) => ({ values: r.series.map((v) => v * 100), color: r.id === "you" ? "var(--color-accent)" : r.id === replay.boss ? "var(--color-ink)" : COLORS[i % COLORS.length], label: t(r.name), width: r.id === "you" ? 4 : r.id === replay.boss ? 3 : 1.5 }));
   return (
-    <div className="overlay" role="dialog" aria-modal="true" aria-label="Reveal">
+    <div className="overlay" role="dialog" aria-modal="true" aria-label={t("Reveal", "Auflösung")}>
       <div className="modal modal-wide reveal">
-        <span className="badge badge-dark">{replay.sim ? "Round over" : "The reveal"}</span>
-        <h1 className="reveal-title">{replay.reveal}</h1>
-        <p>{replay.after}</p>
+        <span className="badge badge-dark">{replay.sim ? t("Round over", "Runde vorbei") : t("The reveal", "Die Auflösung")}</span>
+        <h1 className="reveal-title">{t(replay.reveal)}</h1>
+        <p>{t(replay.after)}</p>
         {boss && (
           <div className={`verdict ${won ? "won" : "lost"}`}>
             <Icon name={replay.boss!} size={48} round />
             <div>
-              <strong>{won ? `You beat ${BOTS[replay.boss!].name}!` : `${BOTS[replay.boss!].name} wins this time.`}</strong>
-              <p className="small">{avoided ? "✓ You avoided the boss's mistake." : "✗ You made the boss's mistake."} {beat ? "✓ Higher risk-adjusted score." : "✗ Lower risk-adjusted score."} {spotted} / {spots.length} habits spotted.</p>
+              <strong>{won ? t(`You beat ${BOTS[replay.boss!].name}!`, `Du hast ${t(BOTS[replay.boss!].name)} geschlagen!`) : t(`${BOTS[replay.boss!].name} wins this time.`, `Diesmal gewinnt ${t(BOTS[replay.boss!].name)}.`)}</strong>
+              <p className="small">{avoided ? t("✓ You avoided the boss's mistake.", "✓ Du hast den Fehler des Bosses vermieden.") : t("✗ You made the boss's mistake.", "✗ Du hast den Fehler des Bosses gemacht.")} {beat ? t("✓ Higher risk-adjusted score.", "✓ Höherer risikobereinigter Score.") : t("✗ Lower risk-adjusted score.", "✗ Niedrigerer risikobereinigter Score.")} {spotted} / {spots.length} {t("habits spotted.", "Gewohnheiten erkannt.")}</p>
             </div>
             <Stars n={stars} />
           </div>
         )}
         <div className="reveal-grid">
           <div>
-            <h3>Leaderboard</h3>
-            <p className="xs muted">Ranked by risk-adjusted score = return − ½ × worst drawdown. Never by trading volume or predictions.</p>
+            <h3>{t("Leaderboard", "Rangliste")}</h3>
+            <p className="xs muted">{t("Ranked by risk-adjusted score = return − ½ × worst drawdown. Never by trading volume or predictions.", "Sortiert nach risikobereinigtem Score = Rendite − ½ × größter Drawdown. Nie nach Handelsvolumen oder Prognosen.")}</p>
             <table className="wtable">
-              <thead><tr><th>Trader</th><th className="r">Return</th><th className="r">Worst drop</th><th className="r">Score</th></tr></thead>
+              <thead><tr><th>Trader</th><th className="r">{t("Return", "Rendite")}</th><th className="r">{t("Worst drop", "Größter Einbruch")}</th><th className="r">Score</th></tr></thead>
               <tbody>
                 {board.map((r) => (
                   <tr key={r.id} className={r.id === "you" ? "me" : ""}>
-                    <td><span className="row nowrap"><Icon name={r.id} size={26} round /> <span>{r.name}{r.habit && <span className="xs muted block">{r.habit}</span>}</span></span></td>
+                    <td><span className="row nowrap"><Icon name={r.id} size={26} round /> <span>{t(r.name)}{r.habit && <span className="xs muted block">{t(r.habit)}</span>}</span></span></td>
                     <td className={`r num ${r.ret >= 0 ? "up" : "down"}`}>{pct(r.ret)}</td>
                     <td className="r num">−{num(r.dd, 1)} %</td>
                     <td className="r num"><strong>{num(r.score)}</strong></td>
@@ -239,22 +249,22 @@ export function RevealModal({ replay, chapter, sim, answers, name, onClose }: { 
                 ))}
               </tbody>
             </table>
-            <p className="xs">Your understanding score: <strong>{spotted} / {spots.length}</strong> habits spotted.</p>
+            <p className="xs">{t("Your understanding score:", "Dein Verständnis-Score:")} <strong>{spotted} / {spots.length}</strong> {t("habits spotted.", "Gewohnheiten erkannt.")}</p>
           </div>
           <div>
-            <h3>Portfolio curves</h3>
+            <h3>{t("Portfolio curves", "Depotverläufe")}</h3>
             <LineChart series={series} height={200} />
             <div className="row xs legend-row">{series.map((s) => <span key={s.label}><span className="swatch" style={{ background: s.color }} /> {s.label}</span>)}</div>
           </div>
         </div>
-        <h3>Mistake Cam</h3>
+        <h3>{t("Mistake Cam", "Fehler-Cam")}</h3>
         <MistakeCam replay={replay} sim={sim} answers={answers} name={name} />
         <div className="card-row"><ConceptCard id={replay.concept} /></div>
         <div className="row" style={{ justifyContent: "flex-end" }}>
-          <button className="btn btn-ghost" onClick={onClose}>Look at the market</button>
+          <button className="btn btn-ghost" onClick={onClose}>{t("Look at the market", "Den Markt ansehen")}</button>
           {replay.sim
-            ? <Link className="btn btn-primary" href="/" onClick={() => actions.start(null)}>Back to the learning map ›</Link>
-            : <Link className="btn btn-primary" href="/history" onClick={() => actions.start(null)}>Back to History mode ›</Link>}
+            ? <Link className="btn btn-primary" href="/" onClick={() => actions.start(null)}>{t("Back to the learning map ›", "Zurück zum Lernpfad ›")}</Link>
+            : <Link className="btn btn-primary" href="/history" onClick={() => actions.start(null)}>{t("Back to History mode ›", "Zurück zum Geschichtsmodus ›")}</Link>}
         </div>
       </div>
     </div>

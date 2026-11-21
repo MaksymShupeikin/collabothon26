@@ -1,4 +1,5 @@
 import { rng } from "../../shared/lib/rng.ts";
+import { dict } from "../../shared/lib/i18n.ts";
 
 // The six hidden news types. The type is revealed only after the price reaction.
 export type NewsKind = "signal" | "noise" | "priced_in" | "rumor" | "sector" | "macro";
@@ -119,3 +120,38 @@ export function generateNews(days: number, seed: number, from = 1): News[] {
 
   return news.sort((a, b) => a.day - b.day || a.time.localeCompare(b.time));
 }
+
+// Headlines stay English in the data and are translated where they are shown.
+dict({
+  Signal: "Signal", Noise: "Rauschen", "Priced in": "Eingepreist", Rumor: "Gerücht", Sector: "Branche", Macro: "Makro",
+  "Simulated newswire": "Simulierter Nachrichtendienst", Newswire: "Nachrichtendienst",
+  "ECB unexpectedly raises key rate by 0.5 points": "EZB erhöht Leitzins überraschend um 0,5 Prozentpunkte",
+  "Inflation cools faster than expected, rate cuts in sight": "Inflation kühlt schneller ab als erwartet, Zinssenkungen in Sicht",
+  "Most economists had expected rates to stay on hold.": "Die meisten Ökonomen hatten unveränderte Zinsen erwartet.",
+  "Consumer prices rose less than forecast for the second month in a row.": "Die Verbraucherpreise stiegen den zweiten Monat in Folge weniger als prognostiziert.",
+  "A surprise is real new information. Higher rates make stocks less attractive, growth stocks the most.": "Eine Überraschung ist echte neue Information. Höhere Zinsen machen Aktien weniger attraktiv, Wachstumsaktien am meisten.",
+  "A surprise is real new information. Lower rates ahead make stocks more attractive.": "Eine Überraschung ist echte neue Information. Sinkende Zinsen machen Aktien attraktiver.",
+  "ECB keeps key rate unchanged, as widely expected": "EZB lässt Leitzins wie allgemein erwartet unverändert",
+  "The decision matches what nearly all economists had forecast.": "Die Entscheidung entspricht dem, was fast alle Ökonomen prognostiziert hatten.",
+  "Everyone expected it, so it was already in the price. Nothing new, no move.": "Alle haben es erwartet, also war es schon im Kurs. Nichts Neues, keine Bewegung.",
+  "Oil price falls 8 % after OPEC+ agrees on higher output": "Ölpreis fällt um 8 %, nachdem sich die OPEC+ auf mehr Förderung einigt",
+  "New chip export limits announced, tech sector under pressure": "Neue Exportgrenzen für Chips angekündigt, Techbranche unter Druck",
+  "Cheaper oil helps carmakers and consumers. A whole sector moved, not one company.": "Billigeres Öl hilft Autobauern und Verbrauchern. Eine ganze Branche hat sich bewegt, nicht ein Unternehmen.",
+  "One decision hit a whole sector at once. Owning only tech stocks means owning this risk.": "Eine Entscheidung traf eine ganze Branche auf einmal. Wer nur Techaktien hält, trägt genau dieses Risiko.",
+  "Report: government considers new purchase bonus for electric cars, sources say": "Bericht: Regierung erwägt neue Kaufprämie für E-Autos, heißt es aus Kreisen",
+  "No official confirmation. A ministry spokesperson declined to comment.": "Keine offizielle Bestätigung. Ein Sprecher des Ministeriums wollte sich nicht äußern.",
+  "An unconfirmed rumor. Prices rose on hope alone.": "Ein unbestätigtes Gerücht. Die Kurse stiegen allein auf Hoffnung.",
+  "Government: no new purchase bonus for electric cars planned": "Regierung: keine neue Kaufprämie für E-Autos geplant",
+  "The rumor was wrong. Whoever bought the hype lost money.": "Das Gerücht war falsch. Wer den Hype gekauft hat, hat Geld verloren.",
+  "Star investor on TV: \"The market could double this year\"": "Star-Investor im TV: „Der Markt könnte sich dieses Jahr verdoppeln“",
+  "An opinion, not information. Nothing about any company changed.": "Eine Meinung, keine Information. An keinem Unternehmen hat sich etwas geändert.",
+  "Noise. Nothing changed about any business.": "Rauschen. An keinem Geschäft hat sich etwas geändert.",
+  "Weather: rainy weekend expected in Frankfurt": "Wetter: verregnetes Wochenende in Frankfurt erwartet",
+  "Bundesliga: late winner sends fans into celebration": "Bundesliga: Später Siegtreffer lässt Fans jubeln",
+  "Survey: Germans plan to spend more on holidays this year": "Umfrage: Deutsche wollen dieses Jahr mehr für Urlaub ausgeben",
+  "Trade fair in Hannover opens with record number of exhibitors": "Messe in Hannover öffnet mit Rekordzahl an Ausstellern",
+  "Blogger: \"The DAX chart looks weak this week\"": "Blogger: „Der DAX-Chart sieht diese Woche schwach aus“",
+  "Analysts debate whether summer will be calm on the markets": "Analysten streiten, ob der Sommer an den Börsen ruhig wird",
+  "Euro little changed against the dollar": "Euro kaum verändert zum Dollar",
+  "Christmas markets expect more visitors than last year": "Weihnachtsmärkte erwarten mehr Besucher als im Vorjahr",
+});

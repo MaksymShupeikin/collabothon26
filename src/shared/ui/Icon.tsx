@@ -38,10 +38,10 @@ const ICONS: Record<string, (c: C) => ReactNode> = {
   pause: ({ fg }) => <><rect x="11" y="8" width="10" height="32" rx="2" fill={fg} /><rect x="27" y="8" width="10" height="32" rx="2" fill={fg} /></>,
 };
 
-/** Custom pictogram. `round` puts it on a petrol disc (avatars, mode tiles). */
-export default function Icon({ name, size = 20, round = false, label }: { name: string; size?: number; round?: boolean; label?: string }) {
+/** Custom pictogram. `round` puts it on a petrol disc (avatars, mode tiles); `color` recolours a plain one (e.g. yellow on a dark band). */
+export default function Icon({ name, size = 20, round = false, label, color }: { name: string; size?: number; round?: boolean; label?: string; color?: string }) {
   const you = name === "you";
-  const c: C = round ? { fg: you ? INK : WHITE, bg: you ? ACC : INK } : { fg: INK, bg: WHITE };
+  const c: C = round ? { fg: you ? INK : WHITE, bg: you ? ACC : INK } : { fg: color ?? INK, bg: WHITE };
   return (
     <svg viewBox="0 0 48 48" width={size} height={size} role={label ? "img" : undefined} aria-label={label} aria-hidden={label ? undefined : true}
       style={{ verticalAlign: "middle", flexShrink: 0 }}>
