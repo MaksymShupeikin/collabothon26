@@ -5,6 +5,7 @@ import { COMPANIES, companyOf } from "@/features/market/companies";
 import { cls, dateDE, eur, EUR, num, pct, qtyFmt, signed } from "@/shared/lib/format";
 import { chapterById } from "@/features/tour/chapters";
 import { PERSONAS } from "@/features/game/personas";
+import { USER } from "@/shared/lib/user";
 import { actions, useGame, type Save } from "@/features/game/store";
 import { bump, setUi, useUi } from "@/features/game/ui";
 import { ask, bid, cancelOrder, costBasis, dateOf, depotValue, fee, priceAt, round2, type OrderType, type Side, type Validity } from "@/features/market/engine";
@@ -60,7 +61,7 @@ function CabinetInner({ initial }: { initial?: { view: View; sym?: string } }) {
       <WebHeader current={current} sub={sub} onNav={nav} onSearch={(s) => go("stock", s)}
         logout={<Link className="btn btn-primary btn-sm" href="/">Exit ›</Link>} />
       <main className="web-main">
-        {view === "home" && <Home save={save} name={persona.name} go={go} />}
+        {view === "home" && <Home save={save} persona={`${persona.name} (${persona.label})`} go={go} />}
         {view === "transfer" && <Transfer save={save} go={go} />}
         {view === "finder" && <Finder save={save} go={go} />}
         {view === "stock" && <Stock save={save} sym={sym} go={go} />}
@@ -73,13 +74,14 @@ function CabinetInner({ initial }: { initial?: { view: View; sym?: string } }) {
   );
 }
 
-function PageHead({ title, owner }: { title: string; owner?: string }) {
+function PageHead({ title, owner, playing }: { title: string; owner?: boolean; playing?: string }) {
   return (
     <div className="page-head">
       <h1>{title}</h1>
       <div className="page-owner">
         <span className="page-icons" aria-hidden>ⓘ ⎙ ✉</span>
-        {owner && <span className="small">Holder: <strong>{owner}</strong></span>}
+        {owner && <span className="small">Holder: <strong>{USER.name}</strong></span>}
+        {playing && <span className="xs muted">Playing as: {playing}</span>}
       </div>
     </div>
   );
@@ -87,7 +89,7 @@ function PageHead({ title, owner }: { title: string; owner?: string }) {
 
 // ── Overview ──────────────────────────────────────────────────────────────
 
-function Home({ save, name, go }: { save: Save; name: string; go: (v: View, s?: string) => void }) {
+function Home({ save, persona, go }: { save: Save; persona: string; go: (v: View, s?: string) => void }) {
   const a = save.sim.acct;
   const dep = depotValue(save.sim);
   const avail = round2(a.cash - reserved(save));
@@ -96,7 +98,7 @@ function Home({ save, name, go }: { save: Save; name: string; go: (v: View, s?: 
   const lastTransfer = save.tx.find((t) => t.account === "giro" && t.text.startsWith("Transfer"));
   return (
     <div className="web-page">
-      <PageHead title={`Good morning, ${name}.`} owner={name} />
+      <PageHead title={`Good morning, ${USER.salutation}.`} owner playing={persona} />
       <section className="acc">
         <div className="acc-title">comdirect</div>
         <table className="acc-table">
@@ -596,13 +598,12 @@ function OrderForm({ save, sym: initial, go, setSym }: { save: Save; sym: string
   );
 }
 
-function OrderTop({ save, avail }: { save: Save; avail: number }) {
-  const persona = PERSONAS[save.persona ?? "starter"];
+function OrderTop({ avail }: { save: Save; avail: number }) {
   return (
     <>
       <PageHead title="Order" />
       <div className="order-top">
-        <div><span className="small">Standard depot</span><span className="xs muted">{persona.name} · {DEPOT_NO}</span></div>
+        <div><span className="small">Standard depot</span><span className="xs muted">{USER.name} · {DEPOT_NO}</span></div>
         <div><span className="small">Verrechnungskonto</span><span className="xs muted num">{IBAN.verrechnung}</span></div>
         <div className="r"><span className="small num">{eur(avail)}</span><span className="xs muted">Available amount</span></div>
       </div>
@@ -618,11 +619,10 @@ function Depot({ save, go }: { save: Save; go: (v: View, s?: string) => void }) 
   const value = depotValue(save.sim), prevValue = depotValue(save.sim, d - 1);
   const cost = costBasis(save.sim);
   const pos = Object.entries(save.sim.acct.holdings);
-  const persona = PERSONAS[save.persona ?? "starter"];
   const dPrev = value - prevValue, dBuy = value - cost;
   return (
     <div className="web-page">
-      <PageHead title="Depot" owner={persona.name} />
+      <PageHead title="Depot" owner />
       <div className="dcards">
         <div className="dcard">
           <div className="dcard-h"><strong>Your depot value</strong><span className="info">ⓘ</span></div>
@@ -708,7 +708,7 @@ function Transactions({ save }: { save: Save }) {
   const label = { giro: "Girokonto", verrechnung: "Verrechnungskonto", depot: "Depot" };
   return (
     <div className="web-page">
-      <PageHead title="Transactions" owner={PERSONAS[save.persona ?? "starter"].name} />
+      <PageHead title="Transactions" owner />
       <section className="acc">
         <div className="acc-title">Select transactions</div>
         <div className="finder-grid pad">

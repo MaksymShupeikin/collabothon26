@@ -3,9 +3,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useGame } from "@/features/game/store";
 import { Wordmark } from "@/shared/ui/Wordmark";
-
-// shortcut: mock signed-in user, as on main; read from the comdirect session once a backend exists.
-const USER = { name: "Max Mustermann", initials: "MM" };
+import { USER } from "@/shared/lib/user";
 
 /** Header of our own (🆕) pages, as on main: logo block + edu, signed-in user. The hub (/) shows no tabs. */
 export default function Header() {
