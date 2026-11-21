@@ -179,7 +179,7 @@ export default function LearningMap() {
   );
 }
 
-/** Short, well-sourced lines from known investors. Rotates every 30 s; a fixed list, nothing is fetched. */
+/** Short, well-sourced lines from known investors. Rotates every 20 s; a fixed list, nothing is fetched. */
 const QUOTES = [
   { q: "Risk comes from not knowing what you’re doing", by: "Warren Buffett" },
   { q: "Know what you own, and know why you own it", by: "Peter Lynch" },
@@ -188,21 +188,76 @@ const QUOTES = [
   { q: "In investing, what is comfortable is rarely profitable", by: "Robert Arnott" },
   { q: "Be fearful when others are greedy, and greedy when others are fearful", by: "Warren Buffett" },
 ];
-const QUOTE_MS = 30_000;
+const QUOTE_MS = 20_000;
+const QUOTE_OUT_MS = 300; // matches .quoteLeaving in the CSS
 
+/** Pause before the next keystroke: an even, unhurried rhythm with a breath after punctuation and only slight unevenness. */
+function keyDelay(ch: string) {
+  if (ch === "," || ch === ".") return 150;
+  if (ch === " ") return 48;
+  return 30 + Math.random() * 10;
+}
+
+/**
+ * Typewriter: each letter inks in (a short fade, not a pop) behind a yellow caret, the author appears once the line is
+ * complete, and after 20 s the line dissolves and the next one is typed. The whole line is laid out from the start
+ * (untyped letters are hidden, not missing), so wrapping never jumps while it types.
+ */
 function Quote() {
   const [i, setI] = useState(0);
+  const [n, setN] = useState(0);
+  const [busy, setBusy] = useState(true);
+  const [leaving, setLeaving] = useState(false);
   useEffect(() => {
-    // A different line per visit (picked after hydration, so server and client markup match), then one step every 30 s.
-    const first = setTimeout(() => setI(Math.floor(Date.now() / QUOTE_MS) % QUOTES.length), 0);
-    const id = setInterval(() => setI((n) => (n + 1) % QUOTES.length), QUOTE_MS);
-    return () => { clearTimeout(first); clearInterval(id); };
+    const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    let alive = true;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const wait = (ms: number) => new Promise<void>((r) => { timer = setTimeout(r, ms); });
+    // A different line per visit (picked after hydration, so server and client markup match).
+    let idx = Math.floor(Date.now() / QUOTE_MS) % QUOTES.length;
+    (async () => {
+      await wait(still ? 0 : 250);
+      while (alive) {
+        const q = QUOTES[idx].q;
+        setI(idx); setLeaving(false);
+        if (still) setN(q.length);
+        else {
+          setN(0); setBusy(true);
+          for (let k = 1; k <= q.length; k++) { await wait(keyDelay(q[k - 1])); if (!alive) return; setN(k); }
+        }
+        setBusy(false);
+        await wait(QUOTE_MS); if (!alive) return;
+        if (!still) {
+          setLeaving(true);
+          await wait(QUOTE_OUT_MS); if (!alive) return;
+          setN(0);
+          await wait(120); if (!alive) return;
+        }
+        idx = (idx + 1) % QUOTES.length;
+      }
+    })();
+    return () => { alive = false; clearTimeout(timer); };
   }, []);
   const { q, by } = QUOTES[i];
+  // The caret lives inside the last typed letter (never after a just-typed space), so it can't drop to a new line on its own.
+  const end = q.slice(0, n).trimEnd().length;
+  const caret = <span key={busy ? "busy" : `idle${i}`} className={`${s.caret} ${busy ? s.caretBusy : ""}`} />;
   return (
-    <figure className={s.quote}>
-      <blockquote key={i} className={s.quoteText}><p>{q}</p></blockquote>
-      <figcaption key={by + i} className={s.quoteBy}>{by}</figcaption>
+    <figure className={`${s.quote} ${leaving ? s.quoteLeaving : ""}`}>
+      <blockquote className={s.quoteText}>
+        <p>
+          <span className={s.srOnly}>{q}</span>
+          <span aria-hidden>
+            {end === 0 && caret}
+            {Array.from(q).map((ch, k) => (
+              <span key={k} className={k < n ? (k === end - 1 ? `${s.ch} ${s.chCaret}` : s.ch) : s.untyped}>
+                {ch}{k === end - 1 && caret}
+              </span>
+            ))}
+          </span>
+        </p>
+      </blockquote>
+      <figcaption className={`${s.quoteBy} ${n === q.length && n > 0 && !leaving ? s.quoteByOn : ""}`}>{by}</figcaption>
     </figure>
   );
 }
