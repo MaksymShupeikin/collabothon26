@@ -1,6 +1,6 @@
 # Phase 1: overnight build report (21.11.2026)
 
-Branch `v2/phase-1-core`, three commits, nothing pushed. `npm run check`, `npm run lint` and `npm run build` pass.
+Branch `v2/phase-1-core`, four commits, nothing pushed. `npm run check`, `npm run lint` and `npm run build` pass.
 
 ## What's built (idea.md §18, phase 1)
 
