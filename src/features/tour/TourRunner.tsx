@@ -74,19 +74,26 @@ function ChapterTour({ ch, ctx }: { ch: Chapter; ctx: Ctx }) {
           )}
         </div>
       }>
-      <p className="small">{resolve(step.text, ctx)}</p>
+      {step.text && <p className="small">{resolve(step.text, ctx)}</p>}
       {isTask && taskText && <p className="small task"><strong>Your turn</strong><span>{taskText}</span></p>}
       {step.game && <div className="coach-game"><MiniGameView game={step.game} /></div>}
       {step.quiz && (
-        <div className="stack-sm">
-          <p className="small"><strong>{step.quiz.q}</strong></p>
-          {step.quiz.options.map((o, k) => (
-            <button key={o} className={`option ${picked !== null && k === step.quiz!.answer && picked === k ? "right" : picked === k ? "wrong" : ""}`}
-              disabled={!!quizDone} onClick={() => { setPicked(k); if (k === step.quiz!.answer) actions.understood(`${ch.id}:q${i}`, 15); }}>
-              {o}
-            </button>
-          ))}
-          {picked !== null && <p className="xs">{picked === step.quiz.answer ? step.quiz.why : "Not quite. Try again."}</p>}
+        <div className="coach-quiz">
+          <span className="quiz-kicker">Quick check</span>
+          <p className="quiz-q">{step.quiz.q}</p>
+          <div className="quiz-options">
+            {step.quiz.options.map((o, k) => {
+              const state = picked === k ? (k === step.quiz!.answer ? "right" : "wrong") : "";
+              return (
+                <button key={o} className={`option ${state}`}
+                  disabled={!!quizDone} onClick={() => { setPicked(k); if (k === step.quiz!.answer) actions.understood(`${ch.id}:q${i}`, 15); }}>
+                  <span className="opt-key" aria-hidden>{state === "right" ? "✓" : state === "wrong" ? "✕" : String.fromCharCode(65 + k)}</span>
+                  <span className="opt-label">{o}</span>
+                </button>
+              );
+            })}
+          </div>
+          {picked !== null && <p className={`quiz-fb ${picked === step.quiz.answer ? "is-right" : "is-wrong"}`} role="status">{picked === step.quiz.answer ? step.quiz.why : "Not quite. Try again."}</p>}
         </div>
       )}
     </CoachMark>

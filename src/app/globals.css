@@ -365,6 +365,18 @@ h3 { font-size: var(--text-base); line-height: 24px; font-weight: 700; }
 .coach-bubble .option:not(:disabled):hover { background: rgba(255, 255, 255, 0.14); }
 .coach-bubble .option.right { background: var(--color-gain); border-color: var(--color-gain); }
 .coach-bubble .option.wrong { background: var(--color-loss); border-color: var(--color-loss); }
+.coach-quiz { display: flex; flex-direction: column; gap: var(--space-3); background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: var(--space-4); padding: var(--space-5); }
+.quiz-kicker { font-size: 11px; line-height: 16px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-accent); }
+.quiz-q { font-size: var(--text-sm); line-height: 21px; font-weight: 700; color: var(--color-white); text-wrap: balance; }
+.quiz-options { display: flex; flex-direction: column; gap: var(--space-2); }
+.coach-quiz .option { display: flex; align-items: center; gap: var(--space-4); border-radius: var(--space-4); padding: var(--space-3) var(--space-4) var(--space-3) var(--space-3); }
+.coach-quiz .option:not(:disabled):hover { border-color: rgba(255, 245, 0, 0.7); }
+.coach-quiz .opt-key { flex: none; display: inline-grid; place-items: center; width: 26px; height: 26px; border-radius: 8px; background: rgba(255, 255, 255, 0.12); font-size: 12px; font-weight: 800; transition: background-color var(--ease), color var(--ease); }
+.coach-quiz .option:not(:disabled):hover .opt-key { background: var(--color-accent); color: var(--color-ink); }
+.coach-quiz .option.right .opt-key, .coach-quiz .option.wrong .opt-key { background: rgba(255, 255, 255, 0.25); color: var(--color-white); }
+.quiz-fb { font-size: var(--text-xs); line-height: 18px; padding: var(--space-3) var(--space-4); border-radius: var(--space-3); }
+.quiz-fb.is-right { background: rgba(111, 212, 156, 0.14); color: #6fd49c; }
+.quiz-fb.is-wrong { background: rgba(255, 138, 125, 0.14); color: #ff8a7d; }
 .coach-bubble .task { display: flex; flex-direction: column; gap: var(--space-1); background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 245, 0, 0.5); border-radius: var(--space-4); padding: var(--space-4) var(--space-5); color: var(--color-white); }
 .coach-bubble .task strong { color: var(--color-accent); font-size: var(--text-xs); line-height: 18px; }
 /* Mini-games keep their ink-on-light charts: they sit on a light inset. */
@@ -738,7 +750,7 @@ button.ccard-face:hover { background: color-mix(in srgb, var(--color-accent) 90%
 .trade .side-toggle .buy[aria-pressed="true"] { background: var(--color-accent); color: var(--color-ink); }
 .trade .side-toggle .sell[aria-pressed="true"] { background: var(--color-ink); color: var(--color-white); }
 .trade .kv.total { border-top: 1px solid var(--color-bg-light); margin-top: var(--space-2); padding-top: var(--space-3); }
-.trade .ticket .btn-lg { width: 100%; }
+.trade .ticket .btn-lg { width: 100%; white-space: normal; text-align: center; line-height: 1.25; }
 
 @media (max-width: 1100px) {
   .trade { height: auto; min-height: 0; }
@@ -778,9 +790,6 @@ button.ccard-face:hover { background: color-mix(in srgb, var(--color-accent) 90%
 .trade .topup-actions { justify-content: flex-end; }
 .trade .table td.r, .trade .table th.r { white-space: nowrap; }
 /* Switching to ProTrader: the learner confirms the move (after the Module 2 mission). */
-.switch-list { list-style: none; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-3) var(--space-6); text-align: left; color: var(--color-bg-dark); font-size: var(--text-sm); line-height: 20px; max-width: 640px; }
-.switch-list strong { color: var(--color-white); display: block; }
-@media (max-width: 600px) { .switch-list { grid-template-columns: 1fr; } }
 
 /* Trading screen, minimal look (from branch pofa_design): flat panels on a pale layer, big calm price block. */
 html:has(.trade), body:has(.trade) { background: color-mix(in srgb, var(--color-bg-light) 40%, var(--color-white)); }
@@ -824,7 +833,8 @@ html:has(.trade), body:has(.trade) { background: color-mix(in srgb, var(--color-
 @keyframes xp-ring { from { opacity: 0.9; transform: scale(1); } to { opacity: 0; transform: scale(1.6, 2.1); } }
 /* Landing: the rank chip flashes and bumps. */
 .sbar-rank { border-radius: var(--radius-lg); padding: 2px var(--space-3) 2px 2px; margin: -2px calc(-1 * var(--space-3)) -2px -2px; }
-.sbar-rank.xp-hit { animation: xp-hit 0.7s cubic-bezier(0.2, 0, 0, 1); }
+.sbar-rank.xp-hit, .user.xp-hit { animation: xp-hit 0.7s cubic-bezier(0.2, 0, 0, 1); }
+.user.xp-hit { border-radius: 999px; }
 .sbar-rank.xp-hit .sbar-xp { color: var(--color-accent); transition: color 0.2s; }
 @keyframes xp-hit { 0% { transform: scale(1); background: transparent; } 25% { transform: scale(1.18); background: rgba(255, 245, 0, 0.28); box-shadow: 0 0 18px 4px rgba(255, 245, 0, 0.45); } 100% { transform: scale(1); background: transparent; box-shadow: none; } }
 /* The reward each step pays, shown up front. */
@@ -832,7 +842,7 @@ html:has(.trade), body:has(.trade) { background: color-mix(in srgb, var(--color-
 .xp-chip.is-pending { background: transparent; color: var(--color-accent); box-shadow: inset 0 0 0 1px rgba(255, 245, 0, 0.5); }
 .xp-done { display: inline-flex; align-items: center; gap: var(--space-3); font-size: var(--text-sm); font-weight: 700; color: #6fd49c; animation: xp-done-in 0.4s cubic-bezier(0.2, 0, 0, 1); }
 @keyframes xp-done-in { from { opacity: 0; transform: scale(0.8); } }
-@media (prefers-reduced-motion: reduce) { .xp-burst-star, .xp-burst-ring, .sbar-rank.xp-hit, .xp-done { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .xp-burst-star, .xp-burst-ring, .sbar-rank.xp-hit, .user.xp-hit, .xp-done { animation: none; } }
 .btn-arrow { width: 1em; height: 1em; flex-shrink: 0; vertical-align: -0.125em; margin-left: var(--space-2); transition: transform var(--ease); }
 .btn:hover:not(:disabled) .btn-arrow { transform: translateX(3px); }
 @media (prefers-reduced-motion: reduce) { .btn-arrow { transition: none; } }

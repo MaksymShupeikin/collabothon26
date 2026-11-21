@@ -55,6 +55,8 @@ function write(s: Save) {
 }
 const subscribe = (l: () => void) => { listeners.add(l); return () => listeners.delete(l); };
 export const getSave = read;
+/** Called after every save write (outside React render). */
+export const onSave = (l: () => void) => { listeners.add(l); return () => { listeners.delete(l); }; };
 export const update = (fn: (s: Save) => Save) => write(fn(read()));
 
 // ── Ranks ─────────────────────────────────────────────────────────────────

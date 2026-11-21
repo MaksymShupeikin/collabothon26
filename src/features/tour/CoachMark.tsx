@@ -153,7 +153,7 @@ export default function CoachMark({ target, title, children, progress, step, foo
       ) : !live && (
         <div className="coach-dim" />
       )}
-      <div ref={bubbleRef} className={`coach-bubble${live ? " is-docked" : ""}`} role="dialog" aria-live="polite" aria-label={title} style={style}>
+      <div ref={bubbleRef} className={`coach-bubble${live ? " is-docked" : ""}`} role="dialog" aria-live="polite" aria-label={title || step} style={style}>
         <div className="coach-head">
           <span className="coach-step">
             <strong>{chapter}</strong>{rest && <span>{rest}</span>}
@@ -162,7 +162,7 @@ export default function CoachMark({ target, title, children, progress, step, foo
             <span style={{ width: `${pct}%` }} />
           </div>
         </div>
-        <h3>{title}</h3>
+        {title && <h3>{title}</h3>}
         {children}
         {footer}
       </div>
