@@ -31,7 +31,7 @@
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
-html, body { background: var(--color-white); color: var(--color-ink); font-family: var(--font); font-size: var(--text-base); line-height: 24px; }
+html, body { overscroll-behavior-y: none; background: var(--color-white); color: var(--color-ink); font-family: var(--font); font-size: var(--text-base); line-height: 24px; }
 a { color: inherit; }
 button, input, select { font: inherit; color: inherit; }
 button { cursor: pointer; }
@@ -93,7 +93,7 @@ h3 { font-size: var(--text-base); line-height: 24px; font-weight: 700; }
 .field select { appearance: none; -webkit-appearance: none; cursor: pointer; padding-right: calc(var(--space-4) + 20px); background: var(--color-white) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%230b1f26' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right var(--space-4) center / 12px 8px; }
 
 /* ── Header of our own pages ── */
-.header { background: var(--color-ink); color: var(--color-white); container-type: inline-size; }
+.header { position: sticky; top: 0; z-index: 50; background: var(--color-ink); color: var(--color-white); container-type: inline-size; }
 .header-inner { max-width: 1180px; margin: 0 auto; padding: 0 var(--space-5); display: flex; align-items: center; gap: var(--space-6); min-height: 64px; }
 .logo { display: flex; align-items: center; gap: var(--space-4); text-decoration: none; align-self: stretch; }
 .logo-mark { --x: calc(max(0px, (100cqw - 1180px) / 2) + var(--space-5)); --out: min(var(--space-9), var(--x)); display: flex; align-items: center; height: 64px; background: var(--color-accent); color: var(--color-ink); margin-left: calc(-1 * var(--out)); padding: 0 var(--space-6) 0 var(--out); }
@@ -104,19 +104,21 @@ h3 { font-size: var(--text-base); line-height: 24px; font-weight: 700; }
 .hnav a[aria-current="page"] { color: var(--color-white); border-bottom-color: var(--color-accent); }
 .user { margin-left: auto; display: flex; align-items: center; gap: var(--space-4); }
 .user-text { display: flex; flex-direction: column; align-items: flex-end; line-height: 18px; }
-.user-rank { display: flex; align-items: center; gap: var(--space-3); color: var(--color-accent); font-weight: 700; line-height: 18px; white-space: nowrap; }
-.user-xp { color: var(--color-bg-dark); font-weight: 400; overflow: hidden; max-width: 0; opacity: 0; transition: max-width 0.4s cubic-bezier(0.1, 0, 0, 1), opacity var(--ease); }
-.user:hover .user-xp, .user:focus-within .user-xp { max-width: 220px; opacity: 1; }
-.user:hover .user-xp::before, .user:focus-within .user-xp::before { content: "· "; }
-.user strong { color: var(--color-white); }
+.user-rank { color: var(--color-bg-dark); font-weight: 400; line-height: 18px; white-space: nowrap; }
 .user-orb { position: relative; width: 52px; height: 52px; flex-shrink: 0; display: grid; place-items: center; }
 .user-ring { position: absolute; inset: 0; width: 100%; height: 100%; }
 .user-ring-track { fill: none; stroke: rgba(255, 255, 255, 0.16); stroke-width: 2.5; }
-.user-ring-fill { fill: none; stroke: var(--color-accent); stroke-width: 2.5; stroke-linecap: round; transition: stroke-dashoffset 0.9s cubic-bezier(0.1, 0, 0, 1); filter: drop-shadow(0 1px 3px rgba(255, 245, 0, 0.45)); }
+.user-ring-fill { fill: none; stroke: var(--color-accent); stroke-width: 2.5; stroke-linecap: round; transition: stroke-dashoffset 0.9s cubic-bezier(0.1, 0, 0, 1), opacity 0.2s; filter: drop-shadow(0 1px 3px rgba(255, 245, 0, 0.45)); }
 .user-avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--color-accent); color: var(--color-ink); display: grid; place-items: center; font-weight: 700; font-size: var(--text-sm); flex-shrink: 0; transition: transform var(--ease); }
 .user:hover .user-avatar { transform: scale(1.06); }
 .user-level { position: absolute; right: -2px; bottom: -2px; min-width: 20px; height: 20px; padding: 0 5px; border-radius: 10px; background: var(--color-ink); color: var(--color-accent); border: 2px solid var(--color-accent); display: grid; place-items: center; font-size: 11px; font-weight: 700; line-height: 1; }
-@media (prefers-reduced-motion: reduce) { .user-xp, .user-ring-fill, .user-avatar { transition: none; } }
+.user-level, .user-ring-track { transition: opacity var(--ease), transform var(--ease); }
+:root[data-rank-visible] .user-level { opacity: 0; transform: scale(0.6); }
+/* Ring: hidden while the card's own ring is on screen; refills (stroke-dashoffset transition) when it scrolls away. */
+:root[data-rank-visible] .user-ring-track { opacity: 0; }
+:root[data-rank-visible] .user-ring-fill { stroke-dashoffset: 100; opacity: 0; transition-duration: 0.25s; } /* opacity 0 also hides the round cap dot at zero length */
+:root:not([data-rank-visible]) .user-ring-fill { transition-duration: 1.1s, 0.2s; transition-delay: 0.1s, 0.1s; }
+@media (prefers-reduced-motion: reduce) { .user-ring-fill, .user-avatar, .user-level, .user-ring-track { transition: none !important; } }
 
 /* Rings */
 .ring { flex-shrink: 0; }

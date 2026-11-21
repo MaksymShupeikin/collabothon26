@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { CARDS } from "@/features/learn/cards";
 import { CHAPTERS, isOpen, nextChapter, surfaceHref, worldOpen, WORLDS, type Chapter, type World } from "@/features/tour/chapters";
 import { PERSONAS } from "@/features/game/personas";
@@ -9,6 +9,7 @@ import { actions, rankOf, RANKS, useGame, type Save } from "@/features/game/stor
 import { setUi } from "@/features/game/ui";
 import Icon from "@/shared/ui/Icon";
 import ProgressRing from "@/shared/ui/ProgressRing";
+import CountUp from "@/shared/ui/CountUp";
 import CardArt, { CARD_SHORT } from "@/features/learn/CardArt";
 import s from "./LearningMap.module.css";
 
@@ -23,6 +24,24 @@ export default function LearningMap() {
   const rank = rankOf(save.xp);
   const next = nextChapter(save);
   const persona = save.persona ? PERSONAS[save.persona] : null;
+  const rankRef = useRef<HTMLDivElement>(null);
+  const [rankShown, setRankShown] = useState(false);
+
+  // While the card's rank ring is on screen, the header's level badge is redundant: flag it so CSS can hide it.
+  useEffect(() => {
+    const el = rankRef.current;
+    if (!el) return;
+    const root = document.documentElement;
+    const io = new IntersectionObserver(
+      ([e]) => {
+        setRankShown(e.isIntersecting); // the card's ring and XP bar fill up each time the card comes into view
+        if (e.isIntersecting) root.setAttribute("data-rank-visible", ""); else root.removeAttribute("data-rank-visible");
+      },
+      { rootMargin: "-64px 0px 0px 0px" }, // sticky header covers the top 64px
+    );
+    io.observe(el);
+    return () => { io.disconnect(); root.removeAttribute("data-rank-visible"); };
+  }, [persona]);
 
   function launch(ch: Chapter) {
     if (ch.id === "w1") actions.resetSandbox();
@@ -81,18 +100,18 @@ export default function LearningMap() {
         </div>
 
         <div className={s.hud}>
-          <div className={s.rank}>
-            <ProgressRing value={rank.progress} size={72} label={`Rank ${rank.level} of ${RANKS.length}, ${Math.round(rank.progress * 100)}% to the next rank`} center={rank.level} />
+          <div className={s.rank} ref={rankRef}>
+            <ProgressRing value={rankShown ? rank.progress : 0} size={72} label={`Rank ${rank.level} of ${RANKS.length}, ${Math.round(rank.progress * 100)}% to the next rank`} center={rank.level} />
             <div className={s.rankText}>
               <strong>{rank.name}</strong>
-              <div className={s.xpBar} aria-hidden><span style={{ width: `${rank.progress * 100}%` }} /></div>
-              <span className="num xs">{save.xp}{rank.nextAt ? ` / ${rank.nextAt} XP · next ${rank.next}` : " XP · top rank"}</span>
+              <div className={s.xpBar} aria-hidden><span style={{ width: `${rankShown ? rank.progress * 100 : 0}%` }} /></div>
+              <span className="num xs"><CountUp to={save.xp} active={rankShown} />{rank.nextAt ? ` / ${rank.nextAt} XP · next ${rank.next}` : " XP · top rank"}</span>
             </div>
           </div>
           <dl className={s.tally}>
-            <div><dt>Stars</dt><dd className="num"><Star />{stars}<small>/{STARS_MAX}</small></dd></div>
-            <div><dt>Cards</dt><dd className="num">{save.cards.length}<small>/{CARDS.length}</small></dd></div>
-            <div><dt>Worlds</dt><dd className="num">{worldsOpen}<small>/{WORLDS.length}</small></dd></div>
+            <div><dt>Stars <Star /></dt><dd className="num"><CountUp to={stars} active={rankShown} /><small>/{STARS_MAX}</small></dd></div>
+            <div><dt>Cards</dt><dd className="num"><CountUp to={save.cards.length} active={rankShown} /><small>/{CARDS.length}</small></dd></div>
+            <div><dt>Worlds</dt><dd className="num"><CountUp to={worldsOpen} active={rankShown} /><small>/{WORLDS.length}</small></dd></div>
           </dl>
         </div>
       </section>
