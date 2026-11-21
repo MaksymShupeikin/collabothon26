@@ -110,7 +110,7 @@ h3 { font-size: var(--text-base); line-height: 24px; font-weight: 700; }
 .user-ring { position: absolute; inset: 0; width: 100%; height: 100%; }
 .user-ring-track { fill: none; stroke: rgba(255, 255, 255, 0.16); stroke-width: 2.5; }
 .user-ring-fill { fill: none; stroke: var(--color-accent); stroke-width: 2.5; stroke-linecap: round; transition: stroke-dashoffset 0.9s cubic-bezier(0.1, 0, 0, 1), opacity 0.2s; filter: drop-shadow(0 1px 3px rgba(255, 245, 0, 0.45)); }
-.user-avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--color-accent); color: var(--color-ink); display: grid; place-items: center; font-weight: 700; font-size: var(--text-sm); flex-shrink: 0; transition: transform var(--ease); }
+.user-avatar { width: 40px; height: 40px; border-radius: 50%; background: rgba(255, 255, 255, 0.08); color: var(--color-accent); display: grid; place-items: center; font-weight: 700; font-size: var(--text-sm); flex-shrink: 0; transition: transform var(--ease); }
 .user:hover .user-avatar { transform: scale(1.06); }
 .user-level { position: absolute; right: -2px; bottom: -2px; min-width: 20px; height: 20px; padding: 0 5px; border-radius: 10px; background: var(--color-ink); color: var(--color-accent); border: 2px solid var(--color-accent); display: grid; place-items: center; font-size: 11px; font-weight: 700; line-height: 1; }
 .user-level, .user-ring-track { transition: opacity var(--ease), transform var(--ease); }
