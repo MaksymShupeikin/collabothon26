@@ -1,0 +1,11 @@
+# VPS deploy: joins the shared Caddy network (~/pkpways), which proxies comdirect.vokh.dev -> comdirect-web:3000.
+services:
+  web:
+    build: .
+    container_name: comdirect-web
+    restart: unless-stopped
+    networks: [db_default]
+
+networks:
+  db_default:
+    external: true
