@@ -8,6 +8,7 @@ import { ask, bid, dateOf, depotValue, fee, priceAt, round2, type OrderInput, ty
 import type { Replay } from "@/features/market/scenarios";
 import CandleChart, { type TradeMark } from "@/shared/charts/CandleChart";
 import Header from "@/features/shell/Header";
+import Glyph from "@/shared/ui/Glyph";
 import Icon from "@/shared/ui/Icon";
 import { MistakeCam, useBoard } from "@/features/pro/ReplayParts";
 
@@ -51,7 +52,6 @@ export default function SimpleDesk(p: SimpleProps) {
   const [tab, setTab] = useState<"news" | "rivals">("news");
   const [bookTab, setBookTab] = useState<"positions" | "orders">("positions");
   const [query, setQuery] = useState("");
-  const [searchOpen, setSearchOpen] = useState(false);
   const [topUpOpen, setTopUpOpen] = useState(false);
   const [topUpAmt, setTopUpAmt] = useState(5000);
   const [topUpCustom, setTopUpCustom] = useState("");
@@ -76,7 +76,7 @@ export default function SimpleDesk(p: SimpleProps) {
   const orders = sim.acct.orders;
   const q = query.trim().toLowerCase();
   const results = q ? comps.filter((c) => [cover(c.sym), masked(c.sym) ? "" : c.sym, coverWkn(c.sym)].some((f) => f.toLowerCase().includes(q))) : comps;
-  const pick = (s: string) => { setSym(s); setErr(null); setQuery(""); setSearchOpen(false); (document.activeElement as HTMLElement | null)?.blur(); };
+  const pick = (s: string) => { setSym(s); setErr(null); setQuery(""); };
 
   // Chart: one candle per trading day; replays label the axis "Day n" instead of a date.
   const times = useMemo(() => closes.map((_, i) => dateOf(u, firstDay + i).toISOString().slice(0, 10)), [closes, u, firstDay]);
@@ -100,22 +100,29 @@ export default function SimpleDesk(p: SimpleProps) {
       <Header />
       <div className="trade">
         <div className="trade-grid">
-          {/* Left: time controls, then news + rivals */}
+          {/* Left: find and pick (search filters the watchlist right below it), then news + rivals */}
           <div className="trade-col">
-            <div className="clock" data-tour="time-machine">
-              <button className="play-btn" onClick={play} disabled={ended} aria-label={speed ? "Pause" : "Play"}>
-                <Icon name={speed ? "pause" : "play"} size={16} />
-              </button>
-              <div className="clock-date">
-                <strong>{u.hideDate ? `Day ${day + 1}` : today.toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short", timeZone: "UTC" })}</strong>
-                <span className="xs muted num">Week {Math.floor(day / 5) + 1} of {Math.ceil(u.days / 5)}</span>
+            {/* Tour target is the panel: it has its own z-index, so a child can't rise above the tour overlay. */}
+            <section className="panel p-watch" aria-label="Watchlist" data-tour="w-search">
+              <div className="watch-search">
+                <input type="search" placeholder="Search name, ticker or WKN" value={query} aria-label="Search stocks" aria-controls="watchlist"
+                  onChange={(e) => setQuery(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === "Enter" && results[0]) pick(results[0].sym); if (e.key === "Escape") setQuery(""); }} />
               </div>
-              <div className="seg" role="group" aria-label="Speed">
-                {PACES.map((x) => (
-                  <button key={x.speed} aria-pressed={pace === x.speed} onClick={() => { setPace(x.speed); if (speed) setSpeed(x.speed); }}>{x.label}</button>
-                ))}
+              {/* Every stock one click away, price and change at a glance. */}
+              <div className="panel-body" id="watchlist">
+                {results.length === 0 && <EmptyState icon="compass" title="No stock found" hint="Try a name, ticker or WKN." />}
+                {results.map((c) => {
+                  const pr = priceOf(c.sym), ch = (pr / priceOf(c.sym, day - 1) - 1) * 100;
+                  return (
+                    <button key={c.sym} className="watch-row" aria-pressed={c.sym === sym} onClick={() => pick(c.sym)}>
+                      <span className="watch-name"><strong>{cover(c.sym)}</strong><span className="xs muted">{masked(c.sym) ? "" : `${c.sym} · `}WKN {coverWkn(c.sym)}</span></span>
+                      <span className="watch-price"><span className="num">{eur(pr)}</span><span className={`chg num ${cls(ch)}`}>{pct(ch)}</span></span>
+                    </button>
+                  );
+                })}
               </div>
-            </div>
+            </section>
             <section className="panel p-feed" aria-label="News and rivals" data-tour="w-news">
               <div className="tabs" role="tablist">
                 <button role="tab" aria-selected={tab === "news"} onClick={() => setTab("news")}>News</button>
@@ -140,31 +147,23 @@ export default function SimpleDesk(p: SimpleProps) {
             </section>
           </div>
 
-          {/* Center: stock search + chart of the selected stock */}
+          {/* Center: time controls (they drive the chart), then the chart of the selected stock */}
           <div className="trade-col">
-            <section className="panel p-search" aria-label="Search stocks" data-tour="w-search">
-              <div className="search">
-                <input type="search" placeholder="Search stocks — name, ticker or WKN" value={query} aria-label="Search stocks"
-                  onChange={(e) => { setQuery(e.target.value); setSearchOpen(true); }} onFocus={() => setSearchOpen(true)} onBlur={() => setSearchOpen(false)}
-                  onKeyDown={(e) => { if (e.key === "Enter" && results[0]) pick(results[0].sym); if (e.key === "Escape") e.currentTarget.blur(); }} />
-                {searchOpen && (
-                  <ul className="search-results" role="listbox">
-                    {results.length === 0 && <li><EmptyState icon="compass" title="No stock found" hint="Try a name, ticker or WKN." /></li>}
-                    {results.map((c) => {
-                      const pr = priceOf(c.sym), ch = (pr / priceOf(c.sym, day - 1) - 1) * 100;
-                      return (
-                        <li key={c.sym}>
-                          <button className="watch-row" role="option" aria-selected={c.sym === sym} onMouseDown={(e) => { e.preventDefault(); pick(c.sym); }}>
-                            <span className="watch-name"><strong>{cover(c.sym)}</strong><span className="xs muted">{masked(c.sym) ? "" : `${c.sym} · `}WKN {coverWkn(c.sym)}</span></span>
-                            <span className="watch-price"><span className="num">{eur(pr)}</span><span className={`chg num ${cls(ch)}`}>{pct(ch)}</span></span>
-                          </button>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                )}
+            <div className="clock" data-tour="time-machine">
+              <button className="play-btn" onClick={play} disabled={ended} aria-label={speed ? "Pause" : "Play"}>
+                <Icon name={speed ? "pause" : "play"} size={16} />
+              </button>
+              <div className="clock-date">
+                <strong>{u.hideDate ? `Day ${day + 1}` : today.toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short", timeZone: "UTC" })}</strong>
+                <span className="xs muted num">Week {Math.floor(day / 5) + 1} of {Math.ceil(u.days / 5)}</span>
+                <span className="day-bar" role="progressbar" aria-label="Market progress" aria-valuemin={0} aria-valuemax={u.days} aria-valuenow={day}><span style={{ width: `${Math.min(100, (day / u.days) * 100)}%` }} /></span>
               </div>
-            </section>
+              <div className="seg" role="group" aria-label="Speed">
+                {PACES.map((x) => (
+                  <button key={x.speed} aria-pressed={pace === x.speed} onClick={() => { setPace(x.speed); if (speed) setSpeed(x.speed); }}>{x.label}</button>
+                ))}
+              </div>
+            </div>
             <section className="panel p-chart" data-tour="w-chart" aria-label="Chart">
               <div className="chart-head">
                 <div>
@@ -200,7 +199,11 @@ export default function SimpleDesk(p: SimpleProps) {
                 </div>
                 <div className="order-grid">
                   <label className="field">Quantity
-                    <input type="number" min={1} step={1} value={qty || ""} onChange={(e) => setQty(Math.floor(Number(e.target.value)))} />
+                    <span className="stepper">
+                      <button type="button" aria-label="One share less" onClick={() => setQty(Math.max(1, (qty || 1) - 1))} disabled={(qty || 1) <= 1}><Glyph name="minus" /></button>
+                      <input type="number" min={1} step={1} value={qty || ""} onChange={(e) => setQty(Math.floor(Number(e.target.value)))} />
+                      <button type="button" aria-label="One share more" onClick={() => setQty((qty || 0) + 1)}><Glyph name="plus" /></button>
+                    </span>
                   </label>
                   <label className="field">Order type
                     <select value={type} onChange={(e) => setType(e.target.value as OrderType)}>
