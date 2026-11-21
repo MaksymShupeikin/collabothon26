@@ -13,6 +13,7 @@
   padding: var(--space-8) var(--space-8) var(--space-8) var(--space-9);
   display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--space-8); align-items: center;
   position: relative; overflow: hidden; isolation: isolate;
+  min-height: 352px; /* fits the longest quote, so rotating quotes never resize the hero; shorter ones centre */
 }
 /* A quiet track motif peeking up over the bottom edge: the path the player is on. Mostly outside the card, clipped by it. */
 .hero::after {
@@ -21,6 +22,20 @@
 }
 .next { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-4); }
 .next h1 { font-size: var(--text-2xl); line-height: 1.08; font-weight: 700; letter-spacing: -0.02em; text-wrap: balance; max-width: 16ch; }
+/* Investor quote: the yellow opening mark sits on its own line above, so mark, text, author and button share one left edge. The button follows the quote; the hero's height comes from the rank panel beside it. */
+.quote { margin: 0; font-size: clamp(26px, 2.6vw, 36px); max-width: 26ch; }
+.quote::before {
+  content: ""; display: block; width: 1.3em; height: 0.94em; margin-bottom: var(--space-4); background: var(--color-accent);
+  /* Two bold quote drops, drawn rather than typed so the font's glyph metrics can't push it off the edge. */
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 26'%3E%3Cpath d='M0 26V15C0 6 5 1 14 0v5c-4 1-6 4-6 8h6v13zm20 0V15c0-9 5-14 14-15v5c-4 1-6 4-6 8h6v13z'/%3E%3C/svg%3E") no-repeat left top / contain;
+}
+.quoteText p { font-weight: 700; line-height: 1.18; letter-spacing: -0.015em; text-wrap: balance; }
+.quoteBy { margin-top: var(--space-4); font-size: var(--text-sm); line-height: 22px; font-weight: 700; color: var(--color-bg-dark); }
+@media (prefers-reduced-motion: no-preference) {
+  .quoteText, .quoteBy { animation: quoteIn 0.7s cubic-bezier(0.16, 1, 0.3, 1) backwards; }
+  .quoteBy { animation-delay: 0.08s; }
+}
+@keyframes quoteIn { from { opacity: 0; transform: translateY(6px); filter: blur(3px); } }
 .go { margin-top: var(--space-5); padding-inline: var(--space-8); }
 /* In-button context: same line, lighter weight, a dot rule before it; tinted from the button's ink so it stays readable on yellow. */
 .goSub { font-weight: 500; color: color-mix(in srgb, var(--color-ink) 78%, var(--color-accent)); display: inline-flex; align-items: center; gap: var(--space-3); }
@@ -41,7 +56,7 @@
 .tally div { display: flex; flex-direction: column-reverse; gap: 0; }
 .tally dt { font-size: var(--text-xs); font-weight: 700; line-height: 1; color: var(--color-bg-dark); display: flex; align-items: center; gap: var(--space-1); }
 .tally dd { font-size: var(--text-lg); font-weight: 700; display: flex; align-items: baseline; gap: var(--space-2); }
-.tally dt .glyph { color: var(--color-accent); width: 1.6em; height: 1.6em; margin-block: -0.3em; }
+.tally dt .glyph { color: currentColor; width: 1.3em; height: 1.3em; margin-block: -0.15em; } /* same tone as the label: the numbers carry the emphasis */
 .tally small { font-size: var(--text-xs); font-weight: 400; color: var(--color-bg-dark); }
 
 /* ── World path ── */
@@ -63,7 +78,7 @@
 
 /* Badge and title share one row: the badge already says which world it is. */
 /* Fixed to two title lines so every chain sits at the same height across the row. */
-.worldSlot { min-height: 48px; }
+.worldSlot { min-height: 48px; margin-bottom: var(--space-3); } /* a little more air between the title and the level track */
 .worldTop { display: flex; align-items: center; gap: var(--space-4); }
 .worldText { display: flex; flex-direction: column; min-width: 0; }
 .badge { display: grid; place-items: center; flex-shrink: 0; width: 40px; height: 40px; border-radius: 50%; background: var(--color-ink); color: var(--color-accent); font-weight: 700; font-size: var(--text-base); }
@@ -117,13 +132,6 @@
 .cta { width: 100%; }
 /* A locked world previews what it teaches, so the card is not an empty box. */
 .teaser { margin-top: auto; color: var(--color-ink-2); text-wrap: pretty; }
-/* Secondary way in: a quiet text action, so the card keeps one button. */
-.sandbox {
-  align-self: center; display: inline-flex; align-items: center; gap: var(--space-2); padding: var(--space-2) var(--space-3);
-  border: 0; background: none; border-radius: var(--space-3); font-size: var(--text-xs); font-weight: 700; color: var(--color-ink-2);
-  text-decoration: underline; text-decoration-color: transparent; text-underline-offset: 3px; transition: color var(--ease), text-decoration-color var(--ease);
-}
-.sandbox:hover { color: var(--color-ink); text-decoration-color: currentColor; }
 .cta .glyph { transition: transform var(--ease); }
 .cta:hover .glyph { transform: translateX(3px); }
 .current :global(.btn-primary) { background: var(--color-ink); color: var(--color-accent); }
@@ -194,7 +202,7 @@
   .cards { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 @media (max-width: 860px) {
-  .hero { grid-template-columns: 1fr; padding: var(--space-6); }
+  .hero { grid-template-columns: 1fr; padding: var(--space-6); min-height: 0; }
   .hud { min-width: 0; }
   .modes { grid-template-columns: 1fr; }
   .next h1 { font-size: var(--text-xl); }

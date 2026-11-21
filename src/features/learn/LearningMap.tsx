@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState } from "react";
 import { CARDS } from "@/features/learn/cards";
 import { CHAPTERS, isOpen, nextChapter, surfaceHref, worldOpen, WORLDS, type Chapter, type World } from "@/features/tour/chapters";
 import { PERSONAS } from "@/features/game/personas";
@@ -49,11 +49,6 @@ export default function LearningMap() {
     setUi({});
     router.push(surfaceHref(ch));
   }
-  function openSandbox() {
-    actions.start(null);
-    setUi({});
-    router.push("/cabinet");
-  }
 
   if (!persona) return (
     <main className="container stack">
@@ -76,20 +71,20 @@ export default function LearningMap() {
 
   return (
     <main className={`container ${s.page}`}>
-      <section className={s.hero} aria-labelledby="next-up">
+      <section className={s.hero} aria-label="Next up">
         <div className={s.next}>
           {next ? (
             <>
-              <h1 id="next-up">{next.title}</h1>
+              <Quote />
               <button className={`btn btn-primary btn-lg ${s.go}`} onClick={() => launch(next)}>
                 {started ? "Continue" : "Start"}
-                <span className={s.goSub}>{next.kind === "chapter" ? `Level ${next.n}` : next.kind === "mission" ? "Mission" : "Boss fight"}</span>
+                <span className={s.goSub}>{next.title}</span>
                 <Arrow />
               </button>
             </>
           ) : (
             <>
-              <h1 id="next-up">Ready for real?</h1>
+              <Quote />
               <Link className={`btn btn-primary btn-lg ${s.go}`} href="/ready">
                 Open your depot
                 <span className={s.goSub}>All cleared</span>
@@ -110,8 +105,8 @@ export default function LearningMap() {
           </div>
           <dl className={s.tally}>
             <div><dt>Stars <Star /></dt><dd className="num"><CountUp to={stars} active={rankShown} /><small>/{STARS_MAX}</small></dd></div>
-            <div><dt>Cards</dt><dd className="num"><CountUp to={save.cards.length} active={rankShown} /><small>/{CARDS.length}</small></dd></div>
-            <div><dt>Worlds</dt><dd className="num"><CountUp to={worldsOpen} active={rankShown} /><small>/{WORLDS.length}</small></dd></div>
+            <div><dt>Cards <CardGlyph /></dt><dd className="num"><CountUp to={save.cards.length} active={rankShown} /><small>/{CARDS.length}</small></dd></div>
+            <div><dt>Worlds <Globe /></dt><dd className="num"><CountUp to={worldsOpen} active={rankShown} /><small>/{WORLDS.length}</small></dd></div>
           </dl>
         </div>
       </section>
@@ -129,12 +124,7 @@ export default function LearningMap() {
         <h2 id="worlds-h" className={s.sectionHead}>Worlds</h2>
         <ol className={s.path}>
           {WORLDS.map((w) => (
-            <WorldTile key={w.n} w={w} save={save} next={next} launch={launch}
-              extra={w.n === 1 ? (
-                <button className={s.sandbox} onClick={openSandbox}>
-                  or explore the sandbox
-                </button>
-              ) : null} />
+            <WorldTile key={w.n} w={w} save={save} next={next} launch={launch} />
           ))}
         </ol>
       </section>
@@ -170,7 +160,35 @@ export default function LearningMap() {
   );
 }
 
-function WorldTile({ w, save, next, launch, extra }: { w: World; save: Save; next: Chapter | undefined; launch: (c: Chapter) => void; extra: ReactNode }) {
+/** Short, well-sourced lines from known investors. Rotates every 30 s; a fixed list, nothing is fetched. */
+const QUOTES = [
+  { q: "Risk comes from not knowing what you’re doing", by: "Warren Buffett" },
+  { q: "Know what you own, and know why you own it", by: "Peter Lynch" },
+  { q: "The investor’s chief problem is likely to be himself", by: "Benjamin Graham" },
+  { q: "Don’t look for the needle in the haystack. Just buy the haystack", by: "John Bogle" },
+  { q: "In investing, what is comfortable is rarely profitable", by: "Robert Arnott" },
+  { q: "Be fearful when others are greedy, and greedy when others are fearful", by: "Warren Buffett" },
+];
+const QUOTE_MS = 30_000;
+
+function Quote() {
+  const [i, setI] = useState(0);
+  useEffect(() => {
+    // A different line per visit (picked after hydration, so server and client markup match), then one step every 30 s.
+    const first = setTimeout(() => setI(Math.floor(Date.now() / QUOTE_MS) % QUOTES.length), 0);
+    const id = setInterval(() => setI((n) => (n + 1) % QUOTES.length), QUOTE_MS);
+    return () => { clearTimeout(first); clearInterval(id); };
+  }, []);
+  const { q, by } = QUOTES[i];
+  return (
+    <figure className={s.quote}>
+      <blockquote key={i} className={s.quoteText}><p>{q}</p></blockquote>
+      <figcaption key={by + i} className={s.quoteBy}>{by}</figcaption>
+    </figure>
+  );
+}
+
+function WorldTile({ w, save, next, launch }: { w: World; save: Save; next: Chapter | undefined; launch: (c: Chapter) => void }) {
   const open = worldOpen(save, w.n);
   const items = CHAPTERS.filter((c) => c.world === w.n);
   const doneCount = items.filter((c) => save.done.includes(c.id)).length;
@@ -227,7 +245,6 @@ function WorldTile({ w, save, next, launch, extra }: { w: World; save: Save; nex
         ) : (
           <button className={`btn btn-outline ${s.cta}`} onClick={() => launch(items[0])}>Replay</button>
         )}
-        {extra}
       </div>}
     </li>
   );
@@ -250,4 +267,7 @@ function ModeTile({ open, lockText, icon, title, line, onOpen, highlight }: { op
 const Arrow = () => <svg className={s.glyph} viewBox="0 0 16 16" aria-hidden><path d="M3 8h9M8.5 4l4 4-4 4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>;
 const Check = () => <svg className={s.glyph} viewBox="0 0 16 16" aria-hidden><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" /></svg>;
 const Lock = () => <svg className={s.glyph} viewBox="0 0 16 16" aria-hidden><path d="M5 7V5.5a3 3 0 016 0V7" fill="none" stroke="currentColor" strokeWidth="1.8" /><rect x="3.5" y="7" width="9" height="6.5" rx="1.5" fill="currentColor" /></svg>;
+// Same filled family as the star: a card with a diamond punched out, a globe.
+const CardGlyph = () => <svg className={s.glyph} viewBox="0 0 16 16" aria-hidden><path fillRule="evenodd" d="M5 1.5h6a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2v-9a2 2 0 012-2zM8 4.8L5.6 8 8 11.2 10.4 8z" fill="currentColor" /></svg>;
+const Globe = () => <svg className={s.glyph} viewBox="0 0 16 16" aria-hidden><circle cx="8" cy="8" r="6.6" fill="currentColor" /><path d="M1.6 8h12.8M8 1.4c-2.6 2.2-2.6 11 0 13.2M8 1.4c2.6 2.2 2.6 11 0 13.2" fill="none" stroke="var(--color-ink)" strokeWidth="1.2" /></svg>;
 const Star = () => <svg className={s.glyph} viewBox="0 0 16 16" aria-hidden><path d="M8 1.8l1.9 3.9 4.3.6-3.1 3 .7 4.3L8 11.6l-3.8 2 .7-4.3-3.1-3 4.3-.6z" fill="currentColor" /></svg>;
