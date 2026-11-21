@@ -17,7 +17,7 @@ export const WORLDS = [
 ] as const;
 
 export const CONCEPTS: Concept[] = [
-  // World 1
+  // Module 1
   { id: "stock", world: 1, title: "Stock", sentence: "A stock is a small piece of a company.", example: "SAP has about 1.2 billion shares. Buy one and you own a tiny slice of SAP.", game: "Slice the pizza",
     quiz: { q: "You buy 1 share of Siemens. What do you own?", options: ["A loan to Siemens", "A tiny piece of Siemens", "A Siemens product voucher"], answer: 1 } },
   { id: "bond", world: 1, title: "Bond", sentence: "With a bond you lend money and get interest back.", example: "Lend 1,000 € at 3% for 5 years → 30 € interest every year, 1,000 € back at the end.", game: "Lend & collect",
@@ -28,7 +28,7 @@ export const CONCEPTS: Concept[] = [
     quiz: { q: "Who receives the dividend?", options: ["Only employees", "Everyone who owns the shares", "Only the bank"], answer: 1 } },
   { id: "market-cap", world: 1, title: "Market cap", sentence: "Market cap = share price × number of shares — the company's price tag.", example: "Price 30 € × 5 billion shares = 150 billion € market cap.", game: "Guess the giant",
     quiz: { q: "Company A: 10 € × 10bn shares. Company B: 500 € × 100m shares. Which is bigger?", options: ["A (100bn)", "B (50bn)", "Same size"], answer: 0 } },
-  // World 2
+  // Module 2
   { id: "spread", world: 2, title: "Bid / Ask / Spread", sentence: "The buy price is a bit higher than the sell price — the gap is the spread, and it costs you.", example: "Ask 100.10 €, bid 99.90 € → buy and sell right away and you lose 0.20 € per share.", game: "Market stall",
     quiz: { q: "You buy at the ask and immediately sell at the bid. You…", options: ["Break even", "Lose the spread", "Earn the spread"], answer: 1 } },
   { id: "market-order", world: 2, title: "Market order", sentence: "A market order buys now, at whatever the current price is.", example: "Fast, but in a jumpy market you might pay more than the price you saw.", game: "Speed round",
@@ -41,7 +41,7 @@ export const CONCEPTS: Concept[] = [
     quiz: { q: "Which costs you more over 30 years?", options: ["TER 0.2%", "TER 1.8%", "No difference"], answer: 1 } },
   { id: "trading-hours", world: 2, title: "Trading hours", sentence: "Outside main exchange hours fewer people trade, so spreads get wider.", example: "The same order at 14:00 and at 22:00 can cost you a different price.", game: "Night market",
     quiz: { q: "When are spreads usually widest?", options: ["Midday on a weekday", "Late at night", "They never change"], answer: 1 } },
-  // World 3
+  // Module 3
   { id: "risk-return", world: 3, title: "Risk vs. return", sentence: "Higher possible gains always come with higher possible losses.", example: "Savings account: ~2%, almost no risk. Single tech stock: +80% or −50% in a year.", game: "The slider",
     quiz: { q: "An offer promises 20% a year with no risk. That's…", options: ["A great deal", "A red flag", "Normal"], answer: 1 } },
   { id: "volatility", world: 3, title: "Volatility", sentence: "Volatility is how wildly a price swings.", example: "Tesla can move ±5% on a normal day; an MSCI World ETF usually ±1%.", game: "Rollercoaster",
@@ -54,7 +54,7 @@ export const CONCEPTS: Concept[] = [
     quiz: { q: "You own 5 car makers. Are you well diversified?", options: ["Yes, 5 companies", "Not really — they move together", "Only if they're German"], answer: 1 } },
   { id: "liquidity", world: 3, title: "Liquidity", sentence: "Liquidity is how fast you can sell without losing value.", example: "A big stock sells in seconds. A flat can take months.", game: "Garage sale",
     quiz: { q: "Which is most liquid?", options: ["Apple shares", "A holiday flat", "A rare painting"], answer: 0 } },
-  // World 4
+  // Module 4
   { id: "compound", world: 4, title: "Compound interest", sentence: "Your profit earns its own profit — it snowballs.", example: "50 €/month at 7% for 30 years: you pay in 18,000 €, it grows to about 61,000 €.", game: "Snowball", minigame: "snowball",
     quiz: { q: "What makes compounding strongest?", options: ["Time", "Trading often", "Checking prices daily"], answer: 0 } },
   { id: "inflation", world: 4, title: "Inflation", sentence: "Inflation makes money lose buying power over time.", example: "At 3% inflation, 100 € buys only about 74 € worth of stuff after 10 years.", game: "Shrinking cart",
@@ -67,7 +67,7 @@ export const CONCEPTS: Concept[] = [
     quiz: { q: "Stocks rallied and now are 85% instead of 70%. Rebalancing means…", options: ["Buying more stocks", "Selling some stocks", "Doing nothing ever"], answer: 1 } },
   { id: "horizon", world: 4, title: "Investment horizon", sentence: "When you need the money changes how much risk you can take.", example: "Money for a flat in 2 years ≠ money for retirement in 30 years.", game: "Two clocks",
     quiz: { q: "Money needed in 1 year should mostly be…", options: ["In a single stock", "Safe and easy to access", "In crypto"], answer: 1 } },
-  // World 5
+  // Module 5
   { id: "earnings", world: 5, title: "Earnings report", sentence: "Companies report results every quarter — prices react to how they compare with expectations.", example: "Profit +10% sounds great — but if +15% was expected, the stock can fall.", game: "Beat or miss",
     quiz: { q: "Profit up 10%, analysts expected 15%. The stock likely…", options: ["Rises", "Falls", "Doesn't trade"], answer: 1 } },
   { id: "priced-in", world: 5, title: "Priced in", sentence: "The market often moves before the news — when it's announced, it's already in the price.", example: "A dividend hike everyone expected barely moves the price on the day.", game: "Too late",

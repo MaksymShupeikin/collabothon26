@@ -22,7 +22,7 @@ export type Mission = {
   check: (c: Ctx) => boolean;
   smart: (c: Ctx) => boolean;
   smartLabel: string;
-  after?: "week"; // World 1: ⏩ 1 week later, then find the P/L
+  after?: "week"; // Module 1: ⏩ 1 week later, then find the P/L
 };
 export type Chapter = {
   id: string;
@@ -51,7 +51,7 @@ export const WORLDS: World[] = [
 const hasPos = (c: Ctx, sym: string, qty = 1) => (c.save.sim.acct.holdings[sym]?.qty ?? 0) >= qty;
 const persona = (c: Ctx) => PERSONAS[c.save.persona ?? "starter"];
 
-// ── World 1 · web cabinet ─────────────────────────────────────────────────
+// ── Module 1 · web cabinet ─────────────────────────────────────────────────
 
 const W1: Chapter[] = [
   {
@@ -136,14 +136,14 @@ const W1: Chapter[] = [
   },
 ];
 
-// ── World 2 · Reading news ────────────────────────────────────────────
+// ── Module 2 · Reading news ────────────────────────────────────────────
 
 const W2: Chapter[] = [
   {
     id: "2.1", world: 2, n: "2.1", kind: "chapter", title: "Your trading area", surface: "pro",
     blurb: "A guided tour of the trading screen: everything on one screen.",
     steps: [
-      { title: "The trading area", text: "Everything on one screen, and time that moves. It's the same depot as in the web cabinet. After World 2 you move on to ProTrader." },
+      { title: "The trading area", text: "Everything on one screen, and time that moves. It's the same depot as in the web cabinet. After Module 2 you move on to ProTrader." },
       { target: "w-account", title: "Your account", text: "Total value, cash and profit or loss. Low on cash? Top up here." },
       { target: "w-search", title: "Find a stock", text: "Type a name, ticker or WKN, then pick the stock from the list.", task: "Search for SAP and pick it.", done: (c) => c.ui.sym === "SAP" },
       { target: "w-chart", title: "Chart", text: "Candles: each one is one day. Green closed higher, red lower. Your trades show up as arrows." },
@@ -209,7 +209,7 @@ const W2: Chapter[] = [
   { id: "b2", world: 2, n: "👾", kind: "boss", title: "Boss: FOMO Max", surface: "pro", replay: "gamestop", card: ["rumor"], blurb: "A historical replay. Don't buy the hype." },
 ];
 
-// ── World 3 · Risk ────────────────────────────────────────────────────────
+// ── Module 3 · Risk ────────────────────────────────────────────────────────
 
 const W3: Chapter[] = [
   {
@@ -264,7 +264,7 @@ const W3: Chapter[] = [
   { id: "b3", world: 3, n: "👾", kind: "boss", title: "Boss: All-in Alex", surface: "pro", replay: "wirecard", card: ["diversification"], blurb: "A historical replay. Keep a diversified depot." },
 ];
 
-// ── World 4 · Time ────────────────────────────────────────────────────────
+// ── Module 4 · Time ────────────────────────────────────────────────────────
 
 const W4: Chapter[] = [
   {
@@ -272,7 +272,7 @@ const W4: Chapter[] = [
     blurb: "Compound interest, made visible.",
     steps: [
       { title: "The snowball", text: "Move the years: your gains start earning their own gains.", game: "snowball" },
-      { target: "time-machine", title: "Years, not days", text: "World 4 unlocks +1 year and +10 years in the time machine." },
+      { target: "time-machine", title: "Years, not days", text: "Module 4 unlocks +1 year and +10 years in the time machine." },
       { title: "Check", text: "One more question.",
         quiz: { q: "Two people save the same monthly amount. One starts at 25, one at 35. Who ends up with more at 65?", options: ["The one who started at 25, by a lot", "About the same", "The one who started later"], answer: 0, why: "Ten extra years of compounding often matter more than the amount." } },
     ],

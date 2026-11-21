@@ -10,9 +10,9 @@ export type Persona = {
   goal: string;
   horizon: string;
   start: number; // play money on the Girokonto
-  plan: number; // €/month savings plan in World 4
+  plan: number; // €/month savings plan in Module 4
   focus: string;
-  w1: { sym: string; qty: number; text: string; hint: string }; // World 1 mission
+  w1: { sym: string; qty: number; text: string; hint: string }; // Module 1 mission
 };
 
 export const PERSONAS: Record<PersonaId, Persona> = {

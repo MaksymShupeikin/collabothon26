@@ -277,7 +277,7 @@ function ProUnlocked({ stars }: { stars: number }) {
         <Stars n={stars} />
         <p className="unlock-kicker">Mission complete · Profit &amp; loss card collected</p>
         <h1>You just did what most people never dare to do.</h1>
-        <p className="unlock-sub">Trading area unlocked: one screen with live news, rival bots and time that moves. ProTrader follows after World 2.</p>
+        <p className="unlock-sub">Trading area unlocked: one screen with live news, rival bots and time that moves. ProTrader follows after Module 2.</p>
         <div className="card-row"><ConceptCard id="pnl" /></div>
         <div className="row" style={{ justifyContent: "center" }}>
           <button className="btn btn-outline-light" onClick={() => { actions.celebratePro(); setStay(true); }}>Keep exploring here</button>

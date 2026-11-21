@@ -25,7 +25,7 @@ export default function Ready() {
       <section className="ready-steps container">
         <div className="card stack">
           <h2>Your next step</h2>
-          <p>A savings plan of <strong className="num">{num(p.plan, 0)} € a month</strong> on a world ETF, like the one you set up in World 4.</p>
+          <p>A savings plan of <strong className="num">{num(p.plan, 0)} € a month</strong> on a world ETF, like the one you set up in Module 4.</p>
           <div className="row">
             <a className="btn btn-primary btn-lg" href="https://www.comdirect.de/" target="_blank" rel="noopener noreferrer">Open my real depot ›</a>
             <Link className="btn btn-outline btn-lg" href="/pro">More practice in free play</Link>

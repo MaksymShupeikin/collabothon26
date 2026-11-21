@@ -65,7 +65,7 @@ export function BossIntro({ replay, chapter, onStart }: { replay: Replay; chapte
   return (
     <div className="overlay overlay-dark" role="dialog" aria-modal="true" aria-label={chapter.title}>
       <div className="boss">
-        <span className="unlock-kicker">👾 Boss round · World {chapter.world}</span>
+        <span className="unlock-kicker">👾 Boss round · Module {chapter.world}</span>
         <Icon name={boss} size={96} round label={BOTS[boss].name} />
         <h1>{BOTS[boss].name}</h1>
         <p className="unlock-sub">{BOTS[boss].habit}.</p>

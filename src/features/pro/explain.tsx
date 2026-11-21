@@ -4,7 +4,7 @@ import { createContext, useContext, useState } from "react";
 /**
  * Pro mode has two layouts on the same market:
  * - learner view (default): fewer widgets' worth of chrome, plain labels, every term explains itself;
- * - ProTrader view (unlocks after the World 2 mission): the 1:1 copy, with an "Explain" switch.
+ * - ProTrader view (unlocks after the Module 2 mission): the 1:1 copy, with an "Explain" switch.
  */
 type Tip = { text: string; x: number; y: number; above: boolean } | null;
 type Ctx = { lv: boolean; explain: boolean; setTip: (t: Tip) => void };
