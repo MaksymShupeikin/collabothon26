@@ -17,12 +17,8 @@ A training sandbox inside comdirect. It looks like the real comdirect screens, r
 
 <table>
   <tr>
-    <td width="50%"><img src="docs/screenshots/start-page.webp" alt="Mocked comdirect start page with the 'Practice first, then invest' banner"><br><sub><b>Entry:</b> one banner on the comdirect start page, no sign-up</sub></td>
     <td width="50%"><img src="docs/screenshots/learning-hub.webp" alt="Learning hub with rank ring, XP, stars, cards and the learning path"><br><sub><b>Learning hub:</b> rank, XP, stars, cards and the four tutorials</sub></td>
-  </tr>
-  <tr>
-    <td width="50%"><img src="docs/screenshots/web-cabinet.webp" alt="Web cabinet sandbox with play money and the sandbox bar"><br><sub><b>Web cabinet:</b> the comdirect customer area 1:1, on play money</sub></td>
-    <td width="50%"><img src="docs/screenshots/protrader.webp" alt="ProTrader sandbox with watchlist, chart, news, depot, order book and the time machine"><br><sub><b>ProTrader:</b> the full workspace plus our time machine</sub></td>
+    <td width="50%"><img src="docs/screenshots/protrader.webp" alt="ProTrader sandbox: a 1:1 replica of the comdirect workspace with the time machine"><br><sub><b>ProTrader:</b> a 1:1 replica of the comdirect workspace, plus our time machine</sub></td>
   </tr>
 </table>
 
