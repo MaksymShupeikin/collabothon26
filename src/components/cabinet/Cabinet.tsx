@@ -58,7 +58,7 @@ function CabinetInner({ initial }: { initial?: { view: View; sym?: string } }) {
     <div className="web">
       <SandboxBar clock={`${dateDE(today(save))} · ${TIME}`} />
       <WebHeader current={current} sub={sub} onNav={nav} onSearch={(s) => go("stock", s)}
-        logout={<Link className="btn btn-primary btn-sm" href="/learn">Exit ›</Link>} />
+        logout={<Link className="btn btn-primary btn-sm" href="/">Exit ›</Link>} />
       <main className="web-main">
         {view === "home" && <Home save={save} name={persona.name} go={go} />}
         {view === "transfer" && <Transfer save={save} go={go} />}

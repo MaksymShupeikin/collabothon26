@@ -1,8 +1,6 @@
-import type { Metadata } from "next";
-import LearningMap from "@/components/LearningMap";
+import { redirect } from "next/navigation";
 
-export const metadata: Metadata = { title: "Learning map · comdirect edu" };
-
+// The hub moved to /.
 export default function LearnPage() {
-  return <LearningMap />;
+  redirect("/");
 }
