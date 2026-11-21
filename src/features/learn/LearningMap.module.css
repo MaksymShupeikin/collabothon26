@@ -31,11 +31,33 @@
 }
 .quoteText p { font-weight: 700; line-height: 1.18; letter-spacing: -0.015em; text-wrap: balance; }
 .quoteBy { margin-top: var(--space-4); font-size: var(--text-sm); line-height: 22px; font-weight: 700; color: var(--color-bg-dark); }
-@media (prefers-reduced-motion: no-preference) {
-  .quoteText, .quoteBy { animation: quoteIn 0.7s cubic-bezier(0.16, 1, 0.3, 1) backwards; }
-  .quoteBy { animation-delay: 0.08s; }
+/* Typewriter. Untyped text is laid out but hidden, so the balanced wrap is fixed from the first keystroke. The caret is a zero-width anchor with the bar drawn outside it, so it never pushes text. */
+.untyped { visibility: hidden; }
+.caret { position: relative; }
+.chCaret { white-space: nowrap; }
+/* Each letter inks in rather than popping: a quick fade of its colour only, so the caret inside it is never dimmed. */
+.ch { animation: chIn 0.22s cubic-bezier(0.16, 1, 0.3, 1); }
+@keyframes chIn { from { color: transparent; } }
+/* Leaving: the whole line dissolves upward together, quicker than it arrived. */
+.quoteText { transition: opacity 0.3s ease-in, filter 0.3s ease-in, transform 0.3s ease-in; }
+.quoteLeaving .quoteText { opacity: 0; filter: blur(3px); transform: translateY(-4px); }
+.caret::after {
+  content: ""; position: absolute; left: 0.04em; top: 0.08em; width: 0.09em; height: 1em;
+  background: var(--color-accent); border-radius: 1px;
 }
-@keyframes quoteIn { from { opacity: 0; transform: translateY(6px); filter: blur(3px); } }
+/* Solid while keys are moving; once idle it rests at the end of the sentence, blinks for 4 s, then goes. */
+.caret:not(.caretBusy)::after { animation: caretBlink 1s steps(1, end) 4 forwards; }
+@keyframes caretBlink { 0% { opacity: 1; } 50%, 100% { opacity: 0; } }
+.quoteBy { opacity: 0; transition: opacity 0.18s ease-in; }
+.quoteByOn { opacity: 1; transform: none; transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.12s, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.12s; }
+@media (prefers-reduced-motion: no-preference) {
+  .quoteBy { transform: translateY(4px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .caret { display: none; }
+  .ch { animation: none; }
+}
+.srOnly { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 .go { margin-top: var(--space-5); padding-inline: var(--space-8); }
 /* In-button context: same line, lighter weight, a dot rule before it; tinted from the button's ink so it stays readable on yellow. */
 .goSub { font-weight: 500; color: color-mix(in srgb, var(--color-ink) 78%, var(--color-accent)); display: inline-flex; align-items: center; gap: var(--space-3); }
