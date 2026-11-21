@@ -27,10 +27,7 @@ export default function Header() {
         <div className="user" aria-label={`Your profile: ${USER.name}, level ${rank.level} ${rank.name}, ${save.xp} XP`}>
           <span className="user-text">
             <strong className="small">{USER.name}</strong>
-            <span className="user-rank xs">
-              {rank.name}
-              <span className="user-xp">{save.xp} XP{rank.next ? ` · ${rank.nextAt! - save.xp} to ${rank.next}` : ""}</span>
-            </span>
+            <span className="user-rank xs">{USER.email}</span>
           </span>
           <span className="user-orb" aria-hidden>
             <svg className="user-ring" viewBox="0 0 52 52">
