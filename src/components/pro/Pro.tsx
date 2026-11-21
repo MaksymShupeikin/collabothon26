@@ -6,7 +6,7 @@ import { cls, dateDE, eur, num, pct, qtyFmt, shortDay, signed } from "@/lib/form
 import { KIND_LABEL, type News } from "@/lib/news";
 import { chapterById, worldOpen, type Chapter } from "@/lib/game/chapters";
 import { PERSONAS } from "@/lib/game/personas";
-import { actions, getSave, useGame } from "@/lib/game/store";
+import { actions, getSave, proTraderOffered, useGame } from "@/lib/game/store";
 import { setUi } from "@/lib/game/ui";
 import { addPlan, advance, deposit, ask, bid, cancelOrder, companiesOf, costBasis, dateOf, depotValue, fee, placeOrder, pricesOf, priceAt, round2, universeOf, type OrderInput, type OrderType, type Sim, type SimEvent, type Validity, newSim } from "@/lib/sim/engine";
 import { REPLAYS, SIM_LESSONS, type BotMove, type Replay } from "@/lib/sim/scenarios";
@@ -18,6 +18,7 @@ import { Wordmark } from "../Wordmark";
 import ProChart, { type ChartMark } from "./ProChart";
 import Widget from "./Widget";
 import { BotBubble, DecisionCard, RevealModal, Rivals, SpotCard, BossIntro } from "./ReplayParts";
+import SimpleDesk from "./Simple";
 import { BOTS } from "@/lib/sim/bots";
 
 export type Mode =
@@ -33,9 +34,40 @@ export default function Pro() {
   const ch = save.active ? chapterById(save.active) : undefined;
   const pro = ch?.surface === "pro" ? ch : undefined;
   if (!save.persona) return <Gate text="Answer three quick questions first." href="/start" cta="Start" />;
-  if (!save.proUnlocked && !save.allUnlocked) return <Gate text="Pro mode unlocks after the World 1 mission: your first stock." href="/" cta="Learning map" />;
+  if (!save.proUnlocked && !save.allUnlocked) return <Gate text="The trading area unlocks after the World 1 mission: your first stock." href="/" cta="Learning map" />;
   const mode: Mode = pro?.replay ? { kind: "replay", replay: REPLAYS[pro.replay] } : pro?.lesson ? { kind: "lesson", id: SIM_LESSONS[pro.lesson as keyof typeof SIM_LESSONS].id } : { kind: "main" };
-  return <Desk key={save.active ?? "free"} mode={mode} chapter={pro} />;
+  // The learner starts on the simple trading area. World 2 always runs there; ProTrader takes over
+  // from World 3 (and in free play) only after the learner has confirmed the switch.
+  const layout: Layout = pro?.world === 2 || !save.proTrader ? "simple" : "pro";
+  const offerSwitch = proTraderOffered(save) && !save.proTrader && pro?.world !== 2;
+  return <Desk key={`${save.active ?? "free"}:${layout}`} mode={mode} chapter={pro} layout={layout} offerSwitch={offerSwitch} />;
+}
+
+type Layout = "simple" | "pro";
+
+/** The move from the simple trading area to ProTrader is a moment: the learner sees what changes and confirms it. */
+function ProTraderSwitch({ chapter, onLater }: { chapter?: Chapter; onLater: () => void }) {
+  return (
+    <div className="overlay overlay-dark" role="dialog" aria-modal="true" aria-labelledby="switch-title">
+      <div className="unlock">
+        <p className="unlock-kicker">World 2 complete · ProTrader unlocked</p>
+        <h1 id="switch-title">Ready for the full trading desk?</h1>
+        <p className="unlock-sub">{chapter ? `${chapter.n} ${chapter.title} runs in ProTrader, the workspace experienced comdirect traders use.` : "From World 3 on you trade in ProTrader, the workspace experienced comdirect traders use."} Your depot, cash and orders come with you.</p>
+        <ul className="switch-list">
+          <li><strong>Widgets</strong>Watchlist, depot, chart, order book and news side by side.</li>
+          <li><strong>Order window</strong>The yellow Order button opens a floating ticket with exchange and validity.</li>
+          <li><strong>Time machine</strong>Jump a day, a week or a month, or straight to the next event.</li>
+          <li><strong>More detail</strong>Volume, indicators, and the type of each headline once prices reacted.</li>
+        </ul>
+        <div className="row" style={{ justifyContent: "center" }}>
+          {chapter
+            ? <Link className="btn btn-outline-light" href="/" onClick={() => actions.start(null)}>Not yet, back to the map</Link>
+            : <button className="btn btn-outline-light" onClick={onLater}>Not yet, keep the simple view</button>}
+          <button className="btn btn-primary btn-lg" onClick={() => { actions.switchToProTrader(); setUi({}); }}>Switch to ProTrader →</button>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 function Gate({ text, href, cta }: { text: string; href: string; cta: string }) {
@@ -50,7 +82,7 @@ function Gate({ text, href, cta }: { text: string; href: string; cta: string }) 
 
 type Toast = { id: number; text: string };
 
-function Desk({ mode, chapter }: { mode: Mode; chapter?: Chapter }) {
+function Desk({ mode, chapter, layout, offerSwitch }: { mode: Mode; chapter?: Chapter; layout: Layout; offerSwitch: boolean }) {
   const save = useGame();
   const replay = mode.kind === "replay" ? mode.replay : undefined;
   const universeId = mode.kind === "main" ? "main" : mode.kind === "lesson" ? mode.id : mode.replay.universe.id;
@@ -83,6 +115,7 @@ function Desk({ mode, chapter }: { mode: Mode; chapter?: Chapter }) {
   const [hidden, setHidden] = useState<Record<string, boolean>>({});
   const [widgetsOpen, setWidgetsOpen] = useState(false);
   const [moneyOpen, setMoneyOpen] = useState(false);
+  const [later, setLater] = useState(false); // "Not yet" on the ProTrader switch (free play)
   const isEnded = ended(sim);
   const years = save.allUnlocked || worldOpen(save, 4) || (mode.kind === "lesson" && mode.id === "w4-plan");
 
@@ -156,7 +189,7 @@ function Desk({ mode, chapter }: { mode: Mode; chapter?: Chapter }) {
   const dv = depotValue(sim), total = round2(sim.acct.cash + dv);
   const label = (d: number) => (u.hideDate ? (d >= 0 ? `Day ${d + 1}` : `−${-d} d`) : (() => { const x = dateOf(u, d); return `${String(x.getUTCDate()).padStart(2, "0")} ${x.toLocaleDateString("en-GB", { month: "short", timeZone: "UTC" })}${x.getUTCMonth() === 0 && x.getUTCDate() <= 7 ? ` ${x.getUTCFullYear()}` : ""}`; })());
   const clock = u.hideDate ? `Day ${sim.day + 1} · ${shortDay(dateOf(u, sim.day))} · date hidden` : `${dateDE(dateOf(u, sim.day))} · ${TIME}`;
-  const firstDay = mode.kind === "main" ? Math.max(-u.history, sim.day - 400) : -Math.min(u.history, replay ? 40 : 120);
+  const firstDay = mode.kind === "main" ? Math.max(-u.history, sim.day - (layout === "simple" ? 60 : 400)) : -Math.min(u.history, replay ? 40 : 120);
   const closes = prices[sym].slice(u.history + firstDay, u.history + sim.day + 1);
   const visibleNews = u.news.filter((n) => n.day <= sim.day && n.day > sim.day - 120).slice().reverse();
   const marks: ChartMark[] = (() => {
@@ -168,6 +201,53 @@ function Desk({ mode, chapter }: { mode: Mode; chapter?: Chapter }) {
   const lastMove = replay?.moves.filter((m) => m.day <= sim.day && m.day >= sim.day - 2).at(-1);
   const show = (w: string) => !hidden[w];
   const simulated = mode.kind !== "replay";
+
+  const overlays = (
+    <>
+      <div className="toasts" aria-live="polite">
+        {toasts.map((t) => <div key={t.id} className="toast" role="status"><span>{t.text}</span><button className="link" onClick={() => setToasts((x) => x.filter((y) => y.id !== t.id))} aria-label="Dismiss">✕</button></div>)}
+      </div>
+
+      {intro && replay && chapter && <BossIntro replay={replay} chapter={chapter} onStart={() => setIntro(false)} />}
+      {(spot || firstSpot) && replay && (
+        <SpotCard move={(spot || firstSpot) as BotMove} name={cover} picked={answers[((spot || firstSpot) as BotMove).bot + ((spot || firstSpot) as BotMove).day]}
+          onPick={(k) => {
+            const mv = (spot || firstSpot) as BotMove;
+            setSpot(mv); // keep the card open for the explanation
+            setAnswers((a) => ({ ...a, [mv.bot + mv.day]: k }));
+            if (k === mv.spot!.answer) actions.understood(`spot:${replay.id}:${mv.bot}:${mv.day}`, 15);
+          }}
+          onClose={() => setSpot(null)} />
+      )}
+      {decision && (
+        <DecisionCard news={decision} onDecide={(act) => {
+          const right = act === ["signal", "sector", "macro"].includes(decision.kind);
+          setDecided((d) => ({ ...d, [decision.id]: true }));
+          const next = { a: w2.current.a + 1, r: w2.current.r + (right ? 1 : 0) };
+          w2.current = next;
+          setUi({ w2Answered: next.a, w2Right: next.r });
+          if (right) actions.understood(`w2:${decision.id}`, 15);
+          return right;
+        }} onClose={() => setDecision(null)} />
+      )}
+      {revealOpen && replay && <RevealModal replay={replay} chapter={chapter} sim={sim} answers={answers} name={cover} onClose={() => setRevealOpen(false)} />}
+      {chapter?.kind === "chapter" && !intro && <TourRunner surface="pro" />}
+      {chapter?.kind === "mission" && <TourRunner surface="pro" />}
+      {offerSwitch && !later && <ProTraderSwitch chapter={chapter} onLater={() => setLater(true)} />}
+    </>
+  );
+
+  if (layout === "simple") {
+    return (
+      <>
+        <SimpleDesk sim={sim} u={u} comps={comps} sym={sym} setSym={setSym} cover={cover} coverWkn={coverWkn}
+          speed={speed} setSpeed={setSpeed} ended={isEnded} closes={closes} firstDay={firstDay} label={label} news={visibleNews}
+          breaking={breaking} clearBreaking={() => setBreaking(null)} freePlay={mode.kind === "main" && !chapter}
+          order={order} cancel={cancel} addMoney={addMoney} replay={replay} answers={answers} />
+        {overlays}
+      </>
+    );
+  }
 
   return (
     <div className="pt">
@@ -297,35 +377,7 @@ function Desk({ mode, chapter }: { mode: Mode; chapter?: Chapter }) {
           planAllowed={years} planAmount={PERSONAS[save.persona ?? "starter"].plan} setPlan={setPlan} disabled={isEnded} />
       )}
 
-      <div className="toasts" aria-live="polite">
-        {toasts.map((t) => <div key={t.id} className="toast" role="status"><span>{t.text}</span><button className="link" onClick={() => setToasts((x) => x.filter((y) => y.id !== t.id))} aria-label="Dismiss">✕</button></div>)}
-      </div>
-
-      {intro && replay && chapter && <BossIntro replay={replay} chapter={chapter} onStart={() => setIntro(false)} />}
-      {(spot || firstSpot) && replay && (
-        <SpotCard move={(spot || firstSpot) as BotMove} name={cover} picked={answers[((spot || firstSpot) as BotMove).bot + ((spot || firstSpot) as BotMove).day]}
-          onPick={(k) => {
-            const mv = (spot || firstSpot) as BotMove;
-            setSpot(mv); // keep the card open for the explanation
-            setAnswers((a) => ({ ...a, [mv.bot + mv.day]: k }));
-            if (k === mv.spot!.answer) actions.understood(`spot:${replay.id}:${mv.bot}:${mv.day}`, 15);
-          }}
-          onClose={() => setSpot(null)} />
-      )}
-      {decision && (
-        <DecisionCard news={decision} onDecide={(act) => {
-          const right = act === ["signal", "sector", "macro"].includes(decision.kind);
-          setDecided((d) => ({ ...d, [decision.id]: true }));
-          const next = { a: w2.current.a + 1, r: w2.current.r + (right ? 1 : 0) };
-          w2.current = next;
-          setUi({ w2Answered: next.a, w2Right: next.r });
-          if (right) actions.understood(`w2:${decision.id}`, 15);
-          return right;
-        }} onClose={() => setDecision(null)} />
-      )}
-      {revealOpen && replay && <RevealModal replay={replay} chapter={chapter} sim={sim} answers={answers} name={cover} onClose={() => setRevealOpen(false)} />}
-      {chapter?.kind === "chapter" && !intro && <TourRunner surface="pro" />}
-      {chapter?.kind === "mission" && <TourRunner surface="pro" />}
+      {overlays}
     </div>
   );
 }

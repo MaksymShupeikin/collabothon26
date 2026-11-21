@@ -43,7 +43,7 @@ comdirect already has the pieces, but they live apart:
 
 ## 2. The solution in one breath
 
-One click on comdirect opens the **training sandbox**. It looks like the real comdirect screens and uses play money. An **interactive tour** explains each element in one or two sentences and has the player do the action themselves. After a few steps the coach steps back and gives a **mission**: *top up your account and buy your first stock, on your own.* After that the player unlocks **Pro mode**: a ProTrader-style market with a **live news feed**, **rival bots** that make typical mistakes, and a **time machine** that fast-forwards days, months or years so the consequences show up in seconds.
+One click on comdirect opens the **training sandbox**. It looks like the real comdirect screens and uses play money. An **interactive tour** explains each element in one or two sentences and has the player do the action themselves. After a few steps the coach steps back and gives a **mission**: *top up your account and buy your first stock, on your own.* After that the player unlocks the **trading area**: one simple trading screen with a **live news feed**, **rival bots** that make typical mistakes, and time that moves. Once World 2 is done, the player confirms the switch to **ProTrader**: the full comdirect-style workspace with a **time machine** that fast-forwards days, months or years so the consequences show up in seconds.
 
 **Learn → do it guided → do it alone → live with the consequences → real comdirect.**
 
@@ -80,10 +80,12 @@ The same mission reads differently per persona. For example: *"Buy your first st
 comdirect start page ──banner "Practice first, then invest"──▶ Onboarding (≈60 s, 3 questions)
         ▶ Learning map (menu)
             ▶ World 1: First steps ............ web-cabinet sandbox
-                 guided chapters ─▶ Mission ─▶ ⏩ 1 week later ─▶ "Pro mode unlocked"
-            ▶ World 2–4 ........................ Pro-mode sandbox (ProTrader style)
+                 guided chapters ─▶ Mission ─▶ ⏩ 1 week later ─▶ "Trading area unlocked"
+            ▶ World 2 .......................... simple trading area (one screen)
+                 guided chapters ─▶ Mission ─▶ "ProTrader unlocked" ─▶ player confirms the switch
+            ▶ World 3–4 ........................ ProTrader sandbox (widget workspace)
                  guided chapters ─▶ Mission ─▶ Boss round vs. a bot ─▶ Debrief
-            ▶ Free play (open Pro-mode market)
+            ▶ Free play (simple trading area until the switch, ProTrader after it)
         ▶ "Ready for real?" ─▶ real comdirect depot
 ```
 
@@ -105,19 +107,23 @@ Maximum 4 screens, about 60 seconds:
 - Always visible: rank ring + XP, concept-card collection (x / 12), "Continue" button on the next chapter.
 - The current code already has a version of this (`/learn`), which needs to be restructured around the worlds below.
 
-## 5. Two sandbox surfaces
+## 5. Three sandbox surfaces
 
-We copy **two real comdirect interfaces** and switch between them on purpose:
+We copy **two real comdirect interfaces** and put a **simple trading area** between them, so the player never jumps straight from the calm web cabinet into the dense ProTrader:
 
-| | **Web-cabinet sandbox** (World 1) | **Pro mode** (World 2+) |
-|---|---|---|
-| Copies | comdirect web customer area | comdirect ProTrader |
-| Why | This is where real customers make their first trade. Calm, light, little on screen. | Dense, real-time, with charts and news: where the "living market" happens |
-| References | `references/01_startseite_…`, `ui-fotos-internet/1_web-kundenbereich/*`, `ui-fotos-internet/2_web-ordermaske/*`, `ui-fotos-internet/3_app-screens/04_wertpapier-details.jpg` | `references/02`–`42` (workspaces, widgets, Ordermaske, Orderbuch, News, Chart) |
-| Time | Paused, with a single ⏩ "1 week later" jump after the mission | Full time machine (see §8) |
-| News | News block on the stock detail page | News widget, as in ProTrader |
+| | **Web-cabinet sandbox** (World 1) | **Trading area** (World 2) | **ProTrader** (World 3+) |
+|---|---|---|---|
+| Copies | comdirect web customer area | 🆕 our simple trading screen (the `main` branch design), in comdirect colours | comdirect ProTrader |
+| Why | This is where real customers make their first trade. Calm, light, little on screen. | First contact with a living market: one screen, three columns (time + news/rivals · search + chart · account + order ticket + positions) | Dense, real-time, with charts and news: the full workspace |
+| References | `references/01_startseite_…`, `ui-fotos-internet/1_web-kundenbereich/*`, `ui-fotos-internet/2_web-ordermaske/*`, `ui-fotos-internet/3_app-screens/04_wertpapier-details.jpg` | `main`: `src/components/Simulator.tsx` | `references/02`–`42` (workspaces, widgets, Ordermaske, Orderbuch, News, Chart) |
+| Time | Paused, with a single ⏩ "1 week later" jump after the mission | ▶ Play / ⏸ Pause at 1 day/s or 1 week/s; big news and bot moves pause it | Full time machine (see §8) |
+| News | News block on the stock detail page | News list next to the chart, plus a Rivals tab in replays | News widget, as in ProTrader |
 
-**The switch itself is a moment in the demo:** after the first trade the screen says *"You just did what most people never dare to do. Pro mode unlocked."* The player sees their own progress.
+Trading area and ProTrader are two layouts on **the same market, depot, orders and replays**: switching never resets the player's money or positions.
+
+**Both switches are moments in the demo:**
+- After the first trade (World 1 mission): *"You just did what most people never dare to do. Trading area unlocked."*
+- After the World 2 mission: a full-screen **"Ready for the full trading desk?"** card explains what changes (widgets, order window, time machine, more detail) and that the depot comes along. The player has to **confirm** ("Switch to ProTrader →"); "Not yet" keeps the simple view in free play, or goes back to the map when a World 3 chapter was opened. World 2 chapters always run on the trading area, World 3+ always on ProTrader. The confirmation is saved (`proTrader` in the save).
 
 **What we copy exactly:** layout, element positions, table columns, field order in the order form, number and date formats (`1.001,16 EUR`, `14.03.2024`, `15:45:06`).
 **What we translate:** all text is in **English** for now. Because the layout stays German, a German version later only means swapping text.
@@ -167,7 +173,7 @@ After a few chapters the coach steps back. A **mission card** appears with one c
 
 Time is the hidden teacher: consequences that take months in real life become visible in seconds.
 
-**Controls** (Pro mode, next to the clock):
+**Controls** (ProTrader, next to the clock; the World 2 trading area only has ▶/⏸ with 1 day/s or 1 week/s):
 `⏸ Pause` · `▶ 1×` · `⏩ 5×` · `⏭ Next event` · jump `+1 day` `+1 week` `+1 month` · `+1 year` / `+10 years` (unlocked in World 4)
 
 **Rules**
@@ -204,7 +210,7 @@ Time is the hidden teacher: consequences that take months in real life become vi
 | Moment | Jump | What the player sees |
 |---|---|---|
 | End of World 1 | ⏩ 1 week | First trade shows up as profit or loss in the depot |
-| World 2 | ⏭ next event | News → price reaction → was it signal, noise or priced in? |
+| World 2 | ▶ play (auto-pauses on the next big headline) | News → price reaction → was it signal, noise or priced in? |
 | World 3 boss | ⏩ 1 month | The Wirecard collapse; concentrated vs. diversified depot side by side |
 | World 4 | ⏩ 10 years | Savings plan vs. one-time buy vs. cash under the mattress, compound interest as a growing curve |
 
@@ -290,18 +296,19 @@ Steady Sam is never a boss. He's the **benchmark** that's always in the table, a
 | 1.4 | **Read a stock page** | Price, daily change, chart periods, key numbers, news block | — |
 | 1.5 | **Place an order** | Buy/sell, quantity, exchange, market vs. limit, validity, shows costs | **Market vs. limit order**, **Fees & spread** |
 | ★ | **Mission: your first stock** | Top up + buy alone → ⏩ 1 week → finds P/L in the depot | **Profit & loss** |
-| 🔓 | **Pro mode unlocked** | | |
+| 🔓 | **Trading area unlocked** | | |
 
-### World 2: Reading the news · *Pro mode*
+### World 2: Reading the news · *trading area*
 | # | Chapter | Card |
 |---|---|---|
-| 2.1 | **Your new cockpit**: guided tour of the ProTrader workspace (header, widgets, Order button) | — |
+| 2.1 | **Your trading area**: guided tour of the simple trading screen (account, search, chart, order ticket, positions, news, play) | — |
 | 2.2 | **Not every headline matters** | **Signal vs. noise** |
 | 2.3 | **The market was faster** | **Priced in** |
 | 2.4 | **Rumors** | **Buy the rumor, sell the news** |
 | ★ | Mission: "Read before you click" · 👾 **Boss: FOMO Max** | |
+| 🔓 | **ProTrader unlocked**: the player confirms the switch | | |
 
-### World 3: Risk · *Pro mode*
+### World 3: Risk · *ProTrader*
 | # | Chapter | Card |
 |---|---|---|
 | 3.1 | **Ups and downs** | **Volatility & drawdown** |
@@ -309,14 +316,14 @@ Steady Sam is never a boss. He's the **benchmark** that's always in the table, a
 | 3.3 | **Hundreds of companies in one click** | **ETF** |
 | ★ | Mission: "Don't put all eggs in one basket" · 👾 **Boss: All-in Alex** | |
 
-### World 4: Time · *Pro mode + ⏩ years*
+### World 4: Time · *ProTrader + ⏩ years*
 | # | Chapter | Card |
 |---|---|---|
 | 4.1 | **Money that grows on its own** | **Compound interest** |
 | 4.2 | **Same amount, every month** | **Savings plan & cost averaging** |
 | ★ | Mission: "Set and forget" · 👾 **Boss: Panic Paula** | |
 
-After World 4: **Free play** (open Pro-mode market with all 4 bots) and a **"Ready for real?"** screen that links to the real comdirect depot / savings-plan page.
+After World 4: **Free play** (open ProTrader market with all 4 bots) and a **"Ready for real?"** screen that links to the real comdirect depot / savings-plan page.
 
 > The current `src/lib/data/concepts.ts` has 30 cards in 5 worlds. For the MVP we cut it down to the 12 above. The other cards stay in the file for the roadmap.
 
@@ -367,7 +374,8 @@ The source of truth is **`DESIGN.md`** (Commerzbank tokens), applied through `sr
 | Historical replays (real events, hidden date, reveal) | 🆕 Invented format; the events themselves are real history |
 | "Add play money" button on the Girokonto | 🆕 Invented (sandbox control, marked as such) |
 | Rival bots, Spot the habit, Mistake Cam, boss rounds, leaderboard | 🆕 Invented |
-| "Pro mode unlocked" transition | 🆕 Invented |
+| Simple trading area between web cabinet and ProTrader | 🆕 Invented (our own `main` design) |
+| "Trading area unlocked" and "Switch to ProTrader" transitions | 🆕 Invented |
 
 The rule for building: **anything marked 🆕 that isn't described in this file gets proposed to the team before it's built.**
 
@@ -377,7 +385,7 @@ The rule for building: **anything marked 🆕 that isn't described in this file 
 2. **Entry (20 s):** comdirect start page → banner → one click → no sign-up.
 3. **Two generations (40 s):** onboarding as Lena (22) and as Helga (58). Same path, different examples and amounts.
 4. **Guided first trade (60 s):** spotlight tour in the web cabinet → top-up with photoTAN → order form → **the player buys their first stock** → ⏩ 1 week → it's in the depot, with profit.
-5. **Pro mode unlocked (90 s):** ProTrader look → historical replay with a hidden date: a celebrated DAX payments company, the first doubts in the press → All-in Alex puts everything in, *"They're a DAX star, what could go wrong?"* → **Spot the habit**: the player picks "Everything in one stock" and keeps a diversified depot → ⏭ next event → the share collapses → **Reveal: "This was Wirecard, June 2020."** → **Mistake Cam** → concept card *Diversification*.
+5. **Trading area → ProTrader (90 s):** one quick look at the simple trading area (World 2, a headline pauses the market) → World 2 done → **"Ready for the full trading desk?"** → the player confirms → ProTrader look, same depot → historical replay with a hidden date: a celebrated DAX payments company, the first doubts in the press → All-in Alex puts everything in, *"They're a DAX star, what could go wrong?"* → **Spot the habit**: the player picks "Everything in one stock" and keeps a diversified depot → ⏭ next event → the share collapses → **Reveal: "This was Wirecard, June 2020."** → **Mistake Cam** → concept card *Diversification*.
 6. **Result (30 s):** leaderboard. The diversified player is far above All-in Alex. "We reward understanding, not trading."
 7. **Why this is new (20 s):** one comparison slide, comdirect edu vs. Musterdepot vs. Akademie (see §1.1).
 8. **Close (30 s):** "Learn → practice → act. Inside comdirect, for every generation."
@@ -393,6 +401,7 @@ The rule for building: **anything marked 🆕 that isn't described in this file 
 | 5 | Play money per persona | **Start money grows with life stage**: Starter 100 € ("investing isn't only for grown-ups"), Builder 500 €, Pre-retiree 1.000 €. After that the player can add any amount via "Add play money". The trading account starts empty; scores are in %, and bots start with the player's amount (§3) |
 | 6 | Bots in the first build? | **Scripted mock** in the core build; real bot engine in phase 2 (§11, §18) |
 | 7 | Reward predictions ("Will this trade work?")? | **No.** Rewarding price predictions is betting-like gamification that regulators criticise. Replaced by **Spot the habit** (§11): XP for naming the risk, independent of the outcome. No prediction accuracy in the leaderboard; the daily challenge classifies news instead of predicting it. |
+| 8 | Jump from web cabinet straight into ProTrader? | **No.** World 2 runs on a simple one-screen trading area (the `main` design); ProTrader opens from World 3, after the World 2 mission, and only once the player **confirms** the switch. Same depot in both. |
 
 ## 18. Build order and roadmap
 
@@ -400,7 +409,7 @@ The rule for building: **anything marked 🆕 that isn't described in this file 
 - Mocked comdirect start page with entry banner, onboarding and personas, learning map
 - Web-cabinet sandbox: account overview, top-up + photoTAN, search, stock page, order form, depot, transactions
 - Guided tour (spotlight + coach), missions with stars, XP, ranks, 12 concept cards
-- Pro mode: ProTrader widget layout, chart, news panel, time machine
+- Trading area (World 2, simple one-screen layout) and ProTrader (World 3+): widget layout, chart, news panel, time machine; confirmed switch between them
 - Historical replays with **scripted mock bots** (avatars, bubbles, Spot the habit, Mistake Cam, precomputed leaderboard)
 
 **Phase 2: real bots**
@@ -420,7 +429,7 @@ The rule for building: **anything marked 🆕 that isn't described in this file 
 
 | Exists | Keep / change |
 |---|---|
-| `Simulator.tsx`: one broker-style trading screen with tour, bots, news, speed control, debrief | Becomes the base of **Pro mode**; layout gets rebuilt to the ProTrader widget grid |
+| `Simulator.tsx` (`main`): one broker-style trading screen with tour, bots, news, speed control, debrief | Its layout is kept 1:1 as the **World 2 trading area** (`src/components/pro/Simple.tsx`), now running on the shared sim engine and save; ProTrader (`Pro.tsx`) takes over from World 3 after the confirmed switch |
 | `CoachMark.tsx`: spotlight + bubble | Keep; reuse in both surfaces |
 | `market.ts`, `news.ts`, `rng.ts`: seeded market, news types, bots, risk score | Keep; add scripted per-lesson scenarios and jump-in-time; the existing bot logic stays as a starting point for phase 2, but phase 1 uses scripted bot actions; `START_CASH` goes from 10.000 € to the persona start amount (≤ 1.000 €); `topUp` allows any amount afterwards |
 | `companies.ts`: only real companies | Keep; add the companies from the replay catalogue (Wirecard, GameStop, VW…) |

@@ -20,7 +20,7 @@ function toCandles(sym: string, prices: number[], times: string[]) {
 const css = (name: string) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 
 /** Candlestick chart (TradingView Lightweight Charts) in the app's palette. */
-export default function CandleChart({ sym, prices, times, trades }: { sym: string; prices: number[]; times: string[]; trades: TradeMark[] }) {
+export default function CandleChart({ sym, prices, times, trades, format }: { sym: string; prices: number[]; times: string[]; trades: TradeMark[]; format?: (time: string) => string }) {
   const box = useRef<HTMLDivElement>(null);
   const chart = useRef<IChartApi | null>(null);
   const series = useRef<ISeriesApi<"Candlestick"> | null>(null);
@@ -51,6 +51,14 @@ export default function CandleChart({ sym, prices, times, trades }: { sym: strin
     })));
     chart.current!.timeScale().fitContent();
   }, [sym, prices, times, trades]);
+
+  // Replays hide the real date: the axis and crosshair then show the caller's own labels ("Day 3").
+  useEffect(() => {
+    if (!chart.current || !format) return;
+    const iso = (t: Time) => (typeof t === "object" ? `${t.year}-${String(t.month).padStart(2, "0")}-${String(t.day).padStart(2, "0")}` : typeof t === "number" ? new Date(t * 1000).toISOString().slice(0, 10) : t);
+    const f = (t: Time) => format(iso(t));
+    chart.current.applyOptions({ localization: { timeFormatter: f }, timeScale: { tickMarkFormatter: f } });
+  }, [format]);
 
   return <div ref={box} className="candle-chart" />;
 }

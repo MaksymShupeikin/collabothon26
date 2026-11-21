@@ -114,7 +114,7 @@ export default function LearningMap() {
                       );
                     })}
                   </div>
-                  {w.n === 1 && save.proUnlocked && <span className="xs pro-note">🔓 Pro mode unlocked</span>}
+                  {w.n === 1 && save.proUnlocked && <span className="xs pro-note">🔓 Trading area unlocked</span>}
                 </div>
                 <div className="world-action">
                   {!open ? (

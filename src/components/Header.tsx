@@ -22,7 +22,7 @@ export default function Header() {
           <nav className="hnav" aria-label="comdirect edu">
             <Link href="/">Learning map</Link>
             <Link href="/cabinet">Web cabinet</Link>
-            {save.proUnlocked && <Link href="/pro">Pro mode</Link>}
+            {save.proUnlocked && <Link href="/pro">{save.proTrader ? "ProTrader" : "Trading area"}</Link>}
           </nav>
         )}
         <div className="user" aria-label="Your profile">
