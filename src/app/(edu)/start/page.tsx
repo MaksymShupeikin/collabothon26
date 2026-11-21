@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Onboarding from "@/components/Onboarding";
+import Onboarding from "@/features/onboarding/Onboarding";
 
 export const metadata: Metadata = { title: "Welcome · comdirect edu" };
 

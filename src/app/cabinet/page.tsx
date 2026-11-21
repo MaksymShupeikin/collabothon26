@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Cabinet from "@/components/cabinet/Cabinet";
+import Cabinet from "@/features/cabinet/Cabinet";
 
 export const metadata: Metadata = { title: "Web cabinet · comdirect edu" };
 

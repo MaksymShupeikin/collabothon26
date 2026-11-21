@@ -1,4 +1,4 @@
-import Header from "@/components/Header";
+import Header from "@/features/shell/Header";
 
 // Our own pages (onboarding, learning map, "ready for real"): comdirect edu header.
 export default function EduLayout({ children }: { children: React.ReactNode }) {
