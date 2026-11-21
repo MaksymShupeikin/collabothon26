@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { useGame } from "@/features/game/store";
+import { getSave, onSave } from "@/features/game/store";
 import { playXpChime } from "@/features/game/sfx";
 
 type Burst = { id: number; delta: number; x: number; y: number };
@@ -26,25 +26,28 @@ function landing() {
 
 /**
  * Every XP gain pops a big "+N XP" over the active card, holds a beat, then flies into the rank chip,
- * which pulses as it lands. Watches the save, so any award (step, quiz, chapter, mission) triggers it.
+ * which pulses as it lands. Watches the save on every page, so any award (step, quiz, chapter, mission) triggers it.
  */
 export default function XpGain() {
-  const { xp } = useGame();
-  const prev = useRef<number | null>(null);
   const [bursts, setBursts] = useState<Burst[]>([]);
 
+  // Listens to save writes directly (not the rendered value), so hydration and page changes never
+  // read as a gain. Mounted once in the root layout, so it works on every page.
   useEffect(() => {
-    const before = prev.current;
-    prev.current = xp;
-    if (before === null || xp <= before) return;
-    const { x, y } = origin();
-    const b = { id: performance.now(), delta: xp - before, x, y };
-    // Deferred a tick so the next step's bubble is placed first (and no setState inside the effect body).
-    window.setTimeout(() => {
-      setBursts((list) => [...list, b]);
-      playXpChime();
-    }, 0);
-  }, [xp]);
+    let before = getSave().xp;
+    return onSave(() => {
+      const xp = getSave().xp;
+      const delta = xp - before;
+      before = xp;
+      if (delta <= 0) return;
+      // Deferred a tick so the next step's bubble is placed first.
+      window.setTimeout(() => {
+        const { x, y } = origin();
+        setBursts((list) => [...list, { id: performance.now() + Math.random(), delta, x, y }]);
+        playXpChime();
+      }, 0);
+    });
+  }, []);
 
   return (
     <div className="xp-layer" aria-live="polite">

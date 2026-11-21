@@ -22,7 +22,7 @@ export default function Header() {
             <Link href="/pro">{save.proTrader ? "ProTrader" : "Trading area"}</Link>
           </nav>
         )}
-        <div className="user" aria-label={`Your profile: ${USER.name}, level ${rank.level} ${rank.name}, ${save.xp} XP`}>
+        <div className="user" data-xp-target aria-label={`Your profile: ${USER.name}, level ${rank.level} ${rank.name}, ${save.xp} XP`}>
           <span className="user-text">
             <strong className="small">{USER.name}</strong>
             <span className="user-rank xs">{USER.email}</span>

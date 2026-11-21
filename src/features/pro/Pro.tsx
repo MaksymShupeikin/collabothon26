@@ -52,13 +52,6 @@ function ProTraderSwitch({ chapter, onLater }: { chapter?: Chapter; onLater: () 
       <div className="unlock">
         <p className="unlock-kicker">Module 2 complete · ProTrader unlocked</p>
         <h1 id="switch-title">Ready for the full trading desk?</h1>
-        <p className="unlock-sub">{chapter ? `${chapter.n} ${chapter.title} runs in ProTrader, the workspace experienced comdirect traders use.` : "From Module 3 on you trade in ProTrader, the workspace experienced comdirect traders use."} Your depot, cash and orders come with you.</p>
-        <ul className="switch-list">
-          <li><strong>Widgets</strong>Watchlist, depot, chart, order book and news side by side.</li>
-          <li><strong>Order window</strong>The yellow Order button opens a floating ticket with exchange and validity.</li>
-          <li><strong>Time machine</strong>Jump a day, a week or a month, or straight to the next event.</li>
-          <li><strong>More detail</strong>Volume, indicators, and the type of each headline once prices reacted.</li>
-        </ul>
         <div className="row" style={{ justifyContent: "center" }}>
           {chapter
             ? <Link className="btn btn-outline-light" href="/" onClick={() => actions.start(null)}>Not yet, back to the map</Link>
@@ -126,12 +119,14 @@ function Desk({ mode, chapter, layout, offerSwitch }: { mode: Mode; chapter?: Ch
 
   // ── time ──
   const toast = (text: string) => setToasts((t) => [...t.slice(-2), { id: Date.now() + Math.random(), text }]);
+  // Guided chapters ask their own questions through the tour; "Spot the habit" cards there would sit under the tour's click gate.
+  const spots = chapter?.kind !== "chapter";
   function stepTime(days: number, stopAtMajor: boolean): boolean {
     const cur = simRef.current;
     let n = Math.min(days, u.days - cur.day);
     if (n <= 0) { setSpeed(0); return false; }
     // replays: stop on a bot's move with a "Spot the habit" question
-    const nextMove = replay?.moves.find((m) => m.spot && m.day > cur.day && !(m.bot + m.day in answers));
+    const nextMove = spots && replay?.moves.find((m) => m.spot && m.day > cur.day && !(m.bot + m.day in answers));
     if (nextMove && (replay && mode.kind === "replay")) n = Math.min(n, nextMove.day - cur.day);
     const res = mode.kind === "main" ? { sim: null as Sim | null, events: actions.jump(n, stopAtMajor) } : advance(cur, n, { stopAtMajor });
     if (res.sim) { setLocal(res.sim); simRef.current = res.sim; } else simRef.current = getSave().sim;
@@ -146,7 +141,7 @@ function Desk({ mode, chapter, layout, offerSwitch }: { mode: Mode; chapter?: Ch
       }
     }
     const day = simRef.current.day;
-    const mv = replay?.moves.find((m) => m.spot && m.day === day && !(m.bot + m.day in answers));
+    const mv = spots && replay?.moves.find((m) => m.spot && m.day === day && !(m.bot + m.day in answers));
     if (mv) { setSpot(mv); setSpeed(0); paused = true; }
     if (day >= u.days) { setSpeed(0); if (chapter?.kind === "boss" || (replay && !chapter)) setRevealOpen(true); }
     return !paused;
@@ -159,7 +154,7 @@ function Desk({ mode, chapter, layout, offerSwitch }: { mode: Mode; chapter?: Ch
     return () => window.clearInterval(id);
   }, [speed]);
   // Bot moves on day 0 (before any time passes) are shown right away, after the boss intro.
-  const firstSpot = !intro && replay?.moves.find((m) => m.spot && m.day === 0 && !(m.bot + m.day in answers));
+  const firstSpot = spots && !intro && replay?.moves.find((m) => m.spot && m.day === 0 && !(m.bot + m.day in answers));
 
   // ── orders ──
   function order(o: OrderInput) {

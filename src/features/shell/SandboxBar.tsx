@@ -3,7 +3,6 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { rankOf, useGame } from "@/features/game/store";
 import ProgressRing from "@/shared/ui/ProgressRing";
-import XpGain from "@/features/game/XpGain";
 
 /** Thin bar above the copied comdirect screens: makes clear this is the training sandbox (🆕, not comdirect). */
 export default function SandboxBar({ clock, dark = false }: { clock?: string; dark?: boolean }) {
@@ -21,7 +20,6 @@ export default function SandboxBar({ clock, dark = false }: { clock?: string; da
         </span>
         <Link href="/" className="sbar-link">Learning map</Link>
       </span>
-      <XpGain />
     </div>
   );
 }

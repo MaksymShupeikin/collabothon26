@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "@/app/globals.css";
+import XpGain from "@/features/game/XpGain";
 
 export const metadata: Metadata = {
   title: "comdirect edu",
@@ -9,7 +10,10 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        {children}
+        <XpGain />
+      </body>
     </html>
   );
 }

@@ -8,7 +8,7 @@ export type Ctx = { save: Save; ui: Ui };
 export type Step = {
   target?: string;
   title: string;
-  text: string | ((c: Ctx) => string);
+  text?: string | ((c: Ctx) => string);
   task?: string | ((c: Ctx) => string); // the player does it; no Next button
   done?: (c: Ctx) => boolean;
   quiz?: { q: string; options: string[]; answer: number; why: string };
@@ -159,13 +159,13 @@ const W2: Chapter[] = [
     steps: [
       { title: "A real story, date hidden", text: "This really happened. You see the company type, not the name or the date. Watch the headlines and the price." },
       { target: "time-machine", title: "Play", text: "Headlines arrive as time moves. Big ones pause the game.", task: "Press Play.", done: (c) => (c.ui.day as number ?? 0) >= 1 },
-      { target: "w-news", title: "First headline", text: "A motor show with record crowds.",
+      { target: "w-news", title: "",
         quiz: { q: "Is \"Motor show opens with record crowds\" a signal for one carmaker's share?", options: ["Signal: new information about the company", "Noise: nothing about the business changed"], answer: 1, why: "Nice for Frankfurt, nothing new about any carmaker's profits." } },
       { target: "time-machine", title: "Keep going", text: "Something bigger is coming.", task: "Press Play until the US agency headline appears.", done: (c) => (c.ui.day as number ?? 0) >= 4 },
-      { target: "w-chart", title: "Look at the chart", text: "The share fell about 19 % in one day.",
+      { target: "w-chart", title: "",
         quiz: { q: "\"US agency: carmaker cheated on emission tests\". Signal or noise?", options: ["Signal: fines, recalls, lost trust", "Noise: just a headline"], answer: 0, why: "Real, new and serious information about this company's future." } },
-      { target: "time-machine", title: "Two days later", text: "Watch what the TV analyst says.", task: "Press Play until day 6.", done: (c) => (c.ui.day as number ?? 0) >= 6 },
-      { target: "w-news", title: "Opinions", text: "Now a TV analyst says the whole sector is finished.",
+      { target: "time-machine", title: "Two days later", text: "Watch what the TV analyst says.", task: "Press Play until the TV analyst's headline appears. Another big headline stops the clock on the way, so press it twice.", done: (c) => (c.ui.day as number ?? 0) >= 6 },
+      { target: "w-news", title: "",
         quiz: { q: "\"The whole auto sector is finished\", says an analyst on TV. Signal or noise?", options: ["Signal", "Noise: a dramatic opinion"], answer: 1, why: "Other carmakers fell much less. The problem was at one company." } },
       { title: "The reveal: Volkswagen, September 2015", text: "\"Dieselgate\". The share lost about a third in a few days. Other carmakers fell much less: the signal was about one company, the TV drama was noise." },
     ],
