@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "check": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON src/lib/market.check.ts"
+    "check": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON src/features/market/engine.check.ts"
   },
   "dependencies": {
     "lightweight-charts": "^5.3.0",
