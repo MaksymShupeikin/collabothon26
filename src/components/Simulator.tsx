@@ -5,7 +5,7 @@ import { COMPANIES } from "@/lib/data/companies";
 import { conceptById } from "@/lib/data/concepts";
 import {
   BOTS, cancelOrder, createMarket, topUp, fee, guessCall, placeOrder, priceOf, riskScore, round2, SPREAD, tick, valueOf,
-  type Market, type News, type OrderType, type Side,
+  type Market, type OrderType, type Side,
 } from "@/lib/market";
 import { tourDone, useProgress } from "@/lib/progress";
 import CoachMark, { type CoachStep } from "./CoachMark";
@@ -46,7 +46,7 @@ const TOUR: (CoachStep & { done?: (c: Ctx) => boolean })[] = [
   { target: "submit", title: "First trade", text: "It's play money.", task: "Place the order.", done: (c) => c.holdings > 0 },
   { target: "news", title: "News", text: "Most headlines are noise. Some are already priced in." },
   { target: "rivals", title: "Rivals", text: "Bots trade the same market. Open this tab and guess if their trades work." },
-  { target: "time", title: "Time", text: "Big news pauses the game.", task: "Press Play.", done: (c) => c.speed > 0 },
+  { target: "time", title: "Time", text: "Start the market here. Time won't stop for news, so pause whenever you want to read.", task: "Press Play.", done: (c) => c.speed > 0 },
 ];
 
 /** One empty-state style for every list and panel in the trading screen. */
@@ -71,7 +71,6 @@ export default function Simulator({ tour = false }: { tour?: boolean }) {
   const [err, setErr] = useState<string | null>(null);
   const [speed, setSpeed] = useState(0);
   const [pace, setPace] = useState(1); // speed to resume with
-  const [breaking, setBreaking] = useState<News | null>(null);
   const [step, setStep] = useState(tour ? 0 : -1);
   const [claimed, setClaimed] = useState(false);
   const [topUpOpen, setTopUpOpen] = useState(false);
@@ -100,12 +99,8 @@ export default function Simulator({ tour = false }: { tour?: boolean }) {
     return () => window.clearInterval(id);
   }, [speed]);
 
-  // Auto-pause on big news; stop at the end. Not during the tour.
-  useEffect(() => {
-    if (m.day >= m.days) { setSpeed(0); return; }
-    const big = m.news.find((n) => n.day === m.day && n.major);
-    if (big && step < 0 && m.day > 0) { setSpeed(0); setBreaking(big); }
-  }, [m.day, m.days, m.news, step]);
+  // Stop at the end. Big news never pauses: reading the feed is the player's job.
+  useEffect(() => { if (m.day >= m.days) setSpeed(0); }, [m.day, m.days]);
 
   // XP for correct guesses on bot trades
   useEffect(() => {
@@ -277,8 +272,8 @@ export default function Simulator({ tour = false }: { tour?: boolean }) {
                 <div className="xs muted">{company.sym} · WKN {company.wkn} · {company.sector}</div>
               </div>
               <div className="chart-price">
-                <strong className="num">{eur(price)}</strong>
                 <span className={`chg num ${cls(price - prevPrice)}`}>{pct((price / prevPrice - 1) * 100)}</span>
+                <strong className="num">{eur(price)}</strong>
               </div>
             </div>
             <div className="chart-body">
@@ -359,24 +354,6 @@ export default function Simulator({ tour = false }: { tour?: boolean }) {
           </section>
         </div>
       </div>
-
-      {breaking && (
-        <div className="overlay" role="dialog" aria-modal="true" aria-label="Breaking news">
-          <div className="modal">
-            <span className="badge badge-accent" style={{ alignSelf: "flex-start" }}>Breaking</span>
-            <h2>{breaking.headline}</h2>
-            <div className="row">
-              {breaking.sym && (
-                <>
-                  <button className="btn btn-primary" onClick={() => { setSelected(breaking.sym!); setSide("buy"); setBreaking(null); }}>Buy {nameOf(breaking.sym)}</button>
-                  <button className="btn btn-outline" onClick={() => { setSelected(breaking.sym!); setSide("sell"); setBreaking(null); }}>Sell {nameOf(breaking.sym)}</button>
-                </>
-              )}
-              <button className="btn btn-dark" onClick={() => { setBreaking(null); setSpeed(pace); }}>Hold</button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {topUpOpen && (() => {
         const amount = topUpCustom ? Number(topUpCustom) : topUpAmt;
