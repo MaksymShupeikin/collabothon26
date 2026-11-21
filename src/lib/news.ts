@@ -1,136 +1,122 @@
-import type { Company } from "./data/companies.ts";
-import type { Effect, News } from "./market.ts";
 import { rng } from "./rng.ts";
 
-// Mock news engine: events are inspired by real past patterns (earnings beats, misses,
-// takeover rumors, rate hikes, sector scandals) but recombined with random companies and timing.
-export function generateNews(companies: Company[], days: number, seed: number): News[] {
+// The six hidden news types. The type is revealed only after the price reaction.
+export type NewsKind = "signal" | "noise" | "priced_in" | "rumor" | "sector" | "macro";
+export type Effect = { target: string; from: number; days: number; total: number }; // target: SYM | "sector:X" | "*"
+export type News = {
+  id: string;
+  day: number; // game day the headline appears
+  time: string; // HH:MM:SS, German format
+  kind: NewsKind;
+  sym?: string;
+  headline: string;
+  body?: string;
+  source: string;
+  major: boolean; // major news auto-pauses the time machine
+  effects: Effect[];
+  explain: string; // one line on *why*, shown after the reveal
+  concept: string; // concept card id
+};
+
+export const KIND_LABEL: Record<NewsKind, string> = {
+  signal: "Signal", noise: "Noise", priced_in: "Priced in", rumor: "Rumor", sector: "Sector", macro: "Macro",
+};
+
+const clock = (r: () => number) => {
+  const s = 8 * 3600 + Math.floor(r() * 9.5 * 3600);
+  return [s / 3600, (s / 60) % 60, s % 60].map((n) => String(Math.floor(n)).padStart(2, "0")).join(":");
+};
+
+/**
+ * Free-play news: simulated macro and sector news only.
+ * Rule from idea.md §8: we never invent company-specific news about a real company.
+ */
+export function generateNews(days: number, seed: number, from = 1): News[] {
   const r = rng(seed ^ 0x9e3779b9);
   const pick = <T,>(a: T[]): T => a[Math.floor(r() * a.length)];
   const between = (a: number, b: number) => a + r() * (b - a);
-  const pct = (a: number, b: number) => Math.round(between(a, b));
-  const stocks = companies.filter((c) => c.sector !== "ETF");
   const news: News[] = [];
-  const add = (n: Omit<News, "id">) => news.push({ ...n, id: news.length + 1 });
-  const fx = (target: string, from: number, days: number, total: number): Effect => ({ target, from, days, total });
+  const add = (n: Omit<News, "id" | "time" | "source"> & { source?: string }) =>
+    news.push({ source: "Simulated newswire", ...n, id: `n${news.length + 1}`, time: clock(r) });
+  const fx = (target: string, from: number, d: number, total: number): Effect => ({ target, from, days: d, total });
 
-  // Background noise: 1–3 unimportant headlines every day.
-  for (let d = 1; d <= days; d++) {
-    const count = 1 + Math.floor(r() * 3);
+  for (let d = from; d <= days; d++) {
+    const count = 1 + Math.floor(r() * 2);
     for (let i = 0; i < count; i++) add(noise(d));
   }
 
-  // Real events every 5–10 days; each one auto-pauses the game.
-  for (let d = 4; d < days - 2; d += 5 + Math.floor(r() * 6)) {
-    const c = pick(stocks);
+  for (let d = Math.max(6, from); d < days - 2; d += 8 + Math.floor(r() * 10)) {
     const roll = r();
-    if (roll < 0.15) {
-      const up = r() < 0.6;
-      add({
-        day: d, kind: "signal", sym: c.sym, major: true, tone: up ? 1 : -1, concept: "earnings",
-        headline: up
-          ? `${c.name} beats forecasts: quarterly revenue +${pct(18, 32)}%, outlook raised`
-          : `${c.name} cuts full-year outlook, cites weak demand`,
-        effects: [fx(c.sym, d, 2, up ? between(0.06, 0.12) : -between(0.07, 0.13))],
-        explain: up
-          ? "Real new information: results AND outlook beat expectations, so the price moved up."
-          : "Lower guidance is real news about future profits. The price adjusted down.",
-      });
-    } else if (roll < 0.27) {
-      add({
-        day: d, kind: "priced_in", sym: c.sym, major: true, tone: 1, concept: "priced-in",
-        headline: `${c.name} confirms dividend increase, as analysts expected`,
-        effects: [fx(c.sym, d, 1, 0.003)],
-        explain: "Everyone expected it. The price already contained this news — it was priced in.",
-      });
-    } else if (roll < 0.42) {
-      const x = pct(6, 14);
-      add({
-        day: d, kind: "miss", sym: c.sym, major: true, tone: 1, concept: "earnings",
-        headline: `${c.name} profit up ${x}% — analysts had expected ${x + pct(4, 8)}%`,
-        effects: [fx(c.sym, d, 2, -between(0.05, 0.09))],
-        explain: "Good news that wasn't good enough. Markets trade on expectations, not on headlines.",
-      });
-    } else if (roll < 0.6) {
-      add({
-        day: d, kind: "rumor", sym: c.sym, major: true, tone: 1, concept: "rumor",
-        headline: `Report: ${c.name} in takeover talks, sources say`,
-        effects: [fx(c.sym, d, 2, between(0.06, 0.1))],
-        explain: "An unconfirmed rumor. The price jumped on hope — buy the rumor, sell the news.",
-      });
-      const later = d + 4 + Math.floor(r() * 4);
-      if (r() < 0.6) {
-        add({
-          day: later, kind: "signal", sym: c.sym, major: true, tone: -1, concept: "rumor",
-          headline: `${c.name} denies takeover talks`,
-          effects: [fx(c.sym, later, 3, -between(0.09, 0.13))],
-          explain: "The rumor was false. Everyone who bought the hype lost money.",
-        });
-      } else {
-        add({
-          day: later, kind: "signal", sym: c.sym, major: true, tone: 1, concept: "rumor",
-          headline: `${c.name} confirms takeover offer at a premium`,
-          effects: [fx(c.sym, later, 1, 0.04)],
-          explain: "This time the rumor was true. Rumors sometimes pay off — that's why they are dangerous.",
-        });
-      }
-    } else if (roll < 0.72) {
-      const tech = r() < 0.5;
-      add({
-        day: d, kind: "sector", major: true, tone: -1, concept: "correlation",
-        headline: tech
-          ? "New chip export limits announced — tech stocks under pressure"
-          : "Emissions probe at a major carmaker rattles the auto sector",
-        effects: [fx(tech ? "sector:Tech" : "sector:Auto", d, 3, -between(0.05, 0.08))],
-        explain: "Bad news for one company often drags its whole sector down — that's correlation.",
-      });
-    } else if (roll < 0.86) {
+    if (roll < 0.2) {
       const hawk = r() < 0.5;
       add({
-        day: d, kind: "macro", major: true, tone: hawk ? -1 : 1, concept: "interest-rates",
-        headline: hawk
-          ? "Central bank raises interest rates by 0.5 points"
-          : "Inflation cools faster than expected — rate cuts in sight",
-        effects: [fx("*", d, 3, hawk ? -0.03 : 0.035), fx("sector:Tech", d, 3, hawk ? -0.03 : 0.02)],
+        day: d, kind: "macro", major: true, concept: "signal-noise",
+        headline: hawk ? "ECB unexpectedly raises key rate by 0.5 points" : "Inflation cools faster than expected, rate cuts in sight",
+        body: hawk ? "Most economists had expected rates to stay on hold." : "Consumer prices rose less than forecast for the second month in a row.",
+        effects: [fx("*", d, 3, hawk ? -0.03 : 0.03), fx("sector:Tech", d, 3, hawk ? -0.025 : 0.02)],
         explain: hawk
-          ? "Higher rates make borrowing pricier and bonds more attractive. Stocks fall, growth/tech the most."
-          : "Lower rates ahead make stocks more attractive, especially growth/tech.",
+          ? "A surprise is real new information. Higher rates make stocks less attractive, growth stocks the most."
+          : "A surprise is real new information. Lower rates ahead make stocks more attractive.",
       });
-    } else if (roll < 0.93) {
+    } else if (roll < 0.4) {
       add({
-        day: d, kind: "delayed", major: true, tone: 0, concept: "priced-in",
-        headline: "EU agrees new rules for car makers, effective in two weeks",
-        effects: [fx("sector:Auto", d + 10, 4, -between(0.04, 0.07))],
-        explain: "Not everything is priced in at once. This rule hit prices when it took effect, ~10 days later.",
+        day: d, kind: "priced_in", major: true, concept: "priced-in",
+        headline: "ECB keeps key rate unchanged, as widely expected",
+        body: "The decision matches what nearly all economists had forecast.",
+        effects: [fx("*", d, 1, 0.002)],
+        explain: "Everyone expected it, so it was already in the price. Nothing new, no move.",
+      });
+    } else if (roll < 0.58) {
+      const up = r() < 0.5;
+      add({
+        day: d, kind: "sector", major: true, concept: "signal-noise",
+        headline: up ? "Oil price falls 8 % after OPEC+ agrees on higher output" : "New chip export limits announced, tech sector under pressure",
+        effects: up ? [fx("sector:Auto", d, 3, 0.04), fx("*", d, 2, 0.01)] : [fx("sector:Tech", d, 3, -between(0.05, 0.08))],
+        explain: up
+          ? "Cheaper oil helps carmakers and consumers. A whole sector moved, not one company."
+          : "One decision hit a whole sector at once. Owning only tech stocks means owning this risk.",
+      });
+    } else if (roll < 0.78) {
+      add({
+        day: d, kind: "rumor", major: true, concept: "rumor",
+        headline: "Report: government considers new purchase bonus for electric cars, sources say",
+        body: "No official confirmation. A ministry spokesperson declined to comment.",
+        effects: [fx("sector:Auto", d, 2, between(0.04, 0.07))],
+        explain: "An unconfirmed rumor. Prices rose on hope alone.",
+      });
+      const later = d + 4 + Math.floor(r() * 3);
+      add({
+        day: later, kind: "signal", major: true, concept: "rumor",
+        headline: "Government: no new purchase bonus for electric cars planned",
+        effects: [fx("sector:Auto", later, 2, -between(0.06, 0.09))],
+        explain: "The rumor was wrong. Whoever bought the hype lost money.",
       });
     } else {
       add({
-        day: d, kind: "noise", sym: c.sym, major: true, tone: 1, concept: "rumor",
-        headline: `Star investor on TV: "${c.name} could double this year"`,
+        day: d, kind: "noise", major: true, concept: "signal-noise",
+        headline: 'Star investor on TV: "The market could double this year"',
         effects: [],
-        explain: "An opinion, not information. Nothing about the company changed.",
+        explain: "An opinion, not information. Nothing about any company changed.",
       });
     }
   }
 
-  function noise(d: number): Omit<News, "id"> {
-    const c = pick(stocks);
-    const t = pick([
-      { h: `${c.name} CEO: "We're excited about the year ahead"`, tone: 1 as const },
-      { h: `Analyst keeps ${c.name} at "hold"`, tone: 0 as const },
-      { h: `${c.name} opens new office in Lisbon`, tone: 1 as const },
-      { h: `${c.name} launches new ad campaign`, tone: 0 as const },
-      { h: `Blogger: "${c.name} chart looks weak"`, tone: -1 as const },
-      { h: `${c.name} board member sells small stake (planned sale)`, tone: -1 as const },
-      { h: `${c.name} wins design award for new product`, tone: 1 as const },
-      { h: "Weather: rainy weekend expected in Frankfurt", tone: 0 as const, none: true },
-      { h: "Bundesliga: late winner sends fans into celebration", tone: 0 as const, none: true },
-    ]);
+  function noise(d: number): Omit<News, "id" | "time" | "source"> {
     return {
-      day: d, kind: "noise", sym: "none" in t ? undefined : c.sym, major: false, tone: t.tone, concept: "rumor",
-      headline: t.h, effects: [], explain: "Noise. Nothing changed about the business.",
+      day: d, kind: "noise", major: false, concept: "signal-noise", effects: [],
+      explain: "Noise. Nothing changed about any business.",
+      headline: pick([
+        "Weather: rainy weekend expected in Frankfurt",
+        "Bundesliga: late winner sends fans into celebration",
+        "Survey: Germans plan to spend more on holidays this year",
+        "Trade fair in Hannover opens with record number of exhibitors",
+        'Blogger: "The DAX chart looks weak this week"',
+        "Analysts debate whether summer will be calm on the markets",
+        "Euro little changed against the dollar",
+        "Christmas markets expect more visitors than last year",
+      ]),
     };
   }
 
-  return news.sort((a, b) => a.day - b.day || a.id - b.id);
+  return news.sort((a, b) => a.day - b.day || a.time.localeCompare(b.time));
 }
