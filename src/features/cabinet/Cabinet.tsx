@@ -142,9 +142,7 @@ function Home({ save, go }: { save: Save; go: (v: View, s?: string) => void }) {
         </table>
         <div className="row acc-actions">
           <button className="pill pill-lg" onClick={() => go("umsaetze")}>{t("All transactions ›", "Alle Umsätze ›")}</button>
-          {save.proUnlocked
-            ? <Link className="pill pill-lg pill-yellow" href="/pro">ProTrader ›</Link>
-            : <span className="pill pill-lg pill-yellow" aria-disabled="true" title={t("Unlocks after the Module 1 mission", "Wird nach der Mission von Modul 1 freigeschaltet")}>🔒 ProTrader</span>}
+          <Link className="pill pill-lg pill-yellow" href="/pro">ProTrader ›</Link>
           <button className="sandbox-btn" data-tour="add-play-money" onClick={() => setAddOpen(true)}><span className="sandbox-tag">Sandbox</span> {t("Add play money", "Spielgeld einzahlen")}</button>
         </div>
       </section>

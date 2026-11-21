@@ -64,7 +64,6 @@ export default function LearningMap() {
   );
 
   const allDone = save.done.includes("b4");
-  const proOpen = save.proUnlocked || save.allUnlocked;
   const stars = Object.values(save.stars).reduce((a, b) => a + b, 0);
   const worldsOpen = WORLDS.filter((w) => worldOpen(save, w.n)).length;
   const started = save.done.length > 0;
@@ -112,10 +111,10 @@ export default function LearningMap() {
       </section>
 
       <section className={s.modes} aria-label={t("Play modes", "Spielmodi")}>
-        <ModeTile open={proOpen} lockText={t("After Module 1", "Nach Modul 1")} icon="chart" title={t("Real Market", "Echter Markt")} line={t("Simple or Pro view.", "Einfache oder Pro-Ansicht.")}
+        <ModeTile open icon="chart" title={t("Real Market", "Echter Markt")} line={t("Simple or Pro view.", "Einfache oder Pro-Ansicht.")}
           onOpen={() => { actions.start(null); setUi({}); router.push("/pro"); }} />
         <ModeTile open icon="sprout" title={t("Investor Simulator", "Anleger-Simulator")} line={t("30 years of life in 10 minutes.", "30 Jahre Leben in 10 Minuten.")} onOpen={() => router.push("/invest")} />
-        {/* always open: History mode is separate from the modules */}
+        {/* all play modes are open from the start, separate from the modules */}
         <ModeTile open icon="hourglass" title={t("History Mode", "Geschichtsmodus")} line={t("Real crashes, hidden dates.", "Echte Crashs, verdeckte Daten.")}
           onOpen={() => router.push("/history")} />
       </section>

@@ -5,7 +5,7 @@ import { companyOf, ETF_SYM } from "@/features/market/companies";
 import { cls, dateDE, dateLocale, eur, num, pct, qtyFmt, shortDay, signed } from "@/shared/lib/format";
 import { dict, useT } from "@/shared/lib/i18n";
 import { KIND_LABEL, type News } from "@/features/market/news";
-import { chapterById, isHistory, worldOpen, type Chapter } from "@/features/tour/chapters";
+import { chapterById, worldOpen, type Chapter } from "@/features/tour/chapters";
 import { PERSONAS } from "@/features/game/personas";
 import { actions, getSave, proTraderOffered, useGame } from "@/features/game/store";
 import { setUi, useUi } from "@/features/game/ui";
@@ -39,7 +39,6 @@ export default function Pro() {
   const ch = save.active ? chapterById(save.active) : undefined;
   const pro = ch?.surface === "pro" ? ch : undefined;
   if (!save.persona) return <Gate text={t("Answer three quick questions first.", "Beantworte zuerst drei kurze Fragen.")} href="/start" cta={t("Start", "Starten")} />;
-  if (!save.proUnlocked && !save.allUnlocked && !(pro && isHistory(pro))) return <Gate text={t("The trading area unlocks after the Module 1 mission: your first stock.", "Der Handelsbereich wird nach der Mission von Modul 1 freigeschaltet: deine erste Aktie.")} href="/" cta={t("Learning map", "Lernpfad")} />;
   const mode: Mode = pro?.replay ? { kind: "replay", replay: REPLAYS[pro.replay] } : pro?.lesson ? { kind: "lesson", id: SIM_LESSONS[pro.lesson as keyof typeof SIM_LESSONS].id } : { kind: "main" };
   // The learner starts on the simple trading area. Module 2 always runs there; ProTrader takes over
   // from Module 3 (and in free play) only after the learner has confirmed the switch.

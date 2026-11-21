@@ -21,7 +21,7 @@ export default function Header() {
           <span className="logo-edu">edu</span>
         </Link>
         <LangSwitch />
-        {save.persona && save.proUnlocked && !["/", "/history", "/invest", "/pro"].includes(path) && (
+        {save.persona && !["/", "/history", "/invest", "/pro"].includes(path) && (
           <nav className="hnav" aria-label="comdirect edu">
             <Link href="/pro">{save.proTrader ? "ProTrader" : t("Trading area", "Handelsbereich")}</Link>
           </nav>
