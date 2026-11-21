@@ -1,26 +1,52 @@
+"use client";
 import Link from "next/link";
+import Icon from "@/components/Icon";
+import LearningMaterial from "@/components/LearningMaterial";
+import { RANKS, rankOf, useProgress } from "@/lib/progress";
 
-// Hero photo: Look Studio on Unsplash (free Unsplash License), hotlinked from Unsplash's CDN as their guidelines ask.
-const PHOTO = "https://images.unsplash.com/photo-1713358630106-3ffa7ec25e0a?w=1200&q=80&auto=format&fit=crop";
+const MODES = [
+  { href: "/tour", icon: "compass", title: "Start the tour", text: "Learn the comdirect trading screen by using it — and place your first trade with play money.", cta: "Start tour" },
+  { href: "/simulator", icon: "chart", title: "Market Simulator", text: "A living market driven by news. Most headlines are noise. Find the signal, beat your rivals.", cta: "Open market" },
+  { href: "/history", icon: "hourglass", title: "History Mode", text: "Real headlines, hidden year. Predict what happened next and test your confidence.", cta: "Play history" },
+];
 
 export default function Home() {
+  const { p } = useProgress();
+  const rank = rankOf(p.xp);
+
   return (
-    <main>
-      <section className="landing">
-        <div className="landing-text">
+    <main className="container stack">
+      <section className="hero">
+        <div>
           <h1>Learn to invest without risking a cent</h1>
-          <p>The same screen as your comdirect depot, with play money. Learn every concept as a game, then test yourself in a market full of news, rumors and rivals.</p>
-          <Link className="btn btn-primary btn-lg" href="/simulator">Open the platform →</Link>
-          {/* Decorative market line along the bottom of the text column. */}
-          <svg className="landing-line" viewBox="0 0 600 120" preserveAspectRatio="none" aria-hidden>
-            <polyline points="0,96 40,90 80,98 120,80 160,86 200,70 240,76 280,58 320,66 360,48 400,54 440,38 480,44 520,26 560,30 600,14" />
-          </svg>
+          <p className="muted">The same screen as your comdirect depot, with play money. Learn every concept as a game, then test yourself in a market full of news, rumors and rivals.</p>
         </div>
-        <figure className="landing-photo">
-          {/* eslint-disable-next-line @next/next/no-img-element -- external CDN photo, no next/image remote config needed */}
-          <img src={PHOTO} alt="Happy young woman taking a selfie with her phone" />
-        </figure>
+        <div className="level">
+          <svg className="level-ring" viewBox="0 0 120 120" role="img" aria-label={`Level ${rank.level} of ${RANKS.length}, ${Math.round(rank.progress * 100)}% to next level`}>
+            <circle cx="60" cy="60" r="60" className="level-ring-bg" />
+            <circle cx="60" cy="60" r="44" className="level-ring-track" />
+            <circle cx="60" cy="60" r="44" className="level-ring-fill" transform="rotate(-90 60 60)" pathLength={100} strokeDasharray="100" strokeDashoffset={100 - rank.progress * 100} />
+            <text x="60" y="62" className="level-ring-num">{rank.level}</text>
+          </svg>
+          <div className="level-text">
+            <strong>{rank.name}</strong>
+            <span className="num">{p.xp}{rank.next ? ` / ${RANKS[rank.level][0]}` : ""} XP</span>
+          </div>
+        </div>
       </section>
+
+      <section className="modes">
+        {MODES.map((m) => (
+          <Link key={m.href} href={m.href} className="card mode">
+            <Icon name={m.icon} size={64} round />
+            <h2>{m.title}</h2>
+            <p className="small muted">{m.text}</p>
+            <span className="btn btn-dark btn-sm">{m.cta} →</span>
+          </Link>
+        ))}
+      </section>
+
+      <LearningMaterial />
     </main>
   );
 }

@@ -20,6 +20,9 @@ const nameOf = (sym: string) => COMPANIES.find((c) => c.sym === sym)?.name ?? sy
 const botMeta = (id: string) => BOTS.find((b) => b.id === id)!;
 const SPEEDS = [{ label: "Pause", ms: 0 }, { label: "1 day/s", ms: 1000 }, { label: "1 week/s", ms: 200 }];
 const START = Date.UTC(2025, 0, 2); // simulated calendar; the year is never shown
+const NO_PRICES: number[] = []; // day 0: no candle yet, only the empty state
+const TOPUP_MAX = 100_000; // keeps play money in a realistic range for a beginner depot
+
 /** Trading day n → calendar date, skipping weekends. */
 function tradingDate(n: number) {
   const d = new Date(START);
@@ -72,6 +75,8 @@ export default function Simulator({ tour = false }: { tour?: boolean }) {
   const [step, setStep] = useState(tour ? 0 : -1);
   const [claimed, setClaimed] = useState(false);
   const [topUpOpen, setTopUpOpen] = useState(false);
+  const [topUpAmt, setTopUpAmt] = useState(5000);
+  const [topUpCustom, setTopUpCustom] = useState("");
   const [tab, setTab] = useState<"news" | "rivals">("news");
   const [bookTab, setBookTab] = useState<"positions" | "orders">("positions");
   const [query, setQuery] = useState("");
@@ -277,7 +282,7 @@ export default function Simulator({ tour = false }: { tour?: boolean }) {
             </div>
             <div className="chart-body">
               {m.day === 0 && <div className="chart-empty"><EmptyState icon="play" title="Market not started" hint="Press play — the chart draws itself day by day." /></div>}
-              <CandleChart sym={selected} prices={m.prices[selected]} times={times} trades={myTrades} />
+              <CandleChart sym={selected} prices={m.day === 0 ? NO_PRICES : m.prices[selected]} times={times} trades={myTrades} />
             </div>
           </section>
         </div>
@@ -319,7 +324,7 @@ export default function Simulator({ tour = false }: { tour?: boolean }) {
                 <div className="kv"><span className="muted">Price ({side === "buy" ? "ask" : "bid"})</span><span className="num">{eur(execPrice)}</span></div>
                 <div className="kv"><span className="muted">Fee</span><span className="num">{eur(orderFee)}</span></div>
                 <div className="kv total"><strong>{side === "buy" ? "Total" : "You receive"}</strong><strong className="num">{eur(side === "buy" ? volume + orderFee : volume - orderFee)}</strong></div>
-                <div className="kv xs muted">{side === "buy" ? <><span>Available</span><span className="num">{eur(m.player.cash)}</span></> : <><span>You own</span><span className="num">{holding?.qty ?? 0}</span></>}</div>
+                {side === "sell" && <div className="kv xs muted"><span>You own</span><span className="num">{holding?.qty ?? 0}</span></div>}
               </div>
               {err && <p className="error" role="alert">{err}</p>}
               <button className={`btn btn-lg ${side === "buy" ? "btn-primary" : "btn-dark"}`} data-tour="submit" onClick={submit} disabled={ended}>
@@ -372,20 +377,41 @@ export default function Simulator({ tour = false }: { tour?: boolean }) {
         </div>
       )}
 
-      {topUpOpen && (
-        <div className="overlay" role="dialog" aria-modal="true" aria-label="Top up play money" onClick={() => setTopUpOpen(false)}>
-          <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <h2>Top up play money</h2>
-            <p className="small muted">Added to your cash. It doesn&apos;t count as profit.</p>
-            <div className="row">
+      {topUpOpen && (() => {
+        const amount = topUpCustom ? Number(topUpCustom) : topUpAmt;
+        const valid = Number.isInteger(amount) && amount >= 1 && amount <= TOPUP_MAX;
+        const close = () => { setTopUpOpen(false); setTopUpCustom(""); };
+        return (
+        <div className="overlay" role="dialog" aria-modal="true" aria-labelledby="topup-title" onClick={close}>
+          <div className="modal topup" onClick={(e) => e.stopPropagation()}>
+            <h2 id="topup-title">Add play money</h2>
+            <p className="small muted">Practice money only. It doesn&apos;t count as profit.</p>
+            <div className="topup-amounts" role="radiogroup" aria-label="Amount">
               {[1000, 5000, 10000].map((a) => (
-                <button key={a} className="btn btn-outline" onClick={() => { setM(topUp(m, a)); setTopUpOpen(false); }}>+{eur(a)}</button>
+                <button key={a} role="radio" aria-checked={!topUpCustom && topUpAmt === a} className="topup-amount num" onClick={() => { setTopUpAmt(a); setTopUpCustom(""); }}>+{eur(a)}</button>
               ))}
             </div>
-            <button className="btn btn-ghost btn-sm" style={{ alignSelf: "flex-start" }} onClick={() => setTopUpOpen(false)}>Cancel</button>
+            <label className="field">
+              <span className="xs muted">Or enter an amount (max {eur(TOPUP_MAX)})</span>
+              <span className="input-prefix">
+                <span aria-hidden>€</span>
+                <input type="number" inputMode="numeric" min={1} max={TOPUP_MAX} step={1} placeholder="e.g. 2500" value={topUpCustom}
+                  aria-invalid={!!topUpCustom && !valid} onChange={(e) => setTopUpCustom(e.target.value)} />
+              </span>
+            </label>
+            {topUpCustom && !valid && <p className="error" role="alert">Enter a whole amount from 1 to {eur(TOPUP_MAX)}.</p>}
+            <div className="topup-sum">
+              <div className="kv"><span className="muted">Cash now</span><span className="num">{eur(m.player.cash)}</span></div>
+              <div className="kv total"><strong>Cash after</strong><strong className="num">{valid ? eur(m.player.cash + amount) : "—"}</strong></div>
+            </div>
+            <div className="row topup-actions">
+              <button className="btn btn-ghost" onClick={close}>Cancel</button>
+              <button className="btn btn-primary" disabled={!valid} onClick={() => { setM(topUp(m, amount)); close(); }}>{valid ? `Add ${eur(amount)}` : "Add"}</button>
+            </div>
           </div>
         </div>
-      )}
+        );
+      })()}
 
       {ended && (
         <div className="overlay" role="dialog" aria-modal="true" aria-label="Round debrief">

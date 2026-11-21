@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useState } from "react";
-import { CONCEPTS, WORLDS, type Concept } from "@/lib/data/concepts";
+import { CONCEPTS, QUIZ_XP, WORLDS, type Concept } from "@/lib/data/concepts";
 import { useProgress } from "@/lib/progress";
 import Icon from "./Icon";
 import MiniGameView from "./MiniGames";
@@ -36,7 +36,7 @@ export default function ConceptQuest({ concept }: { concept: Concept }) {
         <h3>{concept.quiz.q}</h3>
         {concept.quiz.options.map((o, i) => (
           <button key={o} className={`option ${picked === i ? (i === concept.quiz.answer ? "right" : "wrong") : ""}`}
-            onClick={() => { setPicked(i); if (i === concept.quiz.answer) complete(concept.id, 25); }}>
+            onClick={() => { setPicked(i); if (i === concept.quiz.answer) complete(concept.id, QUIZ_XP); }}>
             {o}
           </button>
         ))}

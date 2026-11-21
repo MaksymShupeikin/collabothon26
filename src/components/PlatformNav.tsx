@@ -3,13 +3,13 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const TABS = [
-  { href: "/simulator", label: "Trading" },
-  { href: "/learn", label: "Learning" },
-  { href: "/history", label: "History" },
+  { href: "/simulator", label: "Market Simulator" },
+  { href: "/learn", label: "Learning material" },
+  { href: "/history", label: "History Mode" },
 ];
 const IN_PLATFORM = /^\/(simulator|tour|learn|history)(\/|$)/;
 
-/** Platform tabs + trading actions, rendered inside the header. Hidden on the landing page. */
+/** Platform tabs + trading actions, rendered inside the header. Hidden on the home page. */
 export default function PlatformNav() {
   const path = usePathname();
   if (!IN_PLATFORM.test(path)) return null;
