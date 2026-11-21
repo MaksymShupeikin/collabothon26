@@ -81,7 +81,6 @@ export default function Simulator({ tour = false }: { tour?: boolean }) {
   const [tab, setTab] = useState<"news" | "rivals">("news");
   const [bookTab, setBookTab] = useState<"positions" | "orders">("positions");
   const [query, setQuery] = useState("");
-  const [searchOpen, setSearchOpen] = useState(false);
   const rewarded = useRef(new Set<number>());
 
   // First visit to the platform: run the tour on this screen.
@@ -155,35 +154,26 @@ export default function Simulator({ tour = false }: { tour?: boolean }) {
   const company = COMPANIES.find((c) => c.sym === selected)!;
   const q = query.trim().toLowerCase();
   const results = q ? COMPANIES.filter((c) => [c.name, c.sym, c.wkn].some((f) => f.toLowerCase().includes(q))) : COMPANIES;
-  const pick = (sym: string) => { setSelected(sym); setErr(null); setQuery(""); setSearchOpen(false); (document.activeElement as HTMLElement | null)?.blur(); };
+  const pick = (sym: string) => { setSelected(sym); setErr(null); setQuery(""); };
   const times = useMemo(() => Array.from({ length: m.days + 1 }, (_, d) => tradingDate(d).toISOString().slice(0, 10)), [m.days]);
   const myTrades = useMemo(() => m.player.trades.filter((t) => t.sym === selected).map((t) => ({ i: t.day, side: t.side, label: `${t.side === "buy" ? "B" : "S"} ${t.qty}` })), [m.player.trades, selected]);
 
   return (
     <div className="trade">
       <div className="trade-grid">
-        {/* Left: time controls, then news + rivals */}
+        {/* Left: find and pick (search filters the watchlist right below it), then news + rivals */}
         <div className="trade-col">
-          <div className="clock" data-tour="time">
-            <button className="play-btn" onClick={() => setSpeed(speed ? 0 : pace)} disabled={ended} aria-label={speed ? "Pause" : "Play"}>
-              <Icon name={speed ? "pause" : "play"} size={16} />
-            </button>
-            <div className="clock-date">
-              <strong>{fmtDate(today, { weekday: "short", day: "numeric", month: "short" })}</strong>
-              <span className="xs muted num">Day {m.day} of {m.days}</span>
-              <span className="day-bar" role="progressbar" aria-label="Market progress" aria-valuemin={0} aria-valuemax={m.days} aria-valuenow={m.day}><span style={{ width: `${(m.day / m.days) * 100}%` }} /></span>
+          {/* Tour target is the panel: it has its own z-index, so a child can't rise above the tour overlay. */}
+          <section className="panel p-watch" aria-label="Watchlist" data-tour="search">
+            <div className="watch-search">
+              <input type="search" placeholder="Search name, ticker or WKN" value={query} aria-label="Search stocks" aria-controls="watchlist"
+                onChange={(e) => setQuery(e.target.value)}
+                onKeyDown={(e) => { if (e.key === "Enter" && results[0]) pick(results[0].sym); if (e.key === "Escape") setQuery(""); }} />
             </div>
-            <div className="seg" role="group" aria-label="Speed">
-              {[1, 2].map((i) => (
-                <button key={i} aria-pressed={pace === i} onClick={() => { setPace(i); if (speed) setSpeed(i); }}>{SPEEDS[i].label}</button>
-              ))}
-            </div>
-          </div>
-          {/* Watchlist (OKX-style markets list): every stock one click away, price and change at a glance. */}
-          <section className="panel p-watch" aria-label="Watchlist">
-            <div className="panel-head">Watchlist</div>
-            <div className="panel-body">
-              {COMPANIES.map((c) => {
+            {/* Watchlist (OKX-style markets list): every stock one click away, price and change at a glance. */}
+            <div className="panel-body" id="watchlist">
+              {results.length === 0 && <EmptyState icon="compass" title="No stock found" hint="Try a name, ticker or WKN." />}
+              {results.map((c) => {
                 const p = priceOf(m, c.sym), ch = (p / priceOf(m, c.sym, Math.max(0, m.day - 1)) - 1) * 100;
                 return (
                   <button key={c.sym} className="watch-row" aria-pressed={c.sym === selected} onClick={() => pick(c.sym)}>
@@ -261,32 +251,23 @@ export default function Simulator({ tour = false }: { tour?: boolean }) {
           </section>
         </div>
 
-        {/* Center: stock search + chart of the selected stock */}
+        {/* Center: time controls (they drive the chart), then the chart of the selected stock */}
         <div className="trade-col">
-          {/* Tour target is the panel: it has its own z-index, so a child can't rise above the tour overlay. */}
-          <section className="panel p-search" aria-label="Search stocks" data-tour="search">
-            <div className="search">
-              <input type="search" placeholder="Search stocks — name, ticker or WKN" value={query} aria-label="Search stocks"
-                onChange={(e) => { setQuery(e.target.value); setSearchOpen(true); }} onFocus={() => setSearchOpen(true)} onBlur={() => setSearchOpen(false)}
-                onKeyDown={(e) => { if (e.key === "Enter" && results[0]) pick(results[0].sym); if (e.key === "Escape") e.currentTarget.blur(); }} />
-              {searchOpen && (
-                <ul className="search-results" role="listbox">
-                  {results.length === 0 && <li><EmptyState icon="compass" title="No stock found" hint="Try a name, ticker or WKN." /></li>}
-                  {results.map((c) => {
-                    const p = priceOf(m, c.sym), ch = (p / priceOf(m, c.sym, Math.max(0, m.day - 1)) - 1) * 100;
-                    return (
-                      <li key={c.sym}>
-                        <button className="watch-row" role="option" aria-selected={c.sym === selected} onMouseDown={(e) => { e.preventDefault(); pick(c.sym); }}>
-                          <span className="watch-name"><strong>{c.name}</strong><span className="xs muted">{c.sym} · WKN {c.wkn}</span></span>
-                          <span className="watch-price"><span className="num">{eur(p)}</span><span className={`chg num ${cls(ch)}`}>{pct(ch)}</span></span>
-                        </button>
-                      </li>
-                    );
-                  })}
-                </ul>
-              )}
+          <div className="clock" data-tour="time">
+            <button className="play-btn" onClick={() => setSpeed(speed ? 0 : pace)} disabled={ended} aria-label={speed ? "Pause" : "Play"}>
+              <Icon name={speed ? "pause" : "play"} size={16} />
+            </button>
+            <div className="clock-date">
+              <strong>{fmtDate(today, { weekday: "short", day: "numeric", month: "short" })}</strong>
+              <span className="xs muted num">Day {m.day} of {m.days}</span>
+              <span className="day-bar" role="progressbar" aria-label="Market progress" aria-valuemin={0} aria-valuemax={m.days} aria-valuenow={m.day}><span style={{ width: `${(m.day / m.days) * 100}%` }} /></span>
             </div>
-          </section>
+            <div className="seg" role="group" aria-label="Speed">
+              {[1, 2].map((i) => (
+                <button key={i} aria-pressed={pace === i} onClick={() => { setPace(i); if (speed) setSpeed(i); }}>{SPEEDS[i].label}</button>
+              ))}
+            </div>
+          </div>
           <section className="panel p-chart" data-tour="detail" aria-label="Chart">
             <div className="chart-head">
               <div>
