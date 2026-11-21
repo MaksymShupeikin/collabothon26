@@ -600,8 +600,7 @@ button.ccard-face:hover { background: color-mix(in srgb, var(--color-accent) 90%
 .trade .acct, .trade .clock { display: flex; align-items: center; gap: var(--space-6); flex-shrink: 0; background: var(--color-white); border: 1px solid var(--color-bg-light); border-radius: var(--radius-md); padding: var(--space-3) var(--space-5); box-shadow: var(--shadow-lg); }
 .trade .acct { justify-content: space-between; gap: var(--space-4); padding: var(--space-3) var(--space-4); }
 /* The three column headers (time, search, account) share one height so the columns line up. */
-.trade .trade-col > .clock, .trade .trade-col > .p-search, .trade .trade-col > .acct { height: 68px; }
-.trade .p-search { justify-content: center; }
+.trade .trade-col > .clock, .trade .trade-col > .acct { height: 68px; }
 .trade .acct-main { display: flex; flex-direction: column; }
 .trade .acct-main span { font-size: var(--text-xs); color: var(--color-ink-2); line-height: 16px; }
 .trade .acct-main strong { font-size: var(--text-base); line-height: 22px; white-space: nowrap; }
@@ -670,13 +669,17 @@ button.ccard-face:hover { background: color-mix(in srgb, var(--color-accent) 90%
 .trade .panel-body > .empty-state, .trade .news > .empty-state { flex: 1; }
 .trade .rivals { display: flex; flex-direction: column; gap: var(--space-5); }
 
-/* Stock search: a combobox in the chart header instead of a permanent list. */
-.trade .p-search { flex-shrink: 0; overflow: visible; z-index: 5; }
-.trade .search { position: relative; padding: var(--space-3) var(--space-4); }
-.trade .search input { width: 100%; border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: var(--space-3) var(--space-5); font-size: var(--text-sm); background: var(--color-white); }
-.trade .search input:focus-visible { border-color: var(--color-ink); }
-.trade .search-results { position: absolute; left: var(--space-4); right: var(--space-4); top: calc(100% + var(--space-2)); z-index: 20; list-style: none; background: var(--color-white); border: 1px solid var(--color-bg-light); border-radius: var(--radius-md); box-shadow: 0 12px 32px rgba(11, 31, 38, 0.18); max-height: 360px; overflow: auto; }
-.trade .search-results .watch-row[aria-selected="true"] { background: rgba(255, 245, 0, 0.35); }
+/* Watchlist (left column): the search sits directly above the list it filters. */
+.trade .p-watch { flex: 1 1 0; min-height: 160px; }
+.trade .p-watch .panel-body { padding: 0; }
+.trade .p-watch .watch-row { padding: var(--space-3) var(--space-5); }
+.trade .p-watch .watch-name strong { font-size: var(--text-sm); }
+.trade .watch-search { padding: var(--space-4); border-bottom: 1px solid var(--color-bg-light); flex-shrink: 0; }
+.trade .watch-search input { width: 100%; border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: var(--space-3) var(--space-5); font-size: var(--text-sm); background: var(--color-white); }
+.trade .watch-search input:focus-visible { border-color: var(--color-ink); }
+.trade .p-watch .panel-body:has(> .empty-state) { display: flex; flex-direction: column; }
+/* Left column split 50/50 top to bottom: watchlist and news/rivals get equal height. */
+.trade .trade-col > .p-watch, .trade .trade-col > .p-feed { flex: 1 1 0; min-height: 0; }
 
 .trade .p-order { flex-shrink: 0; }
 .trade .ticket { display: flex; flex-direction: column; gap: var(--space-4); padding: var(--space-5); }
@@ -691,8 +694,8 @@ button.ccard-face:hover { background: color-mix(in srgb, var(--color-accent) 90%
   .trade { height: auto; min-height: 0; }
   .trade .trade-grid { grid-template-columns: 1fr; }
   .trade .trade-col { display: contents; } /* lets panels reorder in one column */
-  .trade .trade-col > .clock, .trade .trade-col > .p-search, .trade .trade-col > .acct { height: auto; }
-  .trade .clock { order: 1; } .trade .p-search { order: 2; } .trade .p-chart { order: 3; min-height: 460px; } .trade .acct { order: 4; } .trade .p-order { order: 5; } .trade .p-book { order: 6; max-height: 420px; } .trade .p-feed { order: 7; max-height: 520px; }
+  .trade .trade-col > .clock, .trade .trade-col > .acct { height: auto; }
+  .trade .clock { order: 1; } .trade .p-watch { order: 2; flex: none; max-height: 360px; } .trade .p-chart { order: 3; min-height: 460px; } .trade .acct { order: 4; } .trade .p-order { order: 5; } .trade .p-book { order: 6; max-height: 420px; } .trade .p-feed { order: 7; max-height: 520px; }
 }
 @media (max-width: 600px) {
   .trade { padding: var(--space-3); gap: var(--space-3); }
@@ -728,3 +731,34 @@ button.ccard-face:hover { background: color-mix(in srgb, var(--color-accent) 90%
 .switch-list { list-style: none; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-3) var(--space-6); text-align: left; color: var(--color-bg-dark); font-size: var(--text-sm); line-height: 20px; max-width: 640px; }
 .switch-list strong { color: var(--color-white); display: block; }
 @media (max-width: 600px) { .switch-list { grid-template-columns: 1fr; } }
+
+/* Trading screen, minimal look (from branch pofa_design): flat panels on a pale layer, big calm price block. */
+html:has(.trade), body:has(.trade) { background: color-mix(in srgb, var(--color-bg-light) 40%, var(--color-white)); }
+.trade .panel, .trade .acct, .trade .clock { box-shadow: none; }
+.trade .chart-head { flex-direction: column; gap: var(--space-1); }
+.trade .chart-head h2 { font-size: var(--text-base); font-weight: 500; color: var(--color-ink-2); }
+.trade .chart-price { align-items: flex-start; }
+.trade .chart-price strong { font-size: 48px; line-height: 52px; letter-spacing: -0.02em; }
+.trade .chart-empty .empty-state { box-shadow: none; border: 1px solid var(--color-bg-light); }
+.trade .empty-state svg { width: 40px; height: 40px; opacity: 0.6; }
+.trade .news-item.fresh { background: rgba(255, 245, 0, 0.18); }
+
+/* Quantity stepper. */
+.stepper { display: grid; grid-template-columns: 40px minmax(0, 1fr) 40px; align-items: stretch; border: 1px solid var(--color-border); border-radius: var(--radius-md); overflow: hidden; }
+.stepper input { border: 0 !important; border-radius: 0 !important; text-align: center; min-width: 0; -moz-appearance: textfield; }
+.stepper input::-webkit-outer-spin-button, .stepper input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.stepper button { border: 0; background: none; color: var(--color-ink); cursor: pointer; display: grid; place-items: center; transition: background-color var(--ease); }
+.stepper button:hover { background: var(--color-bg-light); }
+.stepper button:disabled { opacity: 0.4; cursor: not-allowed; }
+.glyph { display: inline-block; vertical-align: -0.15em; flex-shrink: 0; }
+
+/* Clock progress. */
+.trade .clock-date { min-width: 0; }
+.day-bar { display: block; width: 100%; min-width: 72px; height: 3px; margin-top: 4px; background: var(--color-bg-light); border-radius: 2px; overflow: hidden; }
+.day-bar > span { display: block; height: 100%; background: var(--color-accent); transition: width var(--ease); }
+
+/* Touch targets on phones. */
+@media (max-width: 700px) {
+  .trade .btn, .trade .btn-sm, .trade .seg button, .trade .tabs button, .trade .side-toggle button, .stepper button { min-height: 44px; }
+  .stepper { grid-template-columns: 48px minmax(0, 1fr) 48px; }
+}
