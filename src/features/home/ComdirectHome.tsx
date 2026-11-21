@@ -1,6 +1,7 @@
 import Link from "next/link";
 import WebHeader from "@/features/cabinet/WebHeader";
 import EntryBanner from "@/features/home/EntryBanner";
+import { USER } from "@/shared/lib/user";
 
 // The (mocked) comdirect start page of a real customer, with our entry banner (🆕).
 // Account figures are placeholders.
@@ -20,8 +21,8 @@ export default function ComdirectHome() {
       <main className="web-main">
         <div className="web-page">
           <div className="page-head">
-            <h1>Good morning, Mr Mustermann.</h1>
-            <div className="page-owner"><span className="page-icons" aria-hidden>ⓘ ⎙ ✉</span><span className="small">Holder: <strong>Max Mustermann</strong></span></div>
+            <h1>Good morning, {USER.salutation}.</h1>
+            <div className="page-owner"><span className="page-icons" aria-hidden>ⓘ ⎙ ✉</span><span className="small">Holder: <strong>{USER.name}</strong></span></div>
           </div>
           <EntryBanner />
           <section className="acc">

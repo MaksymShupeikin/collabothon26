@@ -4,8 +4,8 @@ import { ALL_COMPANIES, COMPANIES, type Company } from "@/features/market/compan
 import { Wordmark } from "@/shared/ui/Wordmark";
 
 // Layout copied from the comdirect web customer area (references/01, 1_web-kundenbereich/*); text in English.
-export const MAIN_NAV = ["Personal area", "Informer", "Current account", "Investing", "Depot", "Trading", "Loans", "Help & service"] as const;
-export const SUB_NAV = ["Depot", "Order", "Account & card", "Investing", "Musterdepot", "PostBox", "Administration"] as const;
+export const MAIN_NAV = ["Personal area", "Informer", "Current account", "Depot", "Trading"] as const;
+export const SUB_NAV = ["Depot", "Order", "Account & card"] as const;
 
 export function searchCompanies(q: string, list: Company[] = COMPANIES) {
   const s = q.trim().toLowerCase();
@@ -38,7 +38,6 @@ export default function WebHeader({ onSearch, onNav, current, sub, logout, extra
         <span className="wh-logo"><Wordmark /></span>
         <div className="wh-tools">
           {extraTop}
-          <span className="wh-link">Musterdepot</span>
           <div className="wh-search" data-tour="header-search">
             <input type="search" placeholder="WKN, ISIN, name" aria-label="Search securities by WKN, ISIN or name" value={q}
               onChange={(e) => { setQ(e.target.value); setOpen(true); }} onFocus={() => setOpen(true)} onBlur={() => setOpen(false)}
@@ -73,7 +72,7 @@ export default function WebHeader({ onSearch, onNav, current, sub, logout, extra
         {SUB_NAV.map((s) => (
           <button key={s} className={sub === s ? "on" : ""} onClick={() => onNav?.("Personal area", s)}
             data-tour={s === "Depot" ? "nav-depot" : s === "Account & card" ? "nav-umsaetze" : undefined}>
-            {s === "Account & card" ? "Transactions" : s}{!["Musterdepot", "Order", "Depot", "Account & card"].includes(s) && <span className="chev" aria-hidden>⌄</span>}
+            {s === "Account & card" ? "Transactions" : s}
           </button>
         ))}
       </nav>
