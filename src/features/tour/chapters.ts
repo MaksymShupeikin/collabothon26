@@ -42,7 +42,7 @@ export type World = { n: number; title: string; surface: string; blurb: string }
 
 export const WORLDS: World[] = [
   { n: 1, title: "First steps", surface: "Web cabinet", blurb: "Top up, find a stock, place your first order." },
-  { n: 2, title: "Reading the news", surface: "Trading area", blurb: "Signal or noise? Learn what really moves prices." },
+  { n: 2, title: "Reading news", surface: "Trading area", blurb: "Signal or noise? Learn what really moves prices." },
   { n: 3, title: "Risk", surface: "ProTrader", blurb: "Ups and downs, and why one basket is a bad idea." },
   { n: 4, title: "Time", surface: "ProTrader + years", blurb: "Let time and a savings plan do the work." },
 ];
@@ -136,7 +136,7 @@ const W1: Chapter[] = [
   },
 ];
 
-// ── World 2 · Reading the news ────────────────────────────────────────────
+// ── World 2 · Reading news ────────────────────────────────────────────
 
 const W2: Chapter[] = [
   {

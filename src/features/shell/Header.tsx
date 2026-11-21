@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useGame } from "@/features/game/store";
+import { rankOf, useGame } from "@/features/game/store";
 import { Wordmark } from "@/shared/ui/Wordmark";
 import { USER } from "@/shared/lib/user";
 
@@ -9,6 +9,7 @@ import { USER } from "@/shared/lib/user";
 export default function Header() {
   const save = useGame();
   const path = usePathname();
+  const rank = rankOf(save.xp);
   return (
     <header className="header">
       <div className="header-inner">
@@ -23,9 +24,22 @@ export default function Header() {
             {save.proUnlocked && <Link href="/pro">{save.proTrader ? "ProTrader" : "Trading area"}</Link>}
           </nav>
         )}
-        <div className="user" aria-label="Your profile">
-          <strong className="small">{USER.name}</strong>
-          <span className="user-avatar" aria-hidden>{USER.initials}</span>
+        <div className="user" aria-label={`Your profile: ${USER.name}, level ${rank.level} ${rank.name}, ${save.xp} XP`}>
+          <span className="user-text">
+            <strong className="small">{USER.name}</strong>
+            <span className="user-rank xs">
+              {rank.name}
+              <span className="user-xp">{save.xp} XP{rank.next ? ` · ${rank.nextAt! - save.xp} to ${rank.next}` : ""}</span>
+            </span>
+          </span>
+          <span className="user-orb" aria-hidden>
+            <svg className="user-ring" viewBox="0 0 52 52">
+              <circle cx="26" cy="26" r="24" className="user-ring-track" />
+              <circle cx="26" cy="26" r="24" className="user-ring-fill" transform="rotate(-90 26 26)" pathLength={100} strokeDasharray="100" strokeDashoffset={100 - rank.progress * 100} />
+            </svg>
+            <span className="user-avatar">{USER.initials}</span>
+            <span className="user-level">{rank.level}</span>
+          </span>
         </div>
       </div>
     </header>
