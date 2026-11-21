@@ -20,7 +20,7 @@ export function generateNews(companies: Company[], days: number, seed: number): 
     for (let i = 0; i < count; i++) add(noise(d));
   }
 
-  // Real events every 5–10 days; each one auto-pauses the game.
+  // Real events every 5–10 days; marked "major" in the feed.
   for (let d = 4; d < days - 2; d += 5 + Math.floor(r() * 6)) {
     const c = pick(stocks);
     const roll = r();
