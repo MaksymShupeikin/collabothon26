@@ -4,7 +4,6 @@ import { useEffect, useMemo, useState } from "react";
 import { COMPANIES, companyOf } from "@/features/market/companies";
 import { cls, dateDE, eur, EUR, num, pct, qtyFmt, signed } from "@/shared/lib/format";
 import { chapterById } from "@/features/tour/chapters";
-import { PERSONAS } from "@/features/game/personas";
 import { USER } from "@/shared/lib/user";
 import { actions, useGame, type Save } from "@/features/game/store";
 import { bump, setUi, useUi } from "@/features/game/ui";
@@ -39,7 +38,6 @@ function CabinetInner({ initial }: { initial?: { view: View; sym?: string } }) {
   const save = useGame();
   const [view, setView] = useState<View>(initial?.view ?? "home");
   const [sym, setSym] = useState(initial?.sym ?? "DTE");
-  const persona = PERSONAS[save.persona ?? "starter"];
 
   useEffect(() => { setUi({ surface: "cabinet", view, sym }); }, [view, sym]);
   useEffect(() => { window.scrollTo(0, 0); }, [view]);
@@ -61,7 +59,7 @@ function CabinetInner({ initial }: { initial?: { view: View; sym?: string } }) {
       <WebHeader current={current} sub={sub} onNav={nav} onSearch={(s) => go("stock", s)}
         logout={<Link className="btn btn-primary btn-sm" href="/">Exit ›</Link>} />
       <main className="web-main">
-        {view === "home" && <Home save={save} persona={`${persona.name} (${persona.label})`} go={go} />}
+        {view === "home" && <Home save={save} go={go} />}
         {view === "transfer" && <Transfer save={save} go={go} />}
         {view === "finder" && <Finder save={save} go={go} />}
         {view === "stock" && <Stock save={save} sym={sym} go={go} />}
@@ -74,14 +72,13 @@ function CabinetInner({ initial }: { initial?: { view: View; sym?: string } }) {
   );
 }
 
-function PageHead({ title, owner, playing }: { title: string; owner?: boolean; playing?: string }) {
+function PageHead({ title, owner }: { title: string; owner?: boolean }) {
   return (
     <div className="page-head">
       <h1>{title}</h1>
       <div className="page-owner">
         <span className="page-icons" aria-hidden>ⓘ ⎙ ✉</span>
         {owner && <span className="small">Holder: <strong>{USER.name}</strong></span>}
-        {playing && <span className="xs muted">Playing as: {playing}</span>}
       </div>
     </div>
   );
@@ -89,7 +86,7 @@ function PageHead({ title, owner, playing }: { title: string; owner?: boolean; p
 
 // ── Overview ──────────────────────────────────────────────────────────────
 
-function Home({ save, persona, go }: { save: Save; persona: string; go: (v: View, s?: string) => void }) {
+function Home({ save, go }: { save: Save; go: (v: View, s?: string) => void }) {
   const a = save.sim.acct;
   const dep = depotValue(save.sim);
   const avail = round2(a.cash - reserved(save));
@@ -98,7 +95,7 @@ function Home({ save, persona, go }: { save: Save; persona: string; go: (v: View
   const lastTransfer = save.tx.find((t) => t.account === "giro" && t.text.startsWith("Transfer"));
   return (
     <div className="web-page">
-      <PageHead title={`Good morning, ${USER.salutation}.`} owner playing={persona} />
+      <PageHead title={`Good morning, ${USER.salutation}.`} owner />
       <section className="acc">
         <div className="acc-title">comdirect</div>
         <table className="acc-table">
