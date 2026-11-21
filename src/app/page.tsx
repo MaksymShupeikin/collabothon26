@@ -1,26 +1,61 @@
 import Link from "next/link";
+import WebHeader from "@/components/cabinet/WebHeader";
+import EntryBanner from "@/components/EntryBanner";
 
-// Hero photo: Look Studio on Unsplash (free Unsplash License), hotlinked from Unsplash's CDN as their guidelines ask.
-const PHOTO = "https://images.unsplash.com/photo-1713358630106-3ffa7ec25e0a?w=1200&q=80&auto=format&fit=crop";
+// The (mocked) comdirect start page of a real customer, with our entry banner (🆕).
+// Account figures are placeholders.
+const ROWS: [string, string, string, string, string][] = [
+  ["Girokonto", "Transfer ›", "DE89 2004 1111 0987 6543 00", "3.214,57 €", "3.214,57 €"],
+  ["Visa card (credit card)", "", "•••• •••• •••• 4653", "2.000,00 €", "0,00 €"],
+  ["Tagesgeld PLUS account", "", "DE71 2004 1111 0987 6543 05", "12.500,00 €", "12.500,00 €"],
+  ["Depot", "Buy/Sell ›", "9876543", "", "0,00 €"],
+  ["Verrechnungskonto", "", "DE44 2004 1111 0987 6543 40", "0,00 €", "0,00 €"],
+];
 
 export default function Home() {
   return (
-    <main>
-      <section className="landing">
-        <div className="landing-text">
-          <h1>Learn to invest without risking a cent</h1>
-          <p>The same screen as your comdirect depot, with play money. Learn every concept as a game, then test yourself in a market full of news, rumors and rivals.</p>
-          <Link className="btn btn-primary btn-lg" href="/simulator">Open the platform →</Link>
-          {/* Decorative market line along the bottom of the text column. */}
-          <svg className="landing-line" viewBox="0 0 600 120" preserveAspectRatio="none" aria-hidden>
-            <polyline points="0,96 40,90 80,98 120,80 160,86 200,70 240,76 280,58 320,66 360,48 400,54 440,38 480,44 520,26 560,30 600,14" />
-          </svg>
+    <div className="web">
+      <WebHeader current="Personal area" logout={<span className="btn btn-primary btn-sm" aria-disabled="true">Logout ›</span>} />
+      <main className="web-main">
+        <div className="web-page">
+          <div className="page-head">
+            <h1>Good morning, Mr Mustermann.</h1>
+            <div className="page-owner"><span className="page-icons" aria-hidden>ⓘ ⎙ ✉</span><span className="small">Holder: <strong>Max Mustermann</strong></span></div>
+          </div>
+          <EntryBanner />
+          <section className="acc">
+            <div className="acc-title">comdirect</div>
+            <table className="acc-table">
+              <thead><tr><th>Account</th><th>Actions</th><th>IBAN / number</th><th className="r">Available</th><th className="r">Balance</th></tr></thead>
+              <tbody>
+                {ROWS.map(([a, act, iban, av, bal]) => (
+                  <tr key={a}>
+                    <td><span className="link">{a}</span></td>
+                    <td>{act && <span className="pill">{act}</span>}</td>
+                    <td className="num muted">{iban}</td>
+                    <td className="r num">{av}</td>
+                    <td className="r num bal">{bal}</td>
+                  </tr>
+                ))}
+                <tr className="acc-total"><td><strong>Total</strong></td><td /><td /><td className="r num">17.714,57 €</td><td className="r num bal"><strong>15.714,57 €</strong></td></tr>
+              </tbody>
+            </table>
+            <div className="row acc-actions">
+              <span className="pill pill-lg">All transactions ›</span>
+              <span className="pill pill-lg pill-yellow">ProTrader ›</span>
+              <span className="pill pill-lg pill-yellow">CFD demo account ›</span>
+            </div>
+          </section>
+          <section className="recent">
+            <div className="acc-title">Recent activity</div>
+            <dl>
+              <dt>Login</dt><dd>Today at 09.12</dd>
+              <dt>Depot</dt><dd>Opened 3 years ago · never used</dd>
+            </dl>
+          </section>
+          <p className="xs muted foot-note">Mocked comdirect start page for the demo. The banner above is the entry to comdirect edu. <Link href="/learn">Learning map</Link></p>
         </div>
-        <figure className="landing-photo">
-          {/* eslint-disable-next-line @next/next/no-img-element -- external CDN photo, no next/image remote config needed */}
-          <img src={PHOTO} alt="Happy young woman taking a selfie with her phone" />
-        </figure>
-      </section>
-    </main>
+      </main>
+    </div>
   );
 }
