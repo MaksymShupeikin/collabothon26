@@ -100,7 +100,8 @@
 /* The picture sits on a petrol plate, like a collected concept card: yellow on brand green. */
 .optArt {
   --art-fill: color-mix(in srgb, var(--color-accent) 18%, transparent);
-  display: grid; place-items: center; align-self: stretch; height: clamp(120px, 22vh, 220px); border-radius: var(--space-4);
+  display: grid; place-items: center; align-self: stretch; height: clamp(120px, 22vh, 220px);
+  border-radius: calc(var(--radius-md) - var(--space-4)); /* concentric: the option's radius minus its padding */
   background-color: var(--color-ink); color: var(--color-accent);
   background-image: radial-gradient(circle at 50% 50%, rgba(255, 245, 0, 0.14), transparent 62%), linear-gradient(135deg, transparent 34%, rgba(255, 245, 0, 0.08) 50%, transparent 66%);
 }
