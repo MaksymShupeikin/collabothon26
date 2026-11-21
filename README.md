@@ -13,7 +13,7 @@
 
 A training sandbox inside comdirect. It looks like the real comdirect screens, runs on play money and walks you through them one game step at a time, so buying your first stock feels like something you have already done.
 
-**Learn → do it guided → do it alone → live with the consequences → real comdirect.**
+**No theory first: you act from the very first minute, and every concept sticks because you just did it yourself.**
 
 ## Why
 
@@ -36,15 +36,15 @@ comdirect already has the pieces, but they live apart:
 | Mode | What you do |
 |---|---|
 | **Guided tour** | A spotlight coach explains each element of the web cabinet in one or two sentences, then hands you a mission: top up, search, buy your first stock |
-| **Market simulator** | One simple trading screen with a live news feed, rival bots that make typical mistakes, and time that moves |
-| **ProTrader** | The full comdirect-style workspace with a time machine that fast-forwards days, months or years |
+| **Market simulator** | One simple trading screen with a live news feed and time that moves |
+| **ProTrader** | An exact replica of the comdirect ProTrader layout, so you are fluent in the real workspace before you buy your first stock |
 | **History mode** | Replay real market moments and see how your decisions would have played out |
 | **Investor simulator** | A life-long savings run: income, events and choices, decade by decade |
 | **Learning map** | Worlds, concept cards, mini games, quick-check quizzes and bosses |
 
 ### One path, three life stages
 
-Three onboarding questions pick a persona. The path is the same; examples, amounts, missions and bosses change.
+Three onboarding questions pick a persona, and everything is tailored to it: examples, amounts, missions and bosses all match your life stage.
 
 | Persona | Example | Start money | Savings plan | Focus |
 |---|---|---:|---:|---|
@@ -66,15 +66,6 @@ npm run build
 
 Progress lives in `localStorage` (`cd-edu-v3`). "Reset progress" at the bottom of the hub starts over.
 
-## Demo path (about 5 minutes)
-
-1. `/` on first visit: the mocked comdirect start page with the yellow **"Practice first, then invest"** banner (also at `/comdirect`).
-2. `/start`: three questions pick a persona. "Not you?" switches it.
-3. `/` again, now the hub: your rank, the modes and the learning material per world.
-4. **Start the tour** → `/cabinet`: transfer with photoTAN → search → stock page → order form → **mission: your first stock** → ⏩ 1 week → P/L → **Pro mode unlocked**.
-5. `/pro`: the ProTrader workspace with the time machine. For the Wirecard moment, tick **Demo tools → Unlock all worlds** in the hub and open **👾 Boss: All-in Alex** in World 3.
-6. The reveal shows the Mistake Cam and the risk-adjusted leaderboard.
-
 ## Project structure
 
 | Path | What |
@@ -94,7 +85,3 @@ Progress lives in `localStorage` (`cd-edu-v3`). "Reset progress" at the bottom o
 | `docs/replay-sources.md` | Fact-check notes and sources for the replays |
 
 The full concept is in [`idea.md`](idea.md).
-
----
-
-<sub>Concept prototype built at Collabothon 2026. Not a live comdirect product; all money in the app is play money.</sub>
