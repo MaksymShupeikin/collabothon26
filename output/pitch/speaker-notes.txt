@@ -1,0 +1,56 @@
+COMDIRECT EDU / FINANCE QUEST
+60 seconds | 10 slides | 6 seconds per slide | 120 spoken words
+
+One idea and one short sentence per slide. The HTML Play button advances every six seconds and stops at one minute.
+
+00-06 sec | The first step feels hard.
+Financial knowledge helps, but complexity still makes the first investment feel difficult.
+
+06-12 sec | Guidance inside the UI.
+Others offer lessons and demos, while we add guided missions inside the comdirect trading interface.
+
+12-18 sec | One learning experience.
+comdirect edu combines learning and practice in one simple, gamified experience.
+
+18-24 sec | A guide for every click.
+Users learn, understand, practise with play money, then apply their knowledge.
+
+24-30 sec | Progress you can feel.
+Missions, feedback and rewards make learning engaging and progress easy to see.
+
+30-36 sec | See the consequences.
+History Mode and Investor Simulator show how decisions affect financial outcomes.
+
+36-42 sec | Every life stage.
+Different goals, budgets and horizons keep learning relevant across life stages.
+
+42-48 sec | Part of your bank.
+As a complementary bank product, it connects learning with Commerzbank's existing services.
+
+48-54 sec | Ready to invest.
+Customers practise first, so they can approach real investing with more confidence.
+
+54-60 sec | Confident customers.
+For the bank, we aim to strengthen trust, engagement and informed first steps.
+
+FULL SCRIPT
+
+Financial knowledge helps, but complexity still makes the first investment feel difficult. Others offer lessons and demos, while we add guided missions inside the comdirect trading interface. comdirect edu combines learning and practice in one simple, gamified experience. Users learn, understand, practise with play money, then apply their knowledge. Missions, feedback and rewards make learning engaging and progress easy to see. History Mode and Investor Simulator show how decisions affect financial outcomes. Different goals, budgets and horizons keep learning relevant across life stages. As a complementary bank product, it connects learning with Commerzbank's existing services. Customers practise first, so they can approach real investing with more confidence. For the bank, we aim to strengthen trust, engagement and informed first steps.
+
+STORY
+Problem / comparison / combined solution / guided UI mission / motivation / scenarios / life stages / bank integration / first investment / bank value.
+
+CORRECTED LEARNING ORDER
+Learn / Understand / Practise / Apply.
+
+SOURCES AND COMPARISON SCOPE
+Challenge Card - Finance Quest, Commerzbank, Collabothon 2026, pp. 1-2, supplied by the user.
+https://akademie.comdirect.de/home.php
+https://www.comdirect.de/faq/musterdepot
+https://help.etoro.com/s/article/What-is-eToro-Academy?language=en_GB
+https://www.etoro.com/academy/videos/etoros-virtual-portfolio/
+https://helpcentre.trading212.com/hc/en-us/articles/360007380937-What-is-the-difference-between-practice-and-real-money-accounts
+https://helpcentre.trading212.com/hc/en-us/articles/38653258622493-Introducing-the-new-More-tab-design
+
+The matrix uses checks for documented features and an asterisk for features not described in the reviewed pages. Quizzes are knowledge checks. Musterdepot, eToro and Trading 212 also support learning through practice. Own UI means a different broker interface, rather than comdirect. The table keeps eToro and Trading 212 alongside the existing comdirect services. It does not establish that competing services have no guides, tours or in-app help. eToro already connects its Academy to its Virtual Portfolio; Trading 212 offers learning and a practice mode. The demonstrated product focus is guided missions and checked actions in the comdirect-style trading interface.
+Native bank integration and commercial benefits are proposed; no measured impact is claimed. Potential pilot measures: completed missions, comprehension, return visits and informed handoffs to existing bank services.

@@ -247,7 +247,7 @@
   .cards { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 @media (max-width: 860px) {
-  .hero { grid-template-columns: 1fr; padding: var(--space-6); min-height: 0; }
+  .hero { grid-template-columns: minmax(0, 1fr); padding: var(--space-6); min-height: 0; }
   .hud { min-width: 0; }
   .modes { grid-template-columns: 1fr; }
   .next h1 { font-size: var(--text-xl); }
@@ -256,7 +256,10 @@
   .page { gap: var(--space-8); padding-top: var(--space-5); }
   .modes { margin-top: calc(var(--space-4) - var(--space-8)); gap: var(--space-4); }
   .next h1 { font-size: 34px; }
-  .go { align-self: stretch; }
+  .go { align-self: stretch; flex-wrap: wrap; row-gap: 0; }
+  /* Two lines on phones: "Start →", then what it starts. */
+  .go :global(.btn-context) { order: 1; flex-basis: 100%; justify-content: center; font-size: var(--text-sm); white-space: normal; text-align: center; }
+  .go :global(.btn-context)::before { display: none; }
   .path { grid-template-columns: 1fr; gap: var(--space-5); }
   .world::after { display: none; }
   .worldSlot { min-height: 0; }

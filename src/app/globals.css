@@ -649,6 +649,8 @@ button.ccard-face:hover { background: color-mix(in srgb, var(--color-accent) 90%
 @media (max-width: 1100px) {
   .pt-grid, .pt-grid.with-rivals, .pt-grid.focus, .pt-grid.focus.with-rivals { height: auto; grid-template-columns: 1fr; grid-template-rows: none; grid-auto-rows: minmax(280px, auto);
     grid-template-areas: "chart" "news" "watch" "depot" "book" "rivals"; }
+  .pt-grid:not(.with-rivals) { grid-template-areas: "chart" "news" "watch" "depot" "book"; } /* no empty rivals row */
+  .g-news { max-height: 480px; } /* one column: the feed scrolls inside its widget instead of pushing the rest away */
   .g-chart { min-height: 440px; }
   .hide-sm { display: none !important; }
   .reveal-grid { grid-template-columns: 1fr; }
@@ -859,3 +861,53 @@ html:has(.trade), body:has(.trade) { background: color-mix(in srgb, var(--color-
 .btn-arrow { width: 1em; height: 1em; flex-shrink: 0; vertical-align: -0.125em; margin-left: var(--space-2); transition: transform var(--ease); }
 .btn:hover:not(:disabled) .btn-arrow { transform: translateX(3px); }
 @media (prefers-reduced-motion: reduce) { .btn-arrow { transition: none; } }
+
+/* ── Phones: desktop above these widths is untouched ── */
+@media (max-width: 760px) {
+  /* iOS zooms into any field under 16px on focus. */
+  input:not([type="checkbox"]):not([type="radio"]), select, textarea { font-size: 16px; }
+  .acc-table td.r { white-space: nowrap; }
+}
+@media (max-width: 400px) {
+  .acc-table th:nth-child(4), .acc-table td:nth-child(4) { display: none; } /* balance is the figure that matters on the smallest phones */
+}
+@media (max-width: 600px) {
+  /* Web header: logo + exit on one row, search full width under it. */
+  .wh-top { flex-wrap: wrap; align-items: center; gap: var(--space-4); }
+  .wh-tools { display: contents; }
+  .wh-tools > .btn { margin-left: auto; }
+  .wh-search { order: 1; flex: 1 1 100%; }
+  .wh-search input { width: 100%; padding-top: var(--space-4); padding-bottom: var(--space-4); }
+  .wh-results { left: 0; width: auto; }
+  .acc-table th, .acc-table td { padding: var(--space-3) var(--space-2); }
+  .acc-table th:first-child, .acc-table td:first-child { padding-left: 0; }
+  .acc-table th:last-child, .acc-table td:last-child { padding-right: 0; }
+  .acc-actions { padding: var(--space-5) 0; }
+  .recent { margin-top: var(--space-8); }
+
+  /* ProTrader header: logo + exit, then workspace/order/widgets, then figures/sandbox. */
+  .pt-head { padding: 0 var(--space-4) var(--space-4); gap: var(--space-4); }
+  .pt-head > * { order: 2; }
+  .pt-head > .pt-logo { order: 0; margin-left: calc(-1 * var(--space-4)); }
+  .pt-head > .pt-right { order: 1; }
+  .pt-icon { display: none; }
+  .pt-head > label.pt-field { flex: 1 1 160px; min-width: 0; }
+  .pt-field select { min-width: 0; width: 100%; height: 40px; }
+  .pt-yellow { width: 56px; height: 40px; }
+  .pt-play { height: 40px; }
+  .pt-head > .pt-figs { flex: 1 1 auto; }
+  .pt-logout { padding: var(--space-3) var(--space-5); }
+  .tm { padding: var(--space-3) var(--space-4); gap: var(--space-3); }
+  .tm-btns { width: 100%; gap: 1px; background: var(--color-bg-light); } /* the gap draws the grid lines when buttons wrap */
+  .tm-btns button { flex: 1 1 auto; border-right: 0; min-height: 40px; padding: var(--space-2) var(--space-4); }
+  .pt-tabs button { min-height: 44px; }
+  .pt-search input { max-width: none; }
+  .pt-tools select { height: 40px; }
+
+  /* Order window as a bottom sheet. */
+  .ow { left: 0; right: 0; bottom: 0; border-radius: var(--radius-md) var(--radius-md) 0 0; }
+  .ow-body { max-height: calc(100dvh - 140px); padding-bottom: calc(var(--space-4) + env(safe-area-inset-bottom)); }
+  .ow-side button, .ow-go { min-height: 44px; font-size: var(--text-sm); }
+  .ow-row input, .ow-row select, .ow-grid input, .ow-grid select { min-height: 40px; }
+  .ow-as { min-height: 32px; }
+}
