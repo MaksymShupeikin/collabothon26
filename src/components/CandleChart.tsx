@@ -33,15 +33,15 @@ export default function CandleChart({ sym, prices, times, trades }: { sym: strin
     const el = box.current!;
     const c = createChart(el, {
       autoSize: true,
-      layout: { background: { color: "transparent" }, textColor: css(el, "--color-ink-2"), fontFamily: css(el, "--font"), attributionLogo: false },
+      layout: { background: { color: "transparent" }, textColor: css(el, "--color-ink-2"), fontFamily: getComputedStyle(el).fontFamily, /* resolved: --font holds a nested var() */ attributionLogo: false },
       grid: { vertLines: { visible: false }, horzLines: { visible: false } },
       rightPriceScale: { borderVisible: false },
       timeScale: { borderVisible: false, fixLeftEdge: true, fixRightEdge: true },
-      crosshair: { vertLine: { labelBackgroundColor: css(el, "--color-bg-light") }, horzLine: { labelBackgroundColor: css(el, "--color-bg-light") } },
+      crosshair: { vertLine: { labelBackgroundColor: css(el, "--color-ink") }, horzLine: { labelBackgroundColor: css(el, "--color-ink") } },
     });
     const up = css(el, "--color-gain"), down = css(el, "--color-loss");
     series.current = mode === "line"
-      ? c.addSeries(LineSeries, { color: css(el, "--color-accent"), lineWidth: 2, priceLineVisible: false, crosshairMarkerBorderColor: css(el, "--color-accent") })
+      ? c.addSeries(LineSeries, { color: css(el, "--chart-line"), lineWidth: 2, priceLineVisible: false, crosshairMarkerBorderColor: css(el, "--chart-line") })
       : c.addSeries(CandlestickSeries, { upColor: up, downColor: down, wickUpColor: up, wickDownColor: down, borderVisible: false });
     marks.current = createSeriesMarkers(series.current as ISeriesApi<"Line">, []);
     chart.current = c;

@@ -6,12 +6,12 @@
 <title>comdirect edu: минимальный редизайн</title>
 <style>
   :root {
-    --ink: #0b1f26; --raised: #10272f; --line: #1c3640; --muted: #83989f;
-    --text: #e9eef0; --accent: #fff500; --gain: #2bd47d; --loss: #ff5a5f;
+    --ink: #0b1f26; --raised: #f4f6f7; --line: #dbe2e5; --muted: #506c74;
+    --text: #0b1f26; --accent: #fff500; --gain: #2bd47d; --loss: #ff5a5f;
     --light: #ffffff; --light-line: #dbe2e5;
   }
   * { box-sizing: border-box; }
-  body { margin: 0; background: var(--ink); color: var(--text);
+  body { margin: 0; background: var(--light); color: var(--text);
     font: 16px/1.6 Inter, "Helvetica Neue", system-ui, sans-serif; }
   .wrap { max-width: 1080px; margin: 0 auto; padding: 48px 16px 80px; }
   .kicker { color: var(--accent); font-size: .8rem; letter-spacing: .12em; text-transform: uppercase; font-weight: 700; }
@@ -51,10 +51,10 @@
 
   <h2>Уже сделано в ветке pofa_design</h2>
   <ul>
-    <li><span class="tag y">готово</span> Симулятор — тёмная тема в цветах comdirect. Токены меняются только внутри <code>.trade</code>.</li>
+    <li><span class="tag y">готово</span> Симулятор — светлая тема в цветах Commerzbank / comdirect: белые панели, петрольный текст и линия графика, жёлтый только для действий.</li>
     <li><span class="tag y">готово</span> Плоские панели: нет теней, тихие заголовки панелей, линии 1 px.</li>
     <li><span class="tag y">готово</span> Блок цены как у Robinhood: имя мелко, цена 48 px, изменение под ценой.</li>
-    <li><span class="tag y">готово</span> График по умолчанию — одна жёлтая линия без сетки. Свечи — по переключателю «Candles».</li>
+    <li><span class="tag y">готово</span> График по умолчанию — одна петрольная линия без сетки (жёлтая линия на белом не проходит контраст 3:1). Свечи — по переключателю «Candles».</li>
     <li><span class="tag y">готово</span> Главная: светлый верх, режимы через линии, одна жёлтая кнопка «Start tour».</li>
     <li><span class="tag y">готово</span> Шапка: «New market» и «Start tour» стали тихими текстовыми кнопками.</li>
     <li><span class="tag y">готово</span> Список бумаг слева (watchlist), как на мокапе 01: тикер, имя, цена, % за день.</li>
@@ -94,20 +94,22 @@
   </div>
 
   <h2>Палитра</h2>
-  <p class="muted">Те же цвета бренда. Меняется только правило: жёлтый — только для одного главного действия.</p>
+  <p class="muted">Те же цвета бренда. Тема светлая. Правило: жёлтый — только для главного действия, активной вкладки и прогресса.</p>
   <div class="swatches">
-    <div class="sw"><i style="background:#0b1f26"></i><div>Фон<br><code>#0B1F26</code></div></div>
-    <div class="sw"><i style="background:#10272f"></i><div>Панель<br><code>#10272F</code></div></div>
-    <div class="sw"><i style="background:#1c3640"></i><div>Линия<br><code>#1C3640</code></div></div>
-    <div class="sw"><i style="background:#83989f"></i><div>Вторичный текст<br><code>#83989F</code></div></div>
+    <div class="sw"><i style="background:#ffffff"></i><div>Панель<br><code>#FFFFFF</code></div></div>
+    <div class="sw"><i style="background:#eef2f3"></i><div>Фон страницы<br><code>#DBE2E5 · 40 %</code></div></div>
+    <div class="sw"><i style="background:#dbe2e5"></i><div>Линия<br><code>#DBE2E5</code></div></div>
+    <div class="sw"><i style="background:#0b1f26"></i><div>Текст, график<br><code>#0B1F26</code></div></div>
+    <div class="sw"><i style="background:#506c74"></i><div>Вторичный текст<br><code>#506C74</code></div></div>
     <div class="sw"><i style="background:#fff500"></i><div>Акцент<br><code>#FFF500</code></div></div>
-    <div class="sw"><i style="background:#2bd47d"></i><div>Рост<br><code>#2BD47D</code></div></div>
-    <div class="sw"><i style="background:#ff5a5f"></i><div>Падение<br><code>#FF5A5F</code></div></div>
+    <div class="sw"><i style="background:#1e7d4f"></i><div>Рост<br><code>#1E7D4F</code></div></div>
+    <div class="sw"><i style="background:#c0392b"></i><div>Падение<br><code>#C0392B</code></div></div>
   </div>
 
   <h2>Мокапы</h2>
   <p class="muted">Сгенерированы через ChatGPT image (Codex CLI). Это концепты, не пиксель-в-пиксель макеты. Мелкий текст на картинках может быть неточным.</p>
-  <figure><img src="01-simulator.png" alt="Тёмный экран симулятора: список бумаг слева, цена и жёлтый график в центре, панель покупки справа"><figcaption>01 · Симулятор рынка, тёмная тема</figcaption></figure>
+  <figure><img src="04-simulator-light.png" alt="Светлый экран симулятора: список бумаг слева, цена и петрольный график в центре, панель покупки справа"><figcaption>04 · Симулятор рынка, светлая тема (текущее направление)</figcaption></figure>
+  <figure><img src="01-simulator.png" alt="Тёмный экран симулятора: список бумаг слева, цена и жёлтый график в центре, панель покупки справа"><figcaption>01 · Симулятор рынка, тёмная тема (первый вариант, заменён светлым)</figcaption></figure>
   <figure><img src="02-home.png" alt="Светлая главная: крупный заголовок, уровень, три режима и путь обучения"><figcaption>02 · Главная, светлая тема</figcaption></figure>
   <figure><img src="03-mobile.png" alt="Три мобильных экрана: карточка урока, акция, соперники"><figcaption>03 · Мобильная версия: урок, акция, соперники</figcaption></figure>
 
@@ -137,18 +139,15 @@
   </div>
 
   <h2>Токены для кода</h2>
-  <p class="muted">Первый шаг реализации. Добавить в <code>globals.css</code> и включить на странице симулятора.</p>
-<pre><code>[data-theme="dark"] {
-  --color-bg: #0b1f26;
-  --color-surface: #10272f;
-  --color-line: #1c3640;
-  --color-text: #e9eef0;
-  --color-text-2: #83989f;
-  --color-accent: #fff500;   /* только главное действие */
-  --color-gain: #2bd47d;
-  --color-loss: #ff5a5f;
-  --shadow-lg: none;
-  --radius-md: 12px;
+  <p class="muted">Так токены заданы в коде ветки сейчас.</p>
+<pre><code>/* globals.css — бренд-токены Commerzbank / comdirect, светлая тема */
+:root {
+  --color-ink: #0b1f26;       /* текст, линия графика */
+  --color-ink-2: #506c74;     /* вторичный текст */
+  --color-bg-light: #dbe2e5;  /* линии 1 px */
+  --color-white: #ffffff;     /* панели */
+  --color-accent: #fff500;    /* только действия, активная вкладка, прогресс */
+  --chart-line: var(--color-ink);
 }</code></pre>
 
   <h2>План внедрения</h2>

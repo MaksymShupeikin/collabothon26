@@ -10,6 +10,7 @@
   /* shortcut: gain/loss colors are not in the extracted palette; swap for comdirect's real semantic colors. */
   --color-gain: #1e7d4f;
   --color-loss: #c0392b;
+  --chart-line: var(--color-ink); /* data line: petrol, yellow stays for actions */
 
   --font: var(--font-figtree), Gotham, "Helvetica Neue", Arial, sans-serif;
   --text-xs: 13px; --text-sm: 15px; --text-base: 17px; --text-lg: 22px; --text-xl: 42px; --text-2xl: 54px;
@@ -337,22 +338,10 @@ h3 { font-size: var(--text-base); line-height: 24px; font-weight: 700; }
 .hbtn { border-color: transparent; color: var(--color-bg-dark); }
 .hbtn:hover { background: rgba(255, 255, 255, 0.08); color: var(--color-white); }
 
-/* Trading screen: dark, like a broker. Semantic tokens swap inside .trade:
-   --color-ink = text (light), --color-white = surface (dark). */
-html:has(.trade), body:has(.trade) { background: #0b1f26; }
-.trade {
-  --color-ink: #e9eef0;
-  --color-ink-2: #83989f;
-  --color-border: #2a4752;
-  --color-bg-dark: #83989f;
-  --color-bg-light: #1c3640;
-  --color-white: #10272f;
-  --color-gain: #2bd47d;
-  --color-loss: #ff5a5f;
-  --on-accent: #0b1f26;
-  --radius-md: 12px;
-  color: var(--color-ink);
-}
+/* Trading screen: light, Commerzbank / comdirect brand tokens only.
+   Page sits on a pale petrol-grey layer, panels are white (second neutral layer for panels). */
+html:has(.trade), body:has(.trade) { background: color-mix(in srgb, var(--color-bg-light) 40%, var(--color-white)); }
+.trade { --on-accent: #0b1f26; --radius-md: 12px; }
 .trade .panel, .trade .acct, .trade .clock { border-color: var(--color-bg-light); }
 /* Text on yellow stays dark petrol. */
 .trade .btn-primary, .trade .play-btn, .trade .side-toggle .buy[aria-pressed="true"],
@@ -362,11 +351,10 @@ html:has(.trade), body:has(.trade) { background: #0b1f26; }
 .trade .watch-row[aria-pressed="true"], .trade .search-results .watch-row[aria-selected="true"], .trade .table tr[aria-selected="true"] td {
   background: rgba(255, 245, 0, 0.1); /* full tint, no one-sided bar */
 }
-.trade .watch-row[aria-pressed="true"] .watch-name strong { color: var(--color-accent); }
-.trade .field select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%23e9eef0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); }
-.trade .search input { background: #0b1f26; }
-.trade .search-results { box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4); }
-.trade .news-item.fresh { background: rgba(255, 245, 0, 0.06); }
+.trade .watch-row[aria-pressed="true"] .watch-name strong { color: var(--color-ink); }
+.trade .search input { background: var(--color-white); }
+.trade .search-results { box-shadow: 0 12px 32px rgba(11, 31, 38, 0.14); }
+.trade .news-item.fresh { background: rgba(255, 245, 0, 0.18); }
 .trade .chart-empty .empty-state { box-shadow: none; border: 1px solid var(--color-bg-light); }
 
 /* Robinhood price block: name small, price huge, change right under it. */
@@ -384,8 +372,8 @@ html:has(.trade), body:has(.trade) { background: #0b1f26; }
 
 /* Tour: lighter dim, the screen stays readable. */
 .coach-spot { box-shadow: 0 0 0 9999px rgba(11, 31, 38, 0.45), var(--shadow-focus); }
-.trade .coach-bubble, .trade .modal { border: 1px solid var(--color-bg-light); box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45); }
-.trade .overlay { background: rgba(0, 0, 0, 0.5); }
+.trade .coach-bubble, .trade .modal { border: 1px solid var(--color-bg-light); box-shadow: 0 16px 40px rgba(11, 31, 38, 0.18); }
+.trade .overlay { background: rgba(11, 31, 38, 0.45); }
 .chart-body { flex-direction: column; align-items: stretch; gap: var(--space-2); }
 
 /* Home: light and airy (mockup 02). No dark hero block, modes split by 1px lines. */
@@ -423,9 +411,9 @@ html:has(.trade), body:has(.trade) { background: #0b1f26; }
 .tabbar { display: none; }
 @media (max-width: 700px) {
   .tabbar { display: grid; grid-template-columns: repeat(4, 1fr); position: fixed; left: 0; right: 0; bottom: 0; z-index: 40;
-    background: #0b1f26; border-top: 1px solid #1c3640; padding-bottom: env(safe-area-inset-bottom); }
-  .tabbar a { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: var(--space-3) 0; font-size: 11px; font-weight: 700; text-decoration: none; color: #83989f; }
-  .tabbar a[aria-current="page"] { color: var(--color-accent); }
+    background: var(--color-white); border-top: 1px solid var(--color-bg-light); padding-bottom: env(safe-area-inset-bottom); }
+  .tabbar a { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: var(--space-3) 0; font-size: 11px; font-weight: 700; text-decoration: none; color: var(--color-ink-2); border-top: 3px solid transparent; }
+  .tabbar a[aria-current="page"] { color: var(--color-ink); border-top-color: var(--color-accent); }
   body { padding-bottom: calc(64px + env(safe-area-inset-bottom)); }
   .hnav { display: none; } /* the tab bar replaces the header tabs on phones */
   .trade { height: auto; }
@@ -450,7 +438,7 @@ html:has(.trade), body:has(.trade) { background: #0b1f26; }
 /* Browser surfaces themed from the palette. */
 ::selection { background: var(--color-accent); color: #0b1f26; }
 input, textarea { caret-color: var(--color-ink); }
-.trade { scrollbar-color: #2a4752 transparent; }
+.trade { scrollbar-color: var(--color-bg-dark) transparent; }
 .trade * { scrollbar-width: thin; }
 a { text-underline-offset: 3px; }
 .glyph { display: inline-block; vertical-align: -0.15em; flex-shrink: 0; }
