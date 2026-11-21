@@ -41,8 +41,7 @@ export function generateNews(days: number, seed: number, from = 1): News[] {
   const fx = (target: string, from: number, d: number, total: number): Effect => ({ target, from, days: d, total });
 
   for (let d = from; d <= days; d++) {
-    const count = 1 + Math.floor(r() * 2);
-    for (let i = 0; i < count; i++) add(noise(d));
+    if (r() < 0.55) add(noise(d)); // background noise most days
   }
 
   for (let d = Math.max(6, from); d < days - 2; d += 8 + Math.floor(r() * 10)) {
