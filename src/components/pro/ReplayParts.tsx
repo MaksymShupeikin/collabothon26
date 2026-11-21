@@ -250,7 +250,7 @@ export function RevealModal({ replay, chapter, sim, answers, name, onClose }: { 
         <div className="card-row"><ConceptCard id={replay.concept} /></div>
         <div className="row" style={{ justifyContent: "flex-end" }}>
           <button className="btn btn-ghost" onClick={onClose}>Look at the market</button>
-          <Link className="btn btn-primary" href="/learn" onClick={() => actions.start(null)}>Learning map ›</Link>
+          <Link className="btn btn-primary" href="/" onClick={() => actions.start(null)}>Learning map ›</Link>
         </div>
       </div>
     </div>

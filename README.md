@@ -14,13 +14,14 @@ npm run build
 
 ## Demo path (≈5 min, idea.md §16)
 
-1. `/`: the mocked comdirect start page with the yellow **"Practice first, then invest"** banner.
+1. `/` (first visit): the mocked comdirect start page with the yellow **"Practice first, then invest"** banner. It stays reachable at `/comdirect`.
 2. `/start`: three questions pick a persona (Starter 100 €, Builder 500 €, Pre-retiree 1.000 €). "Not you?" switches persona.
-3. `/cabinet`: World 1 in the copied web cabinet. Spotlight tour → transfer with photoTAN → search → stock page → order form → **mission: your first stock** → ⏩ 1 week → P/L → **Pro mode unlocked**.
-4. `/pro`: ProTrader-style workspace with the time machine. For the Wirecard moment, open the learning map, tick **Demo tools → Unlock all worlds** and press **Fight** on *Boss: All-in Alex*.
-5. The reveal shows the Mistake Cam and the risk-adjusted leaderboard.
+3. `/` again, now the hub (layout from `main`). Dark hero with your rank, three modes (tour, Market Simulator, History Mode) and the learning material per world.
+4. **Start the tour** → `/cabinet`: World 1 in the copied web cabinet. Spotlight tour → transfer with photoTAN → search → stock page → order form → **mission: your first stock** → ⏩ 1 week → P/L → **Pro mode unlocked**.
+5. `/pro`: ProTrader-style workspace with the time machine. For the Wirecard moment, open the hub, tick **Demo tools → Unlock all worlds** and click the **👾 Boss: All-in Alex** chip in World 3.
+6. The reveal shows the Mistake Cam and the risk-adjusted leaderboard.
 
-Progress lives in `localStorage` (`cd-edu-v3`); "Reset progress" on the learning map starts over.
+Progress lives in `localStorage` (`cd-edu-v3`); "Reset progress" at the bottom of the hub starts over.
 
 ## Where things are
 

@@ -33,7 +33,7 @@ export default function Pro() {
   const ch = save.active ? chapterById(save.active) : undefined;
   const pro = ch?.surface === "pro" ? ch : undefined;
   if (!save.persona) return <Gate text="Answer three quick questions first." href="/start" cta="Start" />;
-  if (!save.proUnlocked && !save.allUnlocked) return <Gate text="Pro mode unlocks after the World 1 mission: your first stock." href="/learn" cta="Learning map" />;
+  if (!save.proUnlocked && !save.allUnlocked) return <Gate text="Pro mode unlocks after the World 1 mission: your first stock." href="/" cta="Learning map" />;
   const mode: Mode = pro?.replay ? { kind: "replay", replay: REPLAYS[pro.replay] } : pro?.lesson ? { kind: "lesson", id: SIM_LESSONS[pro.lesson as keyof typeof SIM_LESSONS].id } : { kind: "main" };
   return <Desk key={save.active ?? "free"} mode={mode} chapter={pro} />;
 }
@@ -207,7 +207,7 @@ function Desk({ mode, chapter }: { mode: Mode; chapter?: Chapter }) {
         </div>
         <div className="pt-right">
           <span className="pt-figs num"><span><small>Depot number</small>{mode.kind === "main" ? "1234567" : replay ? "Replay" : "Practice"}</span></span>
-          <Link className="pt-logout" href="/learn">Exit</Link>
+          <Link className="pt-logout" href="/">Exit</Link>
         </div>
       </header>
 

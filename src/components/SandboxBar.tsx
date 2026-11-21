@@ -17,7 +17,7 @@ export default function SandboxBar({ clock, dark = false }: { clock?: string; da
           <ProgressRing value={rank.progress} size={24} label={`Rank ${rank.name}, ${Math.round(rank.progress * 100)} % to the next rank`} center={rank.level} />
           <span><strong>{rank.name}</strong> <span className="num">{save.xp} XP</span></span>
         </span>
-        <Link href="/learn" className="sbar-link">Learning map</Link>
+        <Link href="/" className="sbar-link">Learning map</Link>
       </span>
     </div>
   );

@@ -10,8 +10,10 @@ import { setUi } from "@/lib/game/ui";
 import Icon from "./Icon";
 import ProgressRing from "./ProgressRing";
 import ConceptCard from "./tour/ConceptCard";
-import { Stars } from "./tour/TourRunner";
 
+const STARS_MAX = 21;
+
+/** The hub after onboarding (layout from main): dark hero with rank, three mode cards, learning material. */
 export default function LearningMap() {
   const save = useGame();
   const router = useRouter();
@@ -38,88 +40,111 @@ export default function LearningMap() {
   );
 
   const allDone = save.done.includes("b4");
+  const proOpen = save.proUnlocked || save.allUnlocked;
+  const stars = Object.values(save.stars).reduce((a, b) => a + b, 0);
+  // History mode = the historical replays; it opens the first one not played yet (or the first one to replay).
+  const replays = CHAPTERS.filter((c) => c.replay && isOpen(save, c));
+  const replay = replays.find((c) => !save.done.includes(c.id)) ?? replays[0];
+  const started = save.done.length > 0;
+
   return (
-    <main className="container map">
-      <section className="map-top">
-        <div className="map-hello">
-          <span className="xs muted">{persona.label} · like {persona.who}</span>
-          <h1>Your learning map</h1>
-          {next ? (
-            <button className="btn btn-primary btn-lg" onClick={() => launch(next)}>Continue: {next.n} {next.title} ›</button>
-          ) : <Link className="btn btn-primary btn-lg" href="/ready">Ready for real? ›</Link>}
+    <main className="container stack">
+      <section className="hero">
+        <div>
+          <h1>Learn to invest without risking a cent</h1>
+          <p className="muted">The same screen as your comdirect depot, with play money. Learn every concept as a game, then test yourself in a market full of news, rumors and rivals.</p>
         </div>
-        <div className="map-stats">
-          <div className="stat">
-            <ProgressRing value={rank.progress} size={64} label={`Rank ${rank.name}`} center={rank.level} />
-            <span><strong>{rank.name}</strong><span className="xs muted num">{save.xp}{rank.nextAt ? ` / ${rank.nextAt}` : ""} XP{rank.next ? ` → ${rank.next}` : ""}</span></span>
-          </div>
-          <div className="stat">
-            <Icon name="card" size={44} />
-            <span><strong className="num">{save.cards.length} / 12</strong><span className="xs muted">concept cards</span></span>
-          </div>
-          <div className="stat">
-            <span className="stat-star" aria-hidden>★</span>
-            <span><strong className="num">{Object.values(save.stars).reduce((a, b) => a + b, 0)} / 21</strong><span className="xs muted">mission stars</span></span>
+        <div className="level">
+          <ProgressRing value={rank.progress} size={88} label={`Rank ${rank.level} of ${RANKS.length}, ${Math.round(rank.progress * 100)}% to the next rank`} center={rank.level} />
+          <div className="level-text">
+            <strong>{rank.name}</strong>
+            <span className="num">{save.xp}{rank.nextAt ? ` / ${rank.nextAt}` : ""} XP</span>
           </div>
         </div>
       </section>
 
-      <ol className="path">
-        {WORLDS.map((w) => {
-          const open = worldOpen(save, w.n);
-          const items = CHAPTERS.filter((c) => c.world === w.n);
-          const doneN = items.filter((c) => save.done.includes(c.id)).length;
-          return (
-            <li key={w.n} className={`wcard ${open ? "" : "locked"}`}>
-              <div className="wcard-head">
-                <span className="part-num num" aria-hidden>{doneN === items.length ? "✓" : w.n}</span>
-                <div>
-                  <h2>World {w.n}: {w.title}</h2>
-                  <span className="xs muted">{w.surface} · {w.blurb}</span>
-                </div>
-                <ProgressRing value={doneN / items.length} size={36} label={`${doneN} of ${items.length} done`} />
-              </div>
-              {!open && <p className="small muted locked-note"><Icon name="lock" size={18} /> Unlocks when the World {w.n - 1} mission is done.</p>}
-              <ul className="chapters">
-                {items.map((c) => {
-                  const done = save.done.includes(c.id);
-                  const can = isOpen(save, c);
-                  const current = next?.id === c.id;
-                  return (
-                    <li key={c.id} className={`chap ${c.kind} ${done ? "done" : ""} ${current ? "current" : ""}`}>
-                      <span className="chap-n">{c.n}</span>
-                      <div className="chap-body">
-                        <strong>{c.title}</strong>
-                        <span className="xs muted">{c.blurb}</span>
-                      </div>
-                      <div className="chap-act">
-                        {save.stars[c.id] ? <Stars n={save.stars[c.id]} /> : done ? <span className="xs up">✓ Done</span> : null}
-                        {can ? (
-                          <button className={`btn btn-sm ${current ? "btn-primary" : "btn-outline"}`} onClick={() => launch(c)}>{done ? "Replay" : c.kind === "boss" ? "Fight" : "Start"}</button>
-                        ) : <span className="btn btn-sm btn-outline" aria-disabled="true">🔒</span>}
-                      </div>
-                    </li>
-                  );
-                })}
-              </ul>
-              {w.n === 1 && save.proUnlocked && <p className="xs pro-note">🔓 Pro mode unlocked</p>}
-            </li>
-          );
-        })}
-        <li className={`wcard final ${allDone || save.allUnlocked ? "" : "locked"}`}>
-          <div className="wcard-head">
-            <span className="part-num" aria-hidden>∞</span>
-            <div><h2>Free play &amp; ready for real</h2><span className="xs muted">The open Pro-mode market, then the real comdirect depot.</span></div>
-          </div>
-          <div className="row pad">
-            {save.proUnlocked ? <Link className="btn btn-outline btn-sm" href="/pro" onClick={() => actions.start(null)}>Free play</Link> : <span className="btn btn-outline btn-sm" aria-disabled="true">Free play 🔒</span>}
-            <Link className={`btn btn-sm ${allDone ? "btn-primary" : "btn-outline"}`} href="/ready">Ready for real? ›</Link>
-          </div>
-        </li>
-      </ol>
+      <section className="modes">
+        <button className="card mode" onClick={() => (next ? launch(next) : router.push("/ready"))}>
+          <Icon name="compass" size={64} round />
+          <h2>{started ? "Continue the tour" : "Start the tour"}</h2>
+          <p className="small muted">Learn the comdirect trading screen by using it — and place your first trade with play money.</p>
+          <span className="btn btn-dark btn-sm">{next ? (started ? `Continue: ${next.n} ${next.title}` : "Start tour") : "Ready for real?"} →</span>
+        </button>
+        <ModeCard open={proOpen} lockText="Unlocks after the World 1 mission" icon="chart" title="Market Simulator"
+          text="A living market driven by news, with a time machine. Most headlines are noise. Find the signal, beat your rivals."
+          cta="Open market" onOpen={() => { actions.start(null); setUi({}); router.push("/pro"); }} />
+        <ModeCard open={!!replay} lockText="Unlocks in World 2" icon="hourglass" title="History Mode"
+          text="Real market moments, hidden date. Trade them against the bots, then see what really happened."
+          cta={replay ? `Play: ${replay.title}` : "Play history"} onOpen={() => replay && launch(replay)} />
+      </section>
 
-      <section className="collection" aria-label="Concept cards">
-        <h2>Concept cards <span className="xs muted num">{save.cards.length} / 12</span></h2>
+      <section className="card">
+        <div className="panel-head">
+          Learning material
+          <div className="stats">
+            <span><strong className="num">{save.cards.length}</strong>/{CARDS.length} cards</span>
+            <span><strong className="num">{stars}</strong>/{STARS_MAX} stars</span>
+            <span><strong className="num">{WORLDS.filter((w) => worldOpen(save, w.n)).length}</strong>/{WORLDS.length} worlds</span>
+          </div>
+        </div>
+        <div className="worlds">
+          {WORLDS.map((w) => {
+            const open = worldOpen(save, w.n);
+            const items = CHAPTERS.filter((c) => c.world === w.n);
+            const complete = items.every((c) => save.done.includes(c.id));
+            const todo = items.find((c) => !save.done.includes(c.id) && isOpen(save, c));
+            const current = !!next && next.world === w.n;
+            return (
+              <div key={w.n} className={`world ${open ? "" : "locked"} ${current ? "current" : ""}`}>
+                <span className="part-num num" aria-hidden>{complete ? "✓" : w.n}</span>
+                <div className="stack" style={{ gap: "var(--space-3)" }}>
+                  <div>
+                    <h2>World {w.n}: {w.title}</h2>
+                    <span className="xs muted">{w.surface} · {w.blurb}</span>
+                  </div>
+                  <div className="chips">
+                    {items.map((c) => {
+                      const can = isOpen(save, c);
+                      return (
+                        <button key={c.id} className={`chip ${save.done.includes(c.id) ? "done" : ""} ${can ? "" : "locked"} ${next?.id === c.id ? "next" : ""}`}
+                          disabled={!can} onClick={() => launch(c)} title={c.blurb}>
+                          {c.kind === "chapter" ? c.title : `${c.n} ${c.title}`}
+                          {save.stars[c.id] ? <span className="chip-stars" aria-label={`${save.stars[c.id]} of 3 stars`}> {"★".repeat(save.stars[c.id])}</span> : null}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  {w.n === 1 && save.proUnlocked && <span className="xs pro-note">🔓 Pro mode unlocked</span>}
+                </div>
+                <div className="world-action">
+                  {!open ? (
+                    <span className="btn btn-outline" aria-disabled="true" title={`Finish the World ${w.n - 1} mission`}>🔒 Locked</span>
+                  ) : todo ? (
+                    <button className={`btn ${current ? "btn-primary" : "btn-outline"}`} onClick={() => launch(todo)}>
+                      {items.some((c) => save.done.includes(c.id)) ? "Continue" : "Start"}: {todo.title}
+                    </button>
+                  ) : (
+                    <button className="btn btn-outline" onClick={() => launch(items[0])}>Review</button>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+          <div className={`world ${allDone || save.allUnlocked ? "" : "locked"}`}>
+            <span className="part-num" aria-hidden>∞</span>
+            <div>
+              <h2>Free play &amp; ready for real</h2>
+              <span className="xs muted">The open Pro-mode market, then the real comdirect depot.</span>
+            </div>
+            <div className="world-action">
+              <Link className={`btn ${allDone ? "btn-primary" : "btn-outline"}`} href="/ready">Ready for real? ›</Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="card collection" aria-label="Concept cards">
+        <div className="panel-head">Concept cards <span className="stats"><span><strong className="num">{save.cards.length}</strong>/{CARDS.length} collected</span></span></div>
         <div className="cards-grid">
           {CARDS.map((c) => {
             const has = save.cards.includes(c.id);
@@ -150,5 +175,16 @@ export default function LearningMap() {
         </div>
       )}
     </main>
+  );
+}
+
+function ModeCard({ open, lockText, icon, title, text, cta, onOpen }: { open: boolean; lockText: string; icon: string; title: string; text: string; cta: string; onOpen: () => void }) {
+  return (
+    <button className={`card mode ${open ? "" : "locked"}`} disabled={!open} onClick={onOpen}>
+      <Icon name={icon} size={64} round />
+      <h2>{title}</h2>
+      <p className="small muted">{text}</p>
+      <span className={`btn btn-sm ${open ? "btn-dark" : "btn-outline"}`}>{open ? `${cta} →` : <>🔒&nbsp;{lockText}</>}</span>
+    </button>
   );
 }

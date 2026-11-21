@@ -40,8 +40,8 @@ export default function Onboarding() {
   function go(skip: boolean) {
     actions.setPersona(persona!, a as Answers, skip);
     setUi({});
-    if (skip) router.push("/learn");
-    else { actions.start("1.1"); router.push("/cabinet"); }
+    // Both paths land on the hub (learning map); "Start the tour" there opens World 1.
+    router.push("/");
   }
 
   const step = Math.min(screen, 4);
@@ -105,7 +105,7 @@ export default function Onboarding() {
             </div>
             {persona === "starter" && <p className="small">Only 100 €? On purpose: investing isn’t only for grown-ups with big savings. You can start with what you have.</p>}
             <div className="row">
-              <button className="btn btn-primary btn-lg" onClick={() => go(false)} autoFocus>Start World 1 ›</button>
+              <button className="btn btn-primary btn-lg" onClick={() => go(false)} autoFocus>Let’s start ›</button>
               {expert && checkPassed && <button className="btn btn-outline btn-lg" onClick={() => go(true)}>Skip to Pro mode</button>}
             </div>
             {expert && !checkPassed && check.length === 3 && <p className="xs muted">Two of three were right? Not quite, so World 1 is a good warm-up.</p>}

@@ -107,7 +107,7 @@ export function ChapterDone({ ch, extra }: { ch: Chapter; extra?: React.ReactNod
           </>
         )}
         <div className="row">
-          <Link className="btn btn-outline" href="/learn" onClick={() => actions.start(null)}>Learning map</Link>
+          <Link className="btn btn-outline" href="/" onClick={() => actions.start(null)}>Learning map</Link>
           {next && next.id !== ch.id && (
             <Link className="btn btn-primary" href={surfaceHref(next)} onClick={() => { if (next.id === "w1") actions.resetSandbox(); actions.start(next.id); setUi({}); }}>
               Next: {next.n} {next.title} →
@@ -239,7 +239,7 @@ function ProUnlocked({ stars }: { stars: number }) {
         <p className="unlock-sub">Pro mode unlocked: a ProTrader-style market with live news, rival bots and a time machine.</p>
         <div className="card-row"><ConceptCard id="pnl" /></div>
         <div className="row" style={{ justifyContent: "center" }}>
-          <Link className="btn btn-outline-light" href="/learn" onClick={() => { actions.celebratePro(); actions.start(null); }}>Learning map</Link>
+          <Link className="btn btn-outline-light" href="/" onClick={() => { actions.celebratePro(); actions.start(null); }}>Learning map</Link>
           <Link className="btn btn-primary btn-lg" href="/pro" onClick={() => { actions.celebratePro(); actions.start("2.1"); setUi({}); }}>Enter Pro mode →</Link>
         </div>
       </div>
