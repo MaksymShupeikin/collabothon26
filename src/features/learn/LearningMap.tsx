@@ -9,7 +9,7 @@ import { actions, rankOf, RANKS, useGame, type Save } from "@/features/game/stor
 import { setUi } from "@/features/game/ui";
 import Icon from "@/shared/ui/Icon";
 import ProgressRing from "@/shared/ui/ProgressRing";
-import ConceptCard from "@/features/learn/ConceptCard";
+import CardArt, { CARD_SHORT } from "@/features/learn/CardArt";
 import s from "./LearningMap.module.css";
 
 const STARS_MAX = 21;
@@ -20,7 +20,6 @@ const BOSS_ICON: Record<string, string> = { b2: "max", b3: "alex", b4: "paula" }
 export default function LearningMap() {
   const save = useGame();
   const router = useRouter();
-  const [card, setCard] = useState<string | null>(null);
   const rank = rankOf(save.xp);
   const next = nextChapter(save);
   const persona = save.persona ? PERSONAS[save.persona] : null;
@@ -113,8 +112,8 @@ export default function LearningMap() {
           {WORLDS.map((w) => (
             <WorldTile key={w.n} w={w} save={save} next={next} launch={launch}
               extra={w.n === 1 ? (
-                <button className={`btn btn-dark ${s.sandbox}`} onClick={openSandbox}>
-                  <SandboxGlyph /> Open sandbox
+                <button className={s.sandbox} onClick={openSandbox}>
+                  or explore the sandbox
                 </button>
               ) : null} />
           ))}
@@ -123,18 +122,22 @@ export default function LearningMap() {
 
 
       <section aria-labelledby="cards-h">
-        <h2 id="cards-h" className={s.sectionHead}>Concept cards <span className="num">{save.cards.length}/{CARDS.length}</span></h2>
-        <div className={s.cards}>
+        <h2 id="cards-h" className={s.sectionHead}>Concept cards</h2>
+        <ul className={s.cards}>
           {CARDS.map((c) => {
             const has = save.cards.includes(c.id);
             return (
-              <button key={c.id} className={`${s.mini} ${has ? s.has : ""}`} disabled={!has} onClick={() => setCard(c.id)} aria-label={has ? c.title : `Card from World ${c.world}, not collected yet`}>
-                <Icon name={has ? "card" : "lock"} size={22} />
-                <span>{has ? c.title : `W${c.world}`}</span>
-              </button>
+              <li key={c.id} className={`${s.mini} ${has ? s.has : s.sealed}`}>
+                <span className={s.miniTop}>World {c.world}</span>
+                <span className={s.art}>
+                  <CardArt id={c.id} size={88} />
+                  {!has && <span className={s.seal}><Lock /></span>}
+                </span>
+                <span className={s.miniName}>{CARD_SHORT[c.id] ?? c.title}</span>
+              </li>
             );
           })}
-        </div>
+        </ul>
       </section>
 
       <details className={s.demo}>
@@ -144,15 +147,6 @@ export default function LearningMap() {
           <button className="btn btn-ghost btn-sm" onClick={() => { if (confirm("Reset all progress and start over?")) { actions.reset(); router.push("/start"); } }}>Reset progress</button>
         </div>
       </details>
-
-      {card && (
-        <div className="overlay" role="dialog" aria-modal="true" aria-label="Concept card" onClick={() => setCard(null)}>
-          <div className="modal modal-mid" onClick={(e) => e.stopPropagation()}>
-            <div className="card-row"><ConceptCard id={card} /></div>
-            <button className="btn btn-outline" style={{ alignSelf: "center" }} onClick={() => setCard(null)}>Close</button>
-          </div>
-        </div>
-      )}
     </main>
   );
 }
@@ -166,17 +160,20 @@ function WorldTile({ w, save, next, launch, extra }: { w: World; save: Save; nex
   const current = !!next && next.world === w.n;
   const [peek, setPeek] = useState<Chapter | null>(null);
   const caption = peek ?? todo ?? items[items.length - 1];
+  const prev = WORLDS.find((x) => x.n === w.n - 1);
   const state = !open ? s.locked : current ? s.current : complete ? s.complete : "";
 
   return (
     <li className={`${s.world} ${state}`}>
+      <div className={s.worldSlot}>
       <div className={s.worldTop}>
         <span className={s.badge} aria-hidden>{complete ? <Check /> : !open ? <Lock /> : w.n}</span>
-        <span className={`num xs ${s.count}`}>{doneCount}/{items.length}</span>
+        <div className={s.worldText}>
+          <h3>{w.title}</h3>
+          {/* Hovering a node peeks at that level. */}
+          <span className={`xs ${s.caption}`}>{open ? caption.title : `Unlocks after ${prev?.title ?? `World ${w.n - 1}`}`}</span>
+        </div>
       </div>
-      <div>
-        <h3>{w.title}</h3>
-        <span className={`xs ${s.surface}`}>World {w.n} · {w.surface}</span>
       </div>
 
       <div className={s.track} onMouseLeave={() => setPeek(null)}>
@@ -200,21 +197,19 @@ function WorldTile({ w, save, next, launch, extra }: { w: World; save: Save; nex
             );
           })}
         </div>
-        <span className={`xs ${s.caption}`} aria-hidden>{open ? caption.title : `Finish World ${w.n - 1}`}</span>
       </div>
 
-      <div className={s.actions}>
-        {!open ? (
-          <span className={`btn btn-outline ${s.cta}`} aria-disabled="true"><Lock /> Locked</span>
-        ) : todo ? (
+      {!open && <p className={`xs ${s.teaser}`}>{w.blurb}</p>}
+      {open && <div className={s.actions}>
+        {todo ? (
           <button className={`btn ${current ? "btn-primary" : "btn-outline"} ${s.cta}`} onClick={() => launch(todo)}>
-            {doneCount > 0 ? "Continue" : "Start"} <Arrow />
+            Start lesson <Arrow />
           </button>
         ) : (
           <button className={`btn btn-outline ${s.cta}`} onClick={() => launch(items[0])}>Replay</button>
         )}
         {extra}
-      </div>
+      </div>}
     </li>
   );
 }
@@ -237,4 +232,3 @@ const Arrow = () => <svg className={s.glyph} viewBox="0 0 16 16" aria-hidden><pa
 const Check = () => <svg className={s.glyph} viewBox="0 0 16 16" aria-hidden><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" /></svg>;
 const Lock = () => <svg className={s.glyph} viewBox="0 0 16 16" aria-hidden><path d="M5 7V5.5a3 3 0 016 0V7" fill="none" stroke="currentColor" strokeWidth="1.8" /><rect x="3.5" y="7" width="9" height="6.5" rx="1.5" fill="currentColor" /></svg>;
 const Star = () => <svg className={s.glyph} viewBox="0 0 16 16" aria-hidden><path d="M8 1.8l1.9 3.9 4.3.6-3.1 3 .7 4.3L8 11.6l-3.8 2 .7-4.3-3.1-3 4.3-.6z" fill="currentColor" /></svg>;
-const SandboxGlyph = () => <svg className={s.glyph} viewBox="0 0 16 16" aria-hidden><rect x="2" y="3" width="12" height="9" rx="1.5" fill="none" stroke="currentColor" strokeWidth="1.8" /><path d="M5 14h6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" /><path d="M5 9l2-2 1.5 1.5L11 6" fill="none" stroke="var(--color-accent)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>;

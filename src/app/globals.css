@@ -103,9 +103,20 @@ h3 { font-size: var(--text-base); line-height: 24px; font-weight: 700; }
 .hnav a:hover { color: var(--color-white); }
 .hnav a[aria-current="page"] { color: var(--color-white); border-bottom-color: var(--color-accent); }
 .user { margin-left: auto; display: flex; align-items: center; gap: var(--space-4); }
-.user-rank { display: flex; flex-direction: column; line-height: 18px; }
+.user-text { display: flex; flex-direction: column; align-items: flex-end; line-height: 18px; }
+.user-rank { display: flex; align-items: center; gap: var(--space-3); color: var(--color-accent); font-weight: 700; line-height: 18px; white-space: nowrap; }
+.user-xp { color: var(--color-bg-dark); font-weight: 400; overflow: hidden; max-width: 0; opacity: 0; transition: max-width 0.4s cubic-bezier(0.1, 0, 0, 1), opacity var(--ease); }
+.user:hover .user-xp, .user:focus-within .user-xp { max-width: 220px; opacity: 1; }
+.user:hover .user-xp::before, .user:focus-within .user-xp::before { content: "· "; }
 .user strong { color: var(--color-white); }
-.user-avatar { width: 42px; height: 42px; border-radius: 50%; background: var(--color-accent); color: var(--color-ink); display: grid; place-items: center; font-weight: 700; font-size: var(--text-sm); flex-shrink: 0; }
+.user-orb { position: relative; width: 52px; height: 52px; flex-shrink: 0; display: grid; place-items: center; }
+.user-ring { position: absolute; inset: 0; width: 100%; height: 100%; }
+.user-ring-track { fill: none; stroke: rgba(255, 255, 255, 0.16); stroke-width: 2.5; }
+.user-ring-fill { fill: none; stroke: var(--color-accent); stroke-width: 2.5; stroke-linecap: round; transition: stroke-dashoffset 0.9s cubic-bezier(0.1, 0, 0, 1); filter: drop-shadow(0 1px 3px rgba(255, 245, 0, 0.45)); }
+.user-avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--color-accent); color: var(--color-ink); display: grid; place-items: center; font-weight: 700; font-size: var(--text-sm); flex-shrink: 0; transition: transform var(--ease); }
+.user:hover .user-avatar { transform: scale(1.06); }
+.user-level { position: absolute; right: -2px; bottom: -2px; min-width: 20px; height: 20px; padding: 0 5px; border-radius: 10px; background: var(--color-ink); color: var(--color-accent); border: 2px solid var(--color-accent); display: grid; place-items: center; font-size: 11px; font-weight: 700; line-height: 1; }
+@media (prefers-reduced-motion: reduce) { .user-xp, .user-ring-fill, .user-avatar { transition: none; } }
 
 /* Rings */
 .ring { flex-shrink: 0; }
@@ -362,7 +373,7 @@ button.ccard-face:hover { background: color-mix(in srgb, var(--color-accent) 90%
 
 @media (max-width: 600px) {
   .card { padding: var(--space-5); }
-  .user strong { display: none; }
+  .user-text { display: none; }
 }
 
 /* ── Ready for real ── */
