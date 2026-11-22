@@ -6,7 +6,7 @@
   <img src="https://img.shields.io/badge/Next.js-16-002E3C?style=flat-square" alt="Next.js 16">
   <img src="https://img.shields.io/badge/React-19-506C74?style=flat-square" alt="React 19">
   <img src="https://img.shields.io/badge/PostgreSQL-002E3C?style=flat-square" alt="PostgreSQL">
-  <img src="https://img.shields.io/badge/Python-506C74?style=flat-square" alt="Python">
+  <img src="https://img.shields.io/badge/Node.js-506C74?style=flat-square" alt="Node.js">
   <img src="https://img.shields.io/badge/money-play_only-FFD700?style=flat-square&labelColor=002E3C" alt="Play money only">
   <img src="https://img.shields.io/badge/Collabothon-2026-83989F?style=flat-square" alt="Collabothon 2026">
 </p>
