@@ -9,7 +9,9 @@ import { chapterById, worldOpen, type Chapter } from "@/features/tour/chapters";
 import { PERSONAS } from "@/features/game/personas";
 import { actions, getSave, proTraderOffered, useGame } from "@/features/game/store";
 import { setUi, useUi } from "@/features/game/ui";
-import { addPlan, advance, deposit, ask, bid, cancelOrder, companiesOf, costBasis, dateOf, depotValue, fee, placeOrder, pricesOf, priceAt, round2, universeOf, type OrderInput, type OrderType, type Sim, type SimEvent, type Validity, newSim } from "@/features/market/engine";
+import { addPlan, advance, deposit, ask, bid, cancelOrder, companiesOf, costBasis, dateOf, depotValue, fee, placeOrder, pricesOf, priceAt, replayBarsOf, round2, universeOf, type OrderInput, type OrderType, type Sim, type SimEvent, type Validity, newSim } from "@/features/market/engine";
+import { registerRealMarket, type MarketFile } from "@/features/market/real-market";
+import type { ReplayBar } from "@/features/market/replay-market";
 import { REPLAYS, SIM_LESSONS, type BotMove, type Replay } from "@/features/market/scenarios";
 import Icon from "@/shared/ui/Icon";
 import SandboxBar from "@/features/shell/SandboxBar";
@@ -19,11 +21,13 @@ import { Wordmark } from "@/shared/ui/Wordmark";
 import ProChart, { type ChartMark } from "@/features/pro/ProChart";
 import Widget from "@/features/pro/Widget";
 import { BotBubble, DecisionCard, RevealModal, Rivals, SpotCard, BossIntro } from "@/features/pro/ReplayParts";
+import MarketChart from "@/features/pro/MarketChart";
 import SimpleDesk from "@/features/pro/Simple";
 import { BOTS } from "@/features/market/bots";
 
 export type Mode =
   | { kind: "main" }
+  | { kind: "real"; id: string }
   | { kind: "lesson"; id: string }
   | { kind: "replay"; replay: Replay };
 
@@ -33,12 +37,13 @@ dict({ Watchlist: "Watchlist", Portfolio: "Depot", Chart: "Chart", Orderbook: "O
 const BUDGET = 1000; // replays and simulated lessons: the same round budget for you and the bots (scores are in %)
 const TIME = "17:35:00";
 
-export default function Pro() {
+export default function Pro({ realMarket = false }: { realMarket?: boolean }) {
   const t = useT();
   const save = useGame();
   const ch = save.active ? chapterById(save.active) : undefined;
   const pro = ch?.surface === "pro" ? ch : undefined;
   if (!save.persona) return <Gate text={t("Answer three quick questions first.", "Beantworte zuerst drei kurze Fragen.")} href="/start" cta={t("Start", "Starten")} />;
+  if (realMarket) return <RealMarketDesk layout={save.proTrader ? "pro" : "simple"} />;
   const mode: Mode = pro?.replay ? { kind: "replay", replay: REPLAYS[pro.replay] } : pro?.lesson ? { kind: "lesson", id: SIM_LESSONS[pro.lesson as keyof typeof SIM_LESSONS].id } : { kind: "main" };
   // The learner starts on the simple trading area. Module 2 always runs there; ProTrader takes over
   // from Module 3 (and in free play) only after the learner has confirmed the switch.
@@ -48,6 +53,43 @@ export default function Pro() {
 }
 
 type Layout = "simple" | "pro";
+
+/** Rewinding the market simulation (1 day/s · 1 week/s dialog): restart it from an earlier session, trading on. */
+export type RealSim = { pace: number; cash: number; onRewind: (startIndex: number, pace: number) => void };
+
+function RealMarketDesk({ layout }: { layout: Layout }) {
+  const [market, setMarket] = useState<{ id: string; start: number } | { error: string }>();
+  const file = useRef<MarketFile | null>(null);
+  const [pace, setPace] = useState(1);
+  // A new start session re-registers the market and remounts the desk with a fresh simulation at that date.
+  const onRewind = (startIndex: number, nextPace: number) => {
+    if (!file.current) return;
+    const u = registerRealMarket(file.current, new Date(), startIndex);
+    setPace(nextPace);
+    setMarket({ id: u.id, start: u.history });
+    // Show the new date: the time bar is the first thing to see after going back in time.
+    window.scrollTo({ top: 0, behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+  };
+  useEffect(() => {
+    const controller = new AbortController();
+    fetch("/market/yahoo-daily.json", { signal: controller.signal })
+      .then(async (response) => {
+        if (!response.ok) throw new Error("Missing quotes file");
+        return await response.json() as MarketFile;
+      })
+      .then((data) => {
+        if (controller.signal.aborted) return;
+        file.current = data;
+        const u = registerRealMarket(data);
+        setMarket({ id: u.id, start: u.history });
+      })
+      .catch(() => { if (!controller.signal.aborted) setMarket({ error: "Could not load the local Yahoo Finance quotes." }); });
+    return () => controller.abort();
+  }, []);
+  if (!market) return <div className="pt-gate" role="status">Loading local market data…</div>;
+  if ("error" in market) return <Gate text={market.error} href="/" cta="Learning map" />;
+  return <Desk key={`real:${market.start}`} mode={{ kind: "real", id: market.id }} layout={layout} offerSwitch={false} realSim={{ pace, cash: BUDGET, onRewind }} />;
+}
 
 /** The move from the simple trading area to ProTrader is a moment: the learner sees what changes and confirms it. */
 function ProTraderSwitch({ chapter, onLater }: { chapter?: Chapter; onLater: () => void }) {
@@ -80,12 +122,13 @@ function Gate({ text, href, cta }: { text: string; href: string; cta: string }) 
 
 type Toast = { id: number; text: string };
 
-function Desk({ mode, chapter, layout, offerSwitch }: { mode: Mode; chapter?: Chapter; layout: Layout; offerSwitch: boolean }) {
+function Desk({ mode, chapter, layout, offerSwitch, realSim }: { mode: Mode; chapter?: Chapter; layout: Layout; offerSwitch: boolean; realSim?: RealSim }) {
   const t = useT();
   const save = useGame();
   const replay = mode.kind === "replay" ? mode.replay : undefined;
-  const universeId = mode.kind === "main" ? "main" : mode.kind === "lesson" ? mode.id : mode.replay.universe.id;
+  const universeId = mode.kind === "main" ? "main" : mode.kind === "replay" ? mode.replay.universe.id : mode.id;
   const u = universeOf(universeId);
+  const real = mode.kind === "real";
   const [local, setLocal] = useState<Sim>(() => newSim(universeId, mode.kind === "lesson" && mode.id === "w4-plan" ? 0 : BUDGET));
   const sim = mode.kind === "main" ? save.sim : local;
   const simRef = useRef(sim);
@@ -98,9 +141,12 @@ function Desk({ mode, chapter, layout, offerSwitch }: { mode: Mode; chapter?: Ch
   const heroDays = replay ? u.news.filter((n) => n.sym === replay.hero).map((n) => n.day) : [];
   const storyEnd = heroDays.length ? Math.max(...heroDays) : u.days;
   const masked = (s: Sim) => !!replay && (chapter?.kind === "chapter" ? !tourFinished : s.day < storyEnd);
-  const cover = (sym: string) => (replay && sym === replay.hero && masked(sim) ? t(replay.cover) : companyOf(sym).short);
-  const coverWkn = (sym: string) => (replay && sym === replay.hero && masked(sim) ? replay.coverWkn : companyOf(sym).wkn);
-  const [sym, setSym] = useState<string>(replay ? replay.hero : mode.kind === "lesson" && mode.id === "w4-plan" ? ETF_SYM : mode.kind === "lesson" ? ETF_SYM : "DTE");
+  const describe = (s: string) => u.companies?.find((c) => c.sym === s) ?? companyOf(s);
+  const cover = (sym: string) => (replay && sym === replay.hero && masked(sim) ? t(replay.cover) : describe(sym).short);
+  const coverWkn = (sym: string) => (replay && sym === replay.hero && masked(sim) ? replay.coverWkn : describe(sym).wkn || sym);
+  const [sym, setSym] = useState<string>(replay ? replay.hero : mode.kind === "lesson" && mode.id === "w4-plan" ? ETF_SYM : mode.kind === "lesson" ? ETF_SYM : real ? "DTE.DE" : "DTE");
+  const [watchQuery, setWatchQuery] = useState("");
+  const watch = real ? comps.filter((c) => [c.name, c.sym, c.wkn].some((v) => v.toLowerCase().includes(watchQuery.trim().toLowerCase()))) : comps;
   const [speed, setSpeed] = useState(0);
   const [orderOpen, setOrderOpen] = useState(false);
   const [breaking, setBreaking] = useState<News | null>(null);
@@ -194,9 +240,16 @@ function Desk({ mode, chapter, layout, offerSwitch }: { mode: Mode; chapter?: Ch
   const priceOf = (s: string, d = sim.day) => priceAt(u, s, d);
   const dv = depotValue(sim), total = round2(sim.acct.cash + dv);
   const label = (d: number) => (u.hideDate ? (d >= 0 ? t(`Day ${d + 1}`, `Tag ${d + 1}`) : t(`−${-d} d`, `−${-d} T`)) : (() => { const x = dateOf(u, d); return `${String(x.getUTCDate()).padStart(2, "0")} ${x.toLocaleDateString(dateLocale(t.lang), { month: "short", timeZone: "UTC" })}${x.getUTCMonth() === 0 && x.getUTCDate() <= 7 ? ` ${x.getUTCFullYear()}` : ""}`; })());
-  const clock = u.hideDate ? `${t("Day", "Tag")} ${sim.day + 1} · ${shortDay(dateOf(u, sim.day), t.lang)} · ${t("date hidden", "Datum verdeckt")}` : `${dateDE(dateOf(u, sim.day))} · ${TIME}`;
-  const firstDay = mode.kind === "main" ? Math.max(-u.history, sim.day - (layout === "simple" ? 60 : 400)) : -Math.min(u.history, replay ? 40 : 120);
-  const closes = prices[sym].slice(u.history + firstDay, u.history + sim.day + 1);
+  const clock = u.hideDate ? `${t("Day", "Tag")} ${sim.day + 1} · ${shortDay(dateOf(u, sim.day), t.lang)} · ${t("date hidden", "Datum verdeckt")}` : `${dateDE(dateOf(u, sim.day))}${real ? "" : ` · ${TIME}`}`;
+  const recentStart = Math.max(0, u.days - 14);
+  const onJumpRecent = real && sim.day < recentStart
+    ? () => { setSpeed(0); stepTime(recentStart - simRef.current.day, false); }
+    : undefined;
+  const firstDay = real ? -u.history : mode.kind === "main" ? Math.max(-u.history, sim.day - (layout === "simple" ? 60 : 400)) : -Math.min(u.history, replay ? 40 : 120);
+  const from = u.history + firstDay;
+  const through = u.history + sim.day + 1;
+  const closes = prices[sym].slice(from, through);
+  const replayBars = replayBarsOf(u)?.[sym].slice(from, through);
   const visibleNews = u.news.filter((n) => n.day <= sim.day && n.day > sim.day - 120).slice().reverse();
   const marks: ChartMark[] = (() => {
     const m: ChartMark[] = sim.acct.trades.filter((tr) => tr.sym === sym).map((tr) => ({ day: tr.day, kind: tr.side === "buy" ? "you-buy" : "you-sell", text: t(`You ${tr.side === "buy" ? "B" : "S"} ${qtyFmt(tr.qty)}`, `Du ${tr.side === "buy" ? "K" : "V"} ${qtyFmt(tr.qty)}`) }));
@@ -247,9 +300,9 @@ function Desk({ mode, chapter, layout, offerSwitch }: { mode: Mode; chapter?: Ch
     return (
       <>
         <SimpleDesk sim={sim} u={u} comps={comps} sym={sym} setSym={setSym} cover={cover} coverWkn={coverWkn}
-          speed={speed} setSpeed={setSpeed} ended={isEnded} closes={closes} firstDay={firstDay} label={label} news={visibleNews}
+          speed={speed} setSpeed={setSpeed} ended={isEnded} closes={closes} replayBars={replayBars} firstDay={firstDay} label={label} news={visibleNews}
           breaking={breaking} clearBreaking={() => setBreaking(null)} freePlay={mode.kind === "main" && !chapter}
-          order={order} cancel={cancel} addMoney={addMoney} replay={replay} answers={answers} />
+          order={order} cancel={cancel} addMoney={addMoney} replay={replay} answers={answers} onJumpRecent={onJumpRecent} realSim={realSim} />
         {overlays}
       </>
     );
@@ -299,25 +352,26 @@ function Desk({ mode, chapter, layout, offerSwitch }: { mode: Mode; chapter?: Ch
 
       <TimeBar clock={clock} speed={speed} setSpeed={(s) => { setBreaking(null); setSpeed(s); }} ended={isEnded} years={years}
         jump={(n) => { setBreaking(null); stepTime(n, mode.kind === "replay"); }}
-        next={() => { setBreaking(null); const nx = u.news.find((n) => n.major && n.day > simRef.current.day); const mv = replay?.moves.find((m) => m.day > simRef.current.day); const to = Math.min(nx?.day ?? u.days, mv?.day ?? u.days); stepTime(Math.max(1, to - simRef.current.day), true); }}
-        progress={mode.kind === "main" ? undefined : `${sim.day} / ${u.days} ${t("days", "Tage")}`}
-        label={replay && !replay.sim ? t("Historical replay · headlines retold, prices shaped like the real curve", "Historisches Replay · Schlagzeilen nacherzählt, Kurse wie die echte Kurve geformt") : t("Simulated market", "Simulierter Markt")}
+        next={real ? undefined : () => { setBreaking(null); const nx = u.news.find((n) => n.major && n.day > simRef.current.day); const mv = replay?.moves.find((m) => m.day > simRef.current.day); const to = Math.min(nx?.day ?? u.days, mv?.day ?? u.days); stepTime(Math.max(1, to - simRef.current.day), true); }}
+        progress={replay ? t(`${sim.day + 1} of ${u.days + 1} sessions`, `${sim.day + 1} von ${u.days + 1} Handelstagen`) : mode.kind === "lesson" ? `${sim.day} / ${u.days} ${t("days", "Tage")}` : undefined}
+        label={real ? t("Real Market · Yahoo Finance daily history · EUR", "Echter Markt · Yahoo-Finance-Tageskurse · EUR") : replay && !replay.sim ? t("Historical replay · observed and simulated prices", "Historisches Replay · beobachtete und simulierte Kurse") : t("Simulated market", "Simulierter Markt")}
         breaking={breaking}
         reveal={isEnded && replay ? t(replay.reveal) : undefined}
         onReveal={replay && chapter?.kind !== "chapter" ? () => setRevealOpen(true) : undefined} />
 
       <main className={`pt-grid ${workspace} ${replay ? "with-rivals" : ""}`}>
         {show("Watchlist") && (
-          <Widget id="w-watchlist" title="Watchlist" sub={t("Practice list", "Übungsliste")} className="g-watch">
+          <Widget id="w-watchlist" title="Watchlist" sub={real ? "Yahoo Finance" : t("Practice list", "Übungsliste")} className="g-watch">
+            {real && <div className="pt-search"><input type="search" aria-label={t("Search stocks", "Aktien suchen")} placeholder={t("Name or ticker", "Name oder Kürzel")} value={watchQuery} onChange={(e) => setWatchQuery(e.target.value)} /></div>}
             <table className="pt-table">
               <thead><tr><th>Name</th><th>{t("Exch.", "Börse")}</th><th className="r">{t("Last", "Letzter")}</th><th className="r">{t("Diff. prev.", "Diff. Vortag")}</th></tr></thead>
               <tbody>
-                {comps.map((c) => {
+                {watch.map((c) => {
                   const p = priceOf(c.sym), pp = priceOf(c.sym, sim.day - 1), ch = (p / pp - 1) * 100;
                   return (
                     <tr key={c.sym} className={`clickable ${sym === c.sym ? "sel" : ""}`} onClick={() => setSym(c.sym)}>
                       <td><button className="pt-link" onClick={() => setSym(c.sym)}>{cover(c.sym)}</button></td>
-                      <td className="muted">{c.type === "ETF" ? "Xetra" : "Tradegate"}</td>
+                      <td className="muted">{c.venue ?? (c.type === "ETF" ? "Xetra" : "Tradegate")}</td>
                       <td className="r num cell-y">{num(p)}</td>
                       <td className={`r num ${ch >= 0 ? "cell-g" : "cell-r"}`}>{pct(ch)}</td>
                     </tr>
@@ -361,7 +415,9 @@ function Desk({ mode, chapter, layout, offerSwitch }: { mode: Mode; chapter?: Ch
         )}
 
         {show("Chart") && (
-          <ChartWidget sym={sym} name={cover(sym)} wkn={coverWkn(sym)} closes={closes} firstDay={firstDay} label={label} marks={marks} span={replay ? Math.min(60, 40 + sim.day + 2) : 90}
+          <ChartWidget firstMonth={real ? u.historical!.sessions![0].slice(0, 7) : undefined}
+            asOf={real ? dateOf(u, sim.day).toISOString().slice(0, 10) : undefined} onJumpRecent={onJumpRecent}
+            venue={describe(sym).venue ?? "Xetra"} sym={sym} name={cover(sym)} wkn={coverWkn(sym)} closes={closes} replayBars={replayBars} firstDay={firstDay} label={label} marks={marks} span={real ? 48 : replay ? closes.length : 90}
             bubble={lastMove ? <BotBubble move={lastMove} name={cover} /> : null} />
         )}
 
@@ -369,7 +425,8 @@ function Desk({ mode, chapter, layout, offerSwitch }: { mode: Mode; chapter?: Ch
           <OrderBook sim={sim} expired={expired} cover={cover} coverWkn={coverWkn} label={label} cancel={cancel} />
         )}
 
-        {show("News") && (
+        {real && show("News") && <Widget id="w-news" title="Data source" className="g-news"><div className="pt-foot">Yahoo Finance daily prices and volume. US prices are converted to EUR using the daily reference rate.</div></Widget>}
+        {!real && show("News") && (
           <NewsWidget news={visibleNews} day={sim.day} sel={selNews} setSel={setSelNews} label={label} simulated={simulated} cover={cover} breaking={breaking?.id} />
         )}
 
@@ -380,7 +437,7 @@ function Desk({ mode, chapter, layout, offerSwitch }: { mode: Mode; chapter?: Ch
 
       {orderOpen && (
         <OrderWindow sim={sim} comps={comps} sym={sym} setSym={setSym} cover={cover} coverWkn={coverWkn} order={order} onClose={() => setOrderOpen(false)}
-          planAllowed={years} planAmount={PERSONAS[save.persona ?? "starter"].plan} setPlan={setPlan} disabled={isEnded} />
+          planAllowed={years && !real} planAmount={PERSONAS[save.persona ?? "starter"].plan} setPlan={setPlan} disabled={isEnded} />
       )}
 
       {overlays}
@@ -391,7 +448,7 @@ function Desk({ mode, chapter, layout, offerSwitch }: { mode: Mode; chapter?: Ch
 const ended = (s: Sim) => s.day >= universeOf(s.universe).days;
 
 function TimeBar({ clock, speed, setSpeed, jump, next, ended, years, progress, label, breaking, reveal, onReveal }: {
-  clock: string; speed: number; setSpeed: (s: number) => void; jump: (n: number) => void; next: () => void; ended: boolean; years: boolean;
+  clock: string; speed: number; setSpeed: (s: number) => void; jump: (n: number) => void; next?: () => void; ended: boolean; years: boolean;
   progress?: string; label: string; breaking: News | null; reveal?: string; onReveal?: () => void;
 }) {
   const t = useT();
@@ -403,7 +460,7 @@ function TimeBar({ clock, speed, setSpeed, jump, next, ended, years, progress, l
         <button aria-pressed={speed === 0} onClick={() => setSpeed(0)} title={t("Pause", "Pause")}>⏸</button>
         <button aria-pressed={speed === 1} onClick={() => setSpeed(1)} disabled={ended} title={t("Play 1×", "Abspielen 1×")}>▶ 1×</button>
         <button aria-pressed={speed === 5} onClick={() => setSpeed(5)} disabled={ended} title={t("Play 5×", "Abspielen 5×")}>⏩ 5×</button>
-        <button onClick={next} disabled={ended} title={t("Jump to the next event", "Zum nächsten Ereignis springen")}>{t("⏭ Next event", "⏭ Nächstes Ereignis")}</button>
+        {next && <button onClick={next} disabled={ended} title={t("Jump to the next event", "Zum nächsten Ereignis springen")}>{t("⏭ Next event", "⏭ Nächstes Ereignis")}</button>}
       </div>
       <div className="tm-btns" role="group" aria-label={t("Jump ahead", "Vorspringen")}>
         <button onClick={() => jump(1)} disabled={ended}>{t("+1 day", "+1 Tag")}</button>
@@ -420,17 +477,15 @@ function TimeBar({ clock, speed, setSpeed, jump, next, ended, years, progress, l
   );
 }
 
-function ChartWidget({ sym, name, wkn, closes, firstDay, label, marks, span, bubble }: {
-  sym: string; name: string; wkn: string; closes: number[]; firstDay: number; label: (d: number) => string; marks: ChartMark[]; span: number; bubble: React.ReactNode;
+function ChartWidget({ sym, name, wkn, venue, closes, replayBars, firstDay, label, marks, span, bubble, asOf, onJumpRecent, firstMonth }: {
+  asOf?: string; firstMonth?: string; onJumpRecent?: () => void;
+  sym: string; name: string; wkn: string; venue: string; closes: number[]; replayBars?: ReplayBar[]; firstDay: number; label: (d: number) => string; marks: ChartMark[]; span: number; bubble: React.ReactNode;
 }) {
   const t = useT();
   const [type, setType] = useState<"candles" | "line">("candles");
   const [bb, setBb] = useState(false);
-  return (
-    <Widget id="w-chart" title="Chart" className="g-chart" actionsSlot={<><span className="pt-chip-sel">{t("Since start", "Seit Start")}</span><span className="pt-chip-sel">{t("1 day", "1 Tag")}</span></>}>
-      <div className="pt-chart-top">
-        <span className="pt-instr"><span className="ok-dot" aria-hidden /> <span className="num">{wkn}</span> · Xetra · <strong>{name}</strong></span>
-      </div>
+  const dailyChart = (
+    <>
       <div className="pt-tools">
         <label><span>{t("Chart type", "Chartart")}</span><select value={type} onChange={(e) => setType(e.target.value as "candles" | "line")}><option value="candles">{t("Candles", "Kerzen")}</option><option value="line">{t("Line", "Linie")}</option></select></label>
         <label><span>{t("Indicator", "Indikator")}</span><select value={bb ? "bb" : ""} onChange={(e) => setBb(e.target.value === "bb")}><option value="">{t("Add…", "Hinzufügen …")}</option><option value="bb">Bollinger (20, 2)</option></select></label>
@@ -438,9 +493,17 @@ function ChartWidget({ sym, name, wkn, closes, firstDay, label, marks, span, bub
         <span className="pt-legend xs"><span className="lg-you" /> {t("You", "Du")} <span className="lg-bot" /> Bots <span className="lg-news" /> News</span>
       </div>
       <div className="pt-chart-body">
-        <ProChart sym={sym} closes={closes} firstDay={firstDay} label={label} marks={marks} type={type} bollinger={bb} span={span} />
+        <ProChart sym={sym} closes={closes} replayBars={replayBars} firstDay={firstDay} label={label} marks={marks} type={type} bollinger={bb} span={span} scrollHistory={!!asOf} />
         {bubble}
       </div>
+    </>
+  );
+  return (
+    <Widget id="w-chart" title="Chart" className="g-chart" actionsSlot={asOf ? undefined : <><span className="pt-chip-sel">{t("Since start", "Seit Start")}</span><span className="pt-chip-sel">{t("1 day", "1 Tag")}</span></>}>
+      <div className="pt-chart-top">
+        <span className="pt-instr"><span className="ok-dot" aria-hidden /> <span className="num">{wkn}</span> · {venue} · <strong>{name}</strong></span>
+      </div>
+      {asOf ? <MarketChart symbol={sym} asOf={asOf} firstMonth={firstMonth!} onJumpRecent={onJumpRecent}>{dailyChart}</MarketChart> : dailyChart}
     </Widget>
   );
 }
@@ -542,6 +605,7 @@ function OrderWindow({ sim, comps, sym: initial, setSym, cover, coverWkn, order,
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
   const [amount, setAmount] = useState(String(planAmount));
   const u = universeOf(sim.universe);
+  const venue = comps.find((company) => company.sym === sym)?.venue ?? "Xetra";
   const mid = priceAt(u, sym, sim.day);
   const n = parseInt(qty, 10) || 0;
   const lim = Number(limit.replace(",", ".")) || 0;
@@ -550,7 +614,7 @@ function OrderWindow({ sim, comps, sym: initial, setSym, cover, coverWkn, order,
   const vol = round2(est * n), f = n ? fee(vol) : 0;
   const pick = (s: string) => { setLocalSym(s); setSym(s); setMsg(null); };
   function submit() {
-    const res = order({ sym, side, qty: n, type, limit: lim, validity, exchange: "Xetra" });
+    const res = order({ sym, side, qty: n, type, limit: lim, validity, exchange: venue });
     setMsg(res.error ? { ok: false, text: t(res.error) } : { ok: true, text: res.filled ? t(`Executed: ${side === "buy" ? "bought" : "sold"} ${n} × ${cover(sym)}.`, `Ausgeführt: ${n} × ${cover(sym)} ${side === "buy" ? "gekauft" : "verkauft"}.`) : t(`Order placed in the orderbook (${type} ${num(lim)} €).`, `Order ins Orderbuch gelegt (${type === "stop" ? "Stop" : "Limit"} ${num(lim)} €).`) });
   }
   return (
@@ -563,7 +627,7 @@ function OrderWindow({ sim, comps, sym: initial, setSym, cover, coverWkn, order,
         </div>
         <div className="ow-row">
           <label><span>{t("Instrument", "Wertpapier")}</span><select value={sym} onChange={(e) => pick(e.target.value)}>{comps.map((c) => <option key={c.sym} value={c.sym}>{coverWkn(c.sym)} · {cover(c.sym)}</option>)}</select></label>
-          <label><span>{t("Exchange", "Handelsplatz")}</span><select defaultValue="Xetra"><option>Xetra</option></select></label>
+          <label><span>{t("Exchange", "Handelsplatz")}</span><select key={venue} defaultValue={venue}><option>{venue}</option></select></label>
         </div>
         <strong className="ow-name"><span className="ok-dot" aria-hidden /> {cover(sym)}</strong>
         <div className="ow-quote num">

@@ -111,8 +111,8 @@ export default function LearningMap() {
       </section>
 
       <section className={s.modes} aria-label={t("Play modes", "Spielmodi")}>
-        <ModeTile open icon="chart" title={t("Real Market", "Echter Markt")} line={t("Simple or Pro view.", "Einfache oder Pro-Ansicht.")}
-          onOpen={() => { actions.start(null); setUi({}); router.push("/pro"); }} />
+        <ModeTile open icon="chart" title={t("Real Market", "Echter Markt")} line={t("Practice with historical stock prices.", "Üben mit historischen Kursen.")}
+          onOpen={() => router.push("/real-market")} />
         <ModeTile open icon="sprout" title={t("Investor Simulator", "Anleger-Simulator")} line={t("30 years of life in 10 minutes.", "30 Jahre Leben in 10 Minuten.")} onOpen={() => router.push("/invest")} />
         {/* all play modes are open from the start, separate from the modules */}
         <ModeTile open icon="hourglass" title={t("History Mode", "Geschichtsmodus")} line={t("Real crashes, hidden dates.", "Echte Crashs, verdeckte Daten.")}
