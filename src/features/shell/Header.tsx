@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { rankOf, useGame } from "@/features/game/store";
+import { actions, rankOf, useGame } from "@/features/game/store";
 import { Wordmark } from "@/shared/ui/Wordmark";
 import { USER } from "@/shared/lib/user";
 import { useT } from "@/shared/lib/i18n";
@@ -23,7 +23,10 @@ export default function Header() {
         <LangSwitch />
         {save.persona && !["/", "/history", "/invest", "/pro"].includes(path) && (
           <nav className="hnav" aria-label="comdirect edu">
-            <Link href="/pro">{path === "/real-market" || save.proTrader ? "ProTrader" : t("Trading area", "Handelsbereich")}</Link>
+            {path === "/real-market" || save.proTrader
+              // Same as "Switch to ProTrader": /pro shows the ProTrader layout once save.proTrader is set.
+              ? <Link href="/pro" onClick={() => actions.switchToProTrader()}>ProTrader</Link>
+              : <Link href="/pro">{t("Trading area", "Handelsbereich")}</Link>}
           </nav>
         )}
         <div className="user" aria-label={t(`Your profile: ${USER.name}, level ${rank.level} ${rank.name}, ${save.xp} XP`, `Dein Profil: ${USER.name}, Level ${rank.level} ${t(rank.name)}, ${save.xp} XP`)}>
