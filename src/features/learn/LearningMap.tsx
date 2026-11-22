@@ -111,8 +111,8 @@ export default function LearningMap() {
       </section>
 
       <section className={s.modes} aria-label={t("Play modes", "Spielmodi")}>
-        <ModeTile open icon="chart" title={t("Real Market", "Echter Markt")} line={t("Simple or Pro view.", "Einfache oder Pro-Ansicht.")}
-          onOpen={() => { actions.start(null); setUi({}); router.push("/pro"); }} />
+        <ModeTile open icon="chart" title={t("Real Market", "Echter Markt")} line={t("Practice with historical stock prices.", "Üben mit historischen Kursen.")}
+          onOpen={() => router.push("/real-market")} />
         <ModeTile open icon="sprout" title={t("Investor Simulator", "Anleger-Simulator")} line={t("30 years of life in 10 minutes.", "30 Jahre Leben in 10 Minuten.")} onOpen={() => router.push("/invest")} />
         {/* all play modes are open from the start, separate from the modules */}
         <ModeTile open icon="hourglass" title={t("History Mode", "Geschichtsmodus")} line={t("Real crashes, hidden dates.", "Echte Crashs, verdeckte Daten.")}
@@ -150,7 +150,13 @@ export default function LearningMap() {
 
 
       <section aria-labelledby="cards-h">
-        <h2 id="cards-h" className={s.sectionHead}>{t("Concept cards", "Wissenskarten")}</h2>
+        <div className={s.cardsHeading}>
+          <h2 id="cards-h">{t("Concept cards", "Wissenskarten")}</h2>
+          <p className={s.collectionReward}>
+            {t(`Collect all ${CARDS.length} cards`, `Sammle alle ${CARDS.length} Karten`)}
+            {" · "}<strong>{t("25 € account bonus", "25 € Kontobonus")}</strong>
+          </p>
+        </div>
         <ul className={s.cards}>
           {CARDS.map((c) => {
             const has = save.cards.includes(c.id);

@@ -353,6 +353,8 @@ export const HISTORY: Chapter[] = [
 export const CHAPTERS: Chapter[] = [...W1, ...W2, ...W3, ...W4];
 export const isHistory = (ch: Chapter) => ch.world === 0;
 export const chapterById = (id: string) => CHAPTERS.find((c) => c.id === id) ?? HISTORY.find((c) => c.id === id);
+/** Module 2 and History mode always play on the simple trading area, ProTrader or not. */
+export const simpleOnlyChapter = (c?: Chapter) => c?.surface === "pro" && (c.world === 0 || c.world === 2);
 /** A world unlocks when the previous world's mission is done (idea.md §4.3). */
 export const worldOpen = (save: Save, n: number) => save.allUnlocked || n === 1 || save.done.includes(`w${n - 1}`);
 

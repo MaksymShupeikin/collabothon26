@@ -178,7 +178,8 @@ export const actions = {
   unlockPro() { update((s) => ({ ...s, proUnlocked: true })); },
   celebratePro() { update((s) => ({ ...s, proCelebrated: true })); },
   /** The learner acknowledged the move from the simple trading area to ProTrader. */
-  switchToProTrader() { update((s) => ({ ...s, proTrader: true })); },
+  switchToProTrader() { update((s) => ({ ...s, proTrader: true, simpleChosen: false })); },
+  switchToSimple() { update((s) => ({ ...s, proTrader: false, simpleChosen: true })); },
   setAllUnlocked(on: boolean) { update((s) => ({ ...s, allUnlocked: on, proUnlocked: s.proUnlocked || on })); },
   reset() { write(EMPTY); },
   setInvBest(b: Save["invBest"]) { update((s) => ({ ...s, invBest: b })); },

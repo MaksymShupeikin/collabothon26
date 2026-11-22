@@ -57,7 +57,7 @@ let pgReady: Promise<void> | undefined;
 
 async function db() {
   if (!process.env.DATABASE_URL) throw new Error("DATABASE_URL is not set");
-  sql ??= postgres(process.env.DATABASE_URL, { max: 5 });
+  sql ??= postgres(process.env.DATABASE_URL, { max: 5, onnotice: () => {} }); // silence "table already exists" notices
   pgReady ??= Promise.all([
     sql`create table if not exists saves (
       id uuid primary key,

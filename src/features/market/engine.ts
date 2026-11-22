@@ -2,6 +2,7 @@ import { ALL_COMPANIES, type Company } from "./companies.ts";
 import type { News } from "./news.ts";
 import { gauss, rng } from "../../shared/lib/rng.ts";
 import { dict } from "../../shared/lib/i18n.core.ts";
+import { buildReplayMarket, type HistoricalMarket, type ReplayBar } from "./replay-market.ts";
 
 /**
  * Deterministic market + one player account.
@@ -41,6 +42,9 @@ export type Universe = {
   etf?: { sym: string; of: string[] }; // ETF price = average daily move of these
   startDate: string; // ISO date of game day 0 (a weekday)
   hideDate?: boolean; // historical replays hide the real date until the reveal
+  historical?: HistoricalMarket;
+  companies?: Company[];
+  observedBars?: Record<string, ReplayBar[]>;
 };
 
 export const FEE_FIXED = 4.9;
@@ -58,13 +62,28 @@ export const bid = (mid: number) => round2(mid * (1 - SPREAD));
 
 const universes = new Map<string, Universe>();
 const priceCache = new Map<string, Record<string, number[]>>();
-export const registerUniverse = (u: Universe) => { universes.set(u.id, u); priceCache.delete(u.id); };
+const replayCache = new Map<string, Record<string, ReplayBar[]>>();
+export const registerUniverse = (u: Universe) => {
+  universes.set(u.id, u);
+  priceCache.delete(u.id);
+  replayCache.delete(u.id);
+};
 export const universeOf = (id: string) => {
   const u = universes.get(id);
   if (!u) throw new Error(`Unknown universe ${id}`);
   return u;
 };
-export const companiesOf = (u: Universe): Company[] => u.syms.map((s) => ALL_COMPANIES.find((c) => c.sym === s)!);
+export const companiesOf = (u: Universe): Company[] => u.companies ?? u.syms.map((s) => ALL_COMPANIES.find((c) => c.sym === s)!);
+
+export function replayBarsOf(u: Universe): Record<string, ReplayBar[]> | undefined {
+  if (u.observedBars) return u.observedBars;
+  if (!u.historical) return undefined;
+  const cached = replayCache.get(u.id);
+  if (cached) return cached;
+  const bars = buildReplayMarket(u, u.historical, companiesOf(u));
+  replayCache.set(u.id, bars);
+  return bars;
+}
 
 function effectOn(u: Universe, c: Company, d: number): number {
   let sum = 0;
@@ -92,6 +111,12 @@ function pathPrice(path: Path, d: number, noise: number): number {
 export function pricesOf(u: Universe): Record<string, number[]> {
   const cached = priceCache.get(u.id);
   if (cached) return cached;
+  const replay = replayBarsOf(u);
+  if (replay) {
+    const closes = Object.fromEntries(Object.entries(replay).map(([sym, bars]) => [sym, bars.map((bar) => bar.close)]));
+    priceCache.set(u.id, closes);
+    return closes;
+  }
   const out: Record<string, number[]> = {};
   const H = u.history, N = H + u.days + 1;
   const comps = companiesOf(u);
@@ -139,6 +164,8 @@ export const priceNow = (s: Sim, sym: string) => priceAt(universeOf(s.universe),
 
 /** Game day → calendar date, skipping weekends. Negative days go back in time. */
 export function dateOf(u: Universe, day: number): Date {
+  const session = u.historical?.sessions?.[u.history + day];
+  if (session) return new Date(session + "T00:00:00Z");
   const d = new Date(u.startDate + "T00:00:00Z");
   let n = Math.abs(day);
   const step = day < 0 ? -1 : 1;
@@ -187,6 +214,10 @@ export type OrderResult = { sim: Sim; error: string | null; filled: Trade | null
 
 /** Market orders fill now. A marketable limit order fills now too; otherwise it waits in the order book. */
 export function placeOrder(prev: Sim, o: OrderInput): OrderResult {
+  const u = universeOf(prev.universe);
+  if (u.observedBars?.[o.sym]?.[u.history + prev.day]?.closed) {
+    return { sim: prev, error: "This market has no trading session on the selected date.", filled: null };
+  }
   const s = structuredClone(prev);
   const mid = priceNow(s, o.sym);
   const exchange = o.exchange ?? "Xetra";
@@ -244,6 +275,7 @@ export function advance(prev: Sim, days: number, opts: { stopAtMajor?: boolean }
     const d = ++s.day;
     // Pending orders
     a.orders = a.orders.filter((o) => {
+      if (u.observedBars?.[o.sym]?.[u.history + d]?.closed) return true;
       const p = priceAt(u, o.sym, d);
       const hit = o.type === "limit" ? (o.side === "buy" ? ask(p) <= o.limit : bid(p) >= o.limit) : (o.side === "sell" ? p <= o.limit : p >= o.limit);
       if (hit) {

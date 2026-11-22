@@ -1,7 +1,8 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { rankOf, useGame } from "@/features/game/store";
+import { actions, rankOf, useGame } from "@/features/game/store";
+import { chapterById, simpleOnlyChapter } from "@/features/tour/chapters";
 import { Wordmark } from "@/shared/ui/Wordmark";
 import { USER } from "@/shared/lib/user";
 import { useT } from "@/shared/lib/i18n";
@@ -13,6 +14,8 @@ export default function Header() {
   const path = usePathname();
   const rank = rankOf(save.xp);
   const t = useT();
+  // On the simple trading area after "Simple view", the tab is the way back to ProTrader.
+  const backToPro = path === "/pro" && save.simpleChosen && !simpleOnlyChapter(save.active ? chapterById(save.active) : undefined);
   return (
     <header className="header">
       <div className="header-inner">
@@ -21,9 +24,12 @@ export default function Header() {
           <span className="logo-edu">edu</span>
         </Link>
         <LangSwitch />
-        {save.persona && !["/", "/history", "/invest", "/pro"].includes(path) && (
+        {save.persona && (backToPro || !["/", "/history", "/invest", "/pro"].includes(path)) && (
           <nav className="hnav" aria-label="comdirect edu">
-            <Link href="/pro">{save.proTrader ? "ProTrader" : t("Trading area", "Handelsbereich")}</Link>
+            {path === "/real-market" || save.proTrader || save.simpleChosen
+              // Same as "Switch to ProTrader"; an open Module 2 / History chapter would keep /pro on the simple layout, so leave it.
+              ? <Link href="/pro" onClick={() => { if (simpleOnlyChapter(save.active ? chapterById(save.active) : undefined)) actions.start(null); actions.switchToProTrader(); }}>ProTrader</Link>
+              : <Link href="/pro">{t("Trading area", "Handelsbereich")}</Link>}
           </nav>
         )}
         <div className="user" aria-label={t(`Your profile: ${USER.name}, level ${rank.level} ${rank.name}, ${save.xp} XP`, `Dein Profil: ${USER.name}, Level ${rank.level} ${t(rank.name)}, ${save.xp} XP`)}>

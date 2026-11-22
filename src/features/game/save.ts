@@ -28,6 +28,7 @@ export type Save = {
   proUnlocked: boolean;
   proCelebrated: boolean;
   proTrader: boolean; // the learner confirmed the switch from the simple trading area to ProTrader (offered after the Module 2 mission)
+  simpleChosen: boolean; // the learner went back from ProTrader to the simple area: don't offer the switch again
   allUnlocked: boolean; // demo switch on the learning map
   active: string | null; // chapter / mission currently running
   giro: number;
@@ -50,6 +51,7 @@ export const freshSave = (persona: PersonaId | null = null): Save => ({
   proUnlocked: false,
   proCelebrated: false,
   proTrader: false,
+  simpleChosen: false,
   allUnlocked: false,
   active: null,
   giro: persona ? PERSONAS[persona].start : 0,

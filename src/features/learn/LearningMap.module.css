@@ -200,6 +200,9 @@
 .finish:hover .finishGo .glyph { transform: translateX(3px); }
 
 /* ── Concept cards ── */
+.cardsHeading { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: var(--space-3) var(--space-5); margin-bottom: var(--space-5); }
+.collectionReward { font-size: var(--text-xs); line-height: 20px; color: var(--color-ink-2); }
+.collectionReward strong { color: var(--color-ink); font-weight: 700; }
 .cards { list-style: none; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: var(--space-5); }
 .mini {
   position: relative; aspect-ratio: 5 / 6; border-radius: var(--radius-md); padding: var(--space-4) var(--space-4) var(--space-5);
