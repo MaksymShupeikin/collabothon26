@@ -1,4 +1,8 @@
 <p align="center">
+  <img src=".github/assets/comdirect-edu.svg" alt="comdirect edu — Practice first, then invest" width="100%">
+</p>
+
+<p align="center">
   <img src="https://img.shields.io/badge/Next.js-16-002E3C?style=flat-square" alt="Next.js 16">
   <img src="https://img.shields.io/badge/React-19-506C74?style=flat-square" alt="React 19">
   <img src="https://img.shields.io/badge/money-play_only-FFD700?style=flat-square&labelColor=002E3C" alt="Play money only">
@@ -12,6 +16,29 @@ A play-money training sandbox on the real comdirect screens that guides first-ti
 **No theory first: you act from the very first minute, and every concept sticks because you just did it yourself.**
 
 [View the pitch presentation (PDF)](docs/finance-quest.pdf)
+
+<table>
+  <tr>
+    <td width="50%" valign="top">
+      <a href=".github/assets/learning-hub.webp"><img src=".github/assets/learning-hub.webp" alt="Learning hub with an XP rank ring, collected stars and cards, and a four-module learning path" width="100%"></a>
+      <br><strong>Your next confident step</strong><br>Guided missions, visible progress and a learning path that grows with you
+    </td>
+    <td width="50%" valign="top">
+      <a href=".github/assets/protrader.webp"><img src=".github/assets/protrader.webp" alt="ProTrader practice workspace with a candlestick chart, watchlist, portfolio, order history and simulated news" width="100%"></a>
+      <br><strong>Practise on familiar screens</strong><br>The comdirect-style trading workspace, with play money and a time machine
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <a href=".github/assets/investor-simulator.webp"><img src=".github/assets/investor-simulator.webp" alt="Investor Simulator: 30 years of life in 10 minutes, with a chart comparing financial choices" width="100%"></a>
+      <br><strong>30 years in 10 minutes</strong><br>See how today's decisions shape your future
+    </td>
+    <td width="50%" valign="top">
+      <a href=".github/assets/history-mode.webp"><img src=".github/assets/history-mode.webp" alt="History Mode: real crashes with hidden dates, a historical chart and an unknown outcome" width="100%"></a>
+      <br><strong>Real events, your decisions</strong><br>Replay market turning points before the dates are revealed
+    </td>
+  </tr>
+</table>
 
 ## Why
 
