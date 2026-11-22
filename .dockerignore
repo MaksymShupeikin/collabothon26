@@ -6,3 +6,4 @@ references
 docs
 .impeccable
 .claude
+.env*

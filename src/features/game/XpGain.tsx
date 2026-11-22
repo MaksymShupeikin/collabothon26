@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { getSave, onSave } from "@/features/game/store";
+import { onSave } from "@/features/game/store";
 import { playXpChime } from "@/features/game/sfx";
 
 type Burst = { id: number; delta: number; x: number; y: number };
@@ -34,11 +34,8 @@ export default function XpGain() {
   // Listens to save writes directly (not the rendered value), so hydration and page changes never
   // read as a gain. Mounted once in the root layout, so it works on every page.
   useEffect(() => {
-    let before = getSave().xp;
-    return onSave(() => {
-      const xp = getSave().xp;
-      const delta = xp - before;
-      before = xp;
+    return onSave((prev, next) => {
+      const delta = next.xp - prev.xp;
       if (delta <= 0) return;
       // Deferred a tick so the next step's bubble is placed first.
       window.setTimeout(() => {

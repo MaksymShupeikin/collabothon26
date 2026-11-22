@@ -169,7 +169,7 @@ npm run check      # self-check of the money math, scripted markets and bots
 npm run build
 ```
 
-Progress lives in `localStorage` (`cd-edu-v3`). "Reset progress" at the bottom of the hub starts over.
+Progress lives in Postgres (`saves` table, created on first use), keyed by an anonymous `cd-edu-id` cookie. Set `DATABASE_URL` (e.g. in `.env.local`); without it the app runs but nothing is saved. Old `localStorage` progress is uploaded once on first load. "Reset progress" at the bottom of the hub starts over.
 
 ## Project structure
 

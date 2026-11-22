@@ -1,18 +1,16 @@
 "use client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useSyncExternalStore } from "react";
 import { HISTORY, surfaceHref, type Chapter } from "@/features/tour/chapters";
 import { REPLAYS } from "@/features/market/scenarios";
 import { pricesOf } from "@/features/market/engine";
-import { actions, useGame } from "@/features/game/store";
+import { actions, useGame, useLoaded } from "@/features/game/store";
 import { setUi } from "@/features/game/ui";
 import Icon from "@/shared/ui/Icon";
 import { Arrow, Check, Star } from "@/features/learn/LearningMap";
 import { useT } from "@/shared/lib/i18n";
 import s from "./LearningMap.module.css";
 
-const noop = () => () => {};
 const STORY_ICON: Record<string, string> = { "h-nvidia": "waves" };
 
 /** History Mode: the historical replays, one list to pick from, all open. Years stay hidden until a story has been played. */
@@ -20,8 +18,8 @@ export default function HistoryMode() {
   const t = useT();
   const save = useGame();
   const router = useRouter();
-  // Progress lives in localStorage: render on the client only, like HomeSwitch, so locks and years never hydrate wrong.
-  const client = useSyncExternalStore(noop, () => true, () => false);
+  // Wait for the server save, like HomeSwitch, so locks and years never render wrong.
+  const client = useLoaded();
   const stories = HISTORY;
   const next = stories.find((c) => !save.done.includes(c.id)) ?? stories[0];
 

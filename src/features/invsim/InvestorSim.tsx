@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { actions } from "@/features/game/store";
+import { actions, useGame } from "@/features/game/store";
 import CardArt, { CARD_SHORT } from "@/features/learn/CardArt";
 import LineChart from "@/shared/charts/LineChart";
 import CountUp from "@/shared/ui/CountUp";
@@ -44,18 +44,13 @@ dict({
   "Beat Careful Anna and the mattress": "Schlag die vorsichtige Anna und die Matratze", "Beat Trader Max": "Schlag Trader Max", "No forced sales, no loans": "Keine Notverkäufe, keine Kredite",
   "1st": "Platz 1", "2nd": "Platz 2", "3rd": "Platz 3", "4th": "Platz 4", Thriving: "Blühend", Balanced: "Ausgeglichen", Tight: "Knapp", Grey: "Grau",
 });
-const BEST_KEY = "cd-edu-invsim-best";
-
 type Best = { worth: number; stars: number };
-function readBest(): Best | null {
-  try { return JSON.parse(localStorage.getItem(BEST_KEY) ?? "null"); } catch { return null; }
-}
 
 /** Investor Simulator: 30 years of a life in about ten minutes. One event and one money decision per year. */
 export default function InvestorSim() {
   const [g, setG] = useState<Game | null>(null);
-  const [best, setBest] = useState<Best | null>(null);
-  useEffect(() => { const t = setTimeout(() => setBest(readBest()), 0); return () => clearTimeout(t); }, []);
+  const best = useGame().invBest;
+  const setBest = actions.setInvBest;
 
   const start = () => { setG(newGame(Math.floor(Math.random() * 1e6) + 1, begin)); window.scrollTo({ top: 0 }); };
 
@@ -268,7 +263,6 @@ function End({ g, onAgain, best, setBest }: { g: Game; onAgain: () => void; best
     if (starCount === 3) actions.award("invsim-3stars", 40);
     if (isBest) {
       const b = { worth: r.worth, stars: starCount };
-      try { localStorage.setItem(BEST_KEY, JSON.stringify(b)); } catch { /* private mode: no personal best */ }
       setBest(b);
     }
     return () => clearTimeout(t);

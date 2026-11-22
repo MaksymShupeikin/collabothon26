@@ -4,6 +4,7 @@ services:
     build: .
     container_name: comdirect-web
     restart: unless-stopped
+    env_file: .env # DATABASE_URL=postgres://comdirect:...@db-postgres-1:5432/comdirect (the shared Postgres on db_default)
     networks: [db_default]
 
 networks:
