@@ -66,7 +66,8 @@ comdirect already has the pieces, but they live apart:
 | **History mode** | Replay real market moments and see how your decisions would have played out |
 | **Investor simulator** | A life-long savings run: income, events and choices, decade by decade |
 | **Learning map** | Tutorials, concept cards, mini games, quick-check quizzes and bosses |
-| **AI Agent (MCP)** | Connect your own AI agent (Cursor, Claude Desktop, Claude Code) via Model Context Protocol for live account & position P/L briefings, exact deltas since your last check, and personalized concept tutoring (`/mcp`) |
+| **AI Agent (MCP)** | Connect your own AI chatbot (Claude, ChatGPT, Gemini, Grok, Cursor, Claude Desktop, Claude Code) via Model Context Protocol for live account & position P/L briefings, exact deltas since your last check, and personalized concept tutoring (`/mcp`) |
+| **AI study buddy (chat)** | Ask a question right on the platform, no setup: the "Ask" button opens a chat that knows all of comdirect edu's lessons, sees where you are and what you've completed, and links every answer to the lesson it came from |
 
 ### One path, three life stages
 
@@ -119,9 +120,9 @@ Three onboarding questions pick a persona, and everything is tailored to it: exa
 
 | | |
 |---|---|
-| ✅ **Working** | Onboarding with three personas · all four tutorials end to end, each with a mission and a boss · five History replays (Wirecard, GameStop, VW, NVIDIA, COVID crash) · investor simulator · learning map with XP, ranks, stars and cards · ProTrader replica with the time machine · Real Market with historical quotes and intraday charts · backend progress saving in PostgreSQL · English and German |
+| ✅ **Working** | Onboarding with three personas · all four tutorials end to end, each with a mission and a boss · five History replays (Wirecard, GameStop, VW, NVIDIA, COVID crash) · investor simulator · learning map with XP, ranks, stars and cards · ProTrader replica with the time machine · Real Market with historical quotes and intraday charts · backend progress saving in PostgreSQL · MCP server for your own AI chatbot (12 tools, 5 live resources) · built-in AI study-buddy chat with sources · English and German |
 | 🟡 **Simulated on purpose** | Tutorial prices are scripted; Real Market uses historical quotes · all trades use play money · the photoTAN step is a mock · "Ready for real?" links to comdirect.de |
-| 🔜 **Planned integration** | Customer profile and identity from the bank platform · progress linked to that identity across devices · MCP access for the customer's own agent |
+| 🔜 **Planned integration** | Customer profile and identity from the bank platform · progress linked to that identity across devices |
 
 ## Tech stack
 
@@ -152,11 +153,14 @@ The data flow is:
 
 **In the current prototype,** the progress backend is implemented, while the bank connection is still planned. The profile is the fixed "Max Mustermann" placeholder, and an anonymous browser cookie identifies each save. See [Saving progress](#saving-progress) for the current behaviour.
 
-### MCP integration — planned
+### AI on the platform: built, two ways in
 
-We plan to expose app help and learning context through **Model Context Protocol (MCP)**, so customers can use their own compatible agent while practising. They could ask "What does this field mean?", "Why use a limit order here?" or "What should I try next?" and get an explanation grounded in the app and their current learning step.
+Learners can ask "What does this field mean?", "Why use a limit order here?" or "How is my portfolio doing?" and get an answer grounded in the app and their own sandbox. This closes the learning loop: **get a hint → try it → get feedback → understand why → ask the AI if still unsure**. Both ways are built and running:
 
-This extends the learning loop: **get a hint → try it → get feedback → understand why → ask your agent if still unsure**. MCP support is not yet implemented on `main`. The planned integration would expose authorised app and learning context; real trading remains in the bank's existing services.
+1. **MCP: bring your own AI chatbot.** comdirect edu runs a Model Context Protocol server. Connect Claude, ChatGPT, Gemini, Grok, Cursor, Claude Desktop or Claude Code in a couple of clicks from **`/mcp`** (a pop-up in the app links there). Your chatbot then works with your live sandbox data: account and position P/L, exact changes since your last check, trades, learning progress, concept explanations and History replays. It can even place play-money orders. Details: [AI Agent Integration (MCP)](#ai-agent-integration-mcp).
+2. **The study buddy: a chat built into the platform.** Not everyone wants to set up MCP, so the "Ask" button opens a chat right inside comdirect edu: on desktop a panel, on phones full screen. It knows the whole platform. Every concept card, chapter, mission, History replay, lesson, company and Investor Simulator event is indexed, and the agent looks up the right pieces for each question (retrieval-augmented generation). It also gets your current context: the page you are on, your persona, the cards you collected and the chapters you finished. So it explains things at your level and points you to the chapter that covers a topic. Every answer cites the lessons it came from, in the language you write in. Quiz answers and replay reveals stay hidden until you have earned them. Details: [Study buddy chat](#study-buddy-chat).
+
+Neither gives personal investment advice. Both work on play money only; real trading stays in the bank's existing services.
 
 ## Behind the build
 
@@ -191,13 +195,13 @@ This extends the learning loop: **get a hint → try it → get feedback → und
 **Current limitations.**
 - Tutorial simulations use one price per trading day with a fixed spread; dividends and tax are not modelled.
 - Rival bots only appear in the History replays, not in free play.
-- The bank profile/identity connection and MCP integration are planned; current saves follow a browser rather than a customer across devices.
+- The bank profile/identity connection is planned; current saves follow a browser rather than a customer across devices.
 - Not tested with real first-time investors yet.
 
 **Next.**
 - Test with real first-time investors and measure who places a real first trade.
 - Connect the existing bank identity and profile, so learning progress follows the customer across devices.
-- Add MCP support for app questions through the customer's own agent.
+- Let the study buddy and the MCP server use the signed-in customer's identity, so the AI sees the same progress on every device.
 - Extend the simulation with a wider night spread, dividends and tax on profits.
 - Bring the rival bots into free play.
 
@@ -251,6 +255,23 @@ Open **`/mcp`** in the app to copy your personal pre-filled configuration or run
   ```
 - **Capabilities:** 12 tools (`get_account_update`, `get_portfolio`, `list_market_instruments`, `get_stock_overview`, `get_learning_progress`, `list_concepts`, `explain_concept`, `review_trades`, `get_historical_replays`, `place_paper_order`, `advance_market`, `seed_demo_portfolio`), 5 live resources (`comdirect://portfolio`, `comdirect://learning-progress`, `comdirect://concepts`, `comdirect://market`, `comdirect://replays`), and 4 coaching prompts.
 - **No fabricated news:** The MCP server explicitly instructs connected AI agents never to invent real-time company news — only real sandbox numbers (P/L, fees, spread, price history, sector weights) and clearly labeled *Simulated* macro/sector events.
+
+## Study buddy chat
+
+The built-in chat answers from comdirect edu's own content. It is an AI agent on the Claude API with eight layers:
+
+| # | Layer | What it does |
+|---|---|---|
+| 1 | Interface | "Ask" button and chat panel (full screen on phones); answers stream in with numbered, clickable sources |
+| 2 | Server gateway | `POST /api/chat`; the API key stays on the server, with input limits and a rate limit |
+| 3 | Agent loop | Claude decides what to look up, calls tools, reads the results, searches again if needed, then answers |
+| 4 | Tools | `search_knowledge`, `get_concept`, `get_scenario`, `get_company`, `get_news` |
+| 5 | Retrieval | BM25 search over the index, title-weighted, with a German/Russian keyword safety net; Claude re-ranks by choosing what to read and cite |
+| 6 | Knowledge index | 128 chunks built from the app's concepts, cards, modules, chapters, replays, lessons, companies, personas and life events (`npm run index:assistant`) |
+| 7 | Memory and context | The conversation, the current page, persona, collected cards and finished chapters |
+| 8 | Guardrails | No personal investment advice; citations only for lessons it actually retrieved, otherwise an honest "the platform doesn't cover this"; spoilers stay hidden; `npm run check` runs 18 control questions in EN/DE/RU |
+
+**Setup:** set `ANTHROPIC_API_KEY` on the server (`.env.local` in dev, `~/collabothon26/.env` on the VPS). Without it the app runs as before and the chat says it isn't switched on yet. The model isn't retrained on the platform: each answer retrieves the matching lessons, so updating a lesson and rebuilding the index updates the answers.
 
 ## Project structure
 
