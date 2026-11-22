@@ -1,6 +1,6 @@
 import { execute, FEE_FIXED, FEE_RATE, newAccount, priceAt, round2, SPREAD, universeOf, type Account } from "./engine.ts";
 import type { BotId, Replay } from "./scenarios.ts";
-import { dict } from "../../shared/lib/i18n.ts";
+import { dict } from "../../shared/lib/i18n.core.ts";
 
 export const BOTS: Record<BotId, { name: string; habit: string; concept: string }> = {
   max: { name: "FOMO Max", habit: "Buys every rumor and hype", concept: "rumor" },

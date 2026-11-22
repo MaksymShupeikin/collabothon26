@@ -1,5 +1,5 @@
 // German for the simulated lessons, boss rounds and historical replays (scenarios.ts). Keys are the English source text.
-import { dict } from "../../shared/lib/i18n.ts";
+import { dict } from "../../shared/lib/i18n.core.ts";
 
 dict({
   // Simulated lessons

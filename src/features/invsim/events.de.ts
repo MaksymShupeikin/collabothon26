@@ -1,5 +1,5 @@
 // German for the Investor Simulator's life events (events.ts). Keys are the English source text.
-import { dict } from "../../shared/lib/i18n.ts";
+import { dict } from "../../shared/lib/i18n.core.ts";
 
 dict({
   // Crash-like choices

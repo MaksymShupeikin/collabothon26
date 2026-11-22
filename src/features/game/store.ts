@@ -1,64 +1,103 @@
 "use client";
 import { useSyncExternalStore, type ReactNode } from "react";
 import { companyOf } from "../market/companies.ts";
-import { advance, deposit, newSim, placeOrder, priceNow, round2, withdraw, type OrderInput, type Sim, type SimEvent } from "../market/engine.ts";
+import { advance, deposit, newSim, placeOrder, priceNow, round2, withdraw, type OrderInput, type Sim } from "../market/engine.ts";
 import "../market/scenarios.ts"; // registers the universes
 import { PERSONAS, type Answers, type PersonaId } from "./personas.ts";
+import {
+  addTx,
+  EMPTY_SAVE,
+  freshSave,
+  logSimEvents,
+  RANKS,
+  rankOf,
+  type Save,
+  type Tx,
+} from "./save.ts";
 import { dict } from "../../shared/lib/i18n.ts";
 
-// Progress lives on the server (/api/save, Postgres), keyed by an anonymous browser cookie.
+export { RANKS, rankOf, type Save, type Tx };
 
-export type Tx = { id: number; day: number; account: "giro" | "verrechnung" | "depot"; text: string; amount: number; qty?: number; sym?: string; price?: number };
-export type Save = {
-  v: 3;
-  persona: PersonaId | null;
-  answers: Answers | null;
-  xp: number;
-  earned: string[]; // one-time XP keys (tour steps, answers), so replays never farm XP
-  cards: string[];
-  done: string[]; // finished chapters, missions and bosses
-  stars: Record<string, number>;
-  understanding: number; // right concept answers (Spot the habit, card quizzes)
-  proUnlocked: boolean;
-  proCelebrated: boolean;
-  proTrader: boolean; // the learner confirmed the switch from the simple trading area to ProTrader (offered after the Module 2 mission)
-  allUnlocked: boolean; // demo switch on the learning map
-  active: string | null; // chapter / mission currently running
-  giro: number;
-  sim: Sim;
-  tx: Tx[];
-  nextTx: number;
-  invBest: { worth: number; stars: number } | null; // Investor Simulator personal best
+// Progress lives on the server (/api/save, Postgres or local file fallback), keyed by an anonymous browser cookie.
+
+export type PlayerMeta = {
+  playerId: string | null;
+  storage: "postgres" | "file" | null;
 };
 
 const LEGACY_KEY = "cd-edu-v3", LEGACY_BEST = "cd-edu-invsim-best";
-const fresh = (persona: PersonaId | null = null): Save => ({
-  v: 3, persona, answers: null, xp: 0, earned: [], cards: [], done: [], stars: {}, understanding: 0,
-  proUnlocked: false, proCelebrated: false, proTrader: false, allUnlocked: false, active: null,
-  giro: persona ? PERSONAS[persona].start : 0, sim: newSim("main", 0), tx: [], nextTx: 1, invBest: null,
-});
-const EMPTY = fresh();
+const EMPTY = EMPTY_SAVE;
+const EMPTY_META: PlayerMeta = { playerId: null, storage: null };
 
 let cache: Save = EMPTY;
+let meta: PlayerMeta = EMPTY_META;
 let loaded = false;
 let synced = false; // only after a good load do writes go to the server, so a failed load never overwrites real progress
 let timer: ReturnType<typeof setTimeout> | undefined;
+let reloading = false;
 const listeners = new Set<() => void>();
 const savers = new Set<(prev: Save, next: Save) => void>();
 
+function notify() {
+  listeners.forEach((l) => l());
+}
 function read(): Save { return cache; }
+function readMeta(): PlayerMeta { return meta; }
+
 function write(s: Save) {
   const prev = cache;
   cache = s;
-  listeners.forEach((l) => l());
+  notify();
   savers.forEach((l) => l(prev, s));
   if (synced) { clearTimeout(timer); timer = setTimeout(push, 800); }
 }
+
 function push(keepalive = false) {
   clearTimeout(timer);
   timer = undefined;
   return fetch("/api/save", { method: "PUT", headers: { "content-type": "application/json" }, body: JSON.stringify(cache), keepalive })
     .then((r) => r.ok, () => false);
+}
+
+/** Flush any pending local save immediately (useful before invoking an MCP action). */
+export async function flushSave(): Promise<boolean> {
+  if (!synced) return false;
+  if (timer) return push();
+  return true;
+}
+
+/** Reload latest state from /api/save so edits made by an external AI agent via MCP appear in the browser. */
+export async function reloadFromServer(force = false): Promise<boolean> {
+  if (typeof window === "undefined" || reloading) return false;
+  if (timer && !force) return false;
+  reloading = true;
+  try {
+    const r = await fetch("/api/save", { cache: "no-store" });
+    if (!r.ok) return false;
+    const body = (await r.json()) as { save: Save | null; playerId?: string; storage?: "postgres" | "file" };
+    synced = true;
+    const nextMeta: PlayerMeta = {
+      playerId: body.playerId ?? meta.playerId,
+      storage: body.storage ?? meta.storage,
+    };
+    const metaChanged = nextMeta.playerId !== meta.playerId || nextMeta.storage !== meta.storage;
+    if (metaChanged) meta = nextMeta;
+
+    let saveChanged = false;
+    if (body.save?.v === 3) {
+      const merged = { ...EMPTY, ...body.save };
+      if (JSON.stringify(merged) !== JSON.stringify(cache)) {
+        cache = merged;
+        saveChanged = true;
+      }
+    }
+    if (metaChanged || saveChanged) notify();
+    return true;
+  } catch {
+    return false;
+  } finally {
+    reloading = false;
+  }
 }
 
 /** Progress from before the server existed (this browser's localStorage), uploaded once. */
@@ -70,10 +109,11 @@ function legacy(): Save | null {
 }
 
 if (typeof window !== "undefined") {
-  fetch("/api/save")
+  fetch("/api/save", { cache: "no-store" })
     .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`))))
-    .then(({ save }: { save: Save | null }) => {
+    .then(({ save, playerId, storage }: { save: Save | null; playerId?: string; storage?: "postgres" | "file" }) => {
       synced = true;
+      meta = { playerId: playerId ?? null, storage: storage ?? null };
       const old = legacy();
       if (save?.v === 3) cache = { ...EMPTY, ...save };
       else if (old) {
@@ -82,9 +122,14 @@ if (typeof window !== "undefined") {
       } else if (cache !== EMPTY) push(); // onboarding finished before the load came back
     })
     .catch((e) => console.warn("Progress server unreachable; this session will not be saved.", e))
-    .finally(() => { loaded = true; listeners.forEach((l) => l()); });
+    .finally(() => { loaded = true; notify(); });
   // Flush the pending write when the tab goes away.
   addEventListener("pagehide", () => { if (timer) push(true); });
+  // Pick up external updates (e.g. an AI agent trading or advancing time via MCP) when returning to the tab.
+  addEventListener("focus", () => { if (loaded && !timer) void reloadFromServer(); });
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible" && loaded && !timer) void reloadFromServer();
+  });
 }
 
 const subscribe = (l: () => void) => { listeners.add(l); return () => listeners.delete(l); };
@@ -93,34 +138,13 @@ export const getSave = read;
 export const onSave = (l: (prev: Save, next: Save) => void) => { savers.add(l); return () => { savers.delete(l); }; };
 /** True once the save has arrived from the server (or failed to). */
 export const useLoaded = () => useSyncExternalStore(subscribe, () => loaded, () => false);
+/** Current browser session UUID and server storage backend for MCP setup. */
+export const usePlayerMeta = () => useSyncExternalStore(subscribe, readMeta, () => EMPTY_META);
 /** Renders its children only once the save is loaded, so nothing reads or writes the empty placeholder. */
 export const SaveGate = ({ children }: { children: ReactNode }) => (useLoaded() ? children : null);
 export const update = (fn: (s: Save) => Save) => write(fn(read()));
 
-// ── Ranks ─────────────────────────────────────────────────────────────────
-
-export const RANKS: [number, string][] = [[0, "Saver"], [150, "Beginner"], [400, "Investor"], [800, "Strategist"], [1300, "Market Reader"]];
-export function rankOf(xp: number) {
-  const i = RANKS.findLastIndex(([min]) => xp >= min);
-  const next = RANKS[i + 1];
-  return { level: i + 1, name: RANKS[i][1], next: next?.[1], nextAt: next?.[0], progress: next ? (xp - RANKS[i][0]) / (next[0] - RANKS[i][0]) : 1 };
-}
-
 // ── Actions ───────────────────────────────────────────────────────────────
-
-const addTx = (s: Save, t: Omit<Tx, "id">): Save => ({ ...s, tx: [{ ...t, id: s.nextTx }, ...s.tx], nextTx: s.nextTx + 1 });
-
-/** Logs fills from pending orders and savings plans as transactions. */
-function logEvents(s: Save, events: SimEvent[]): Save {
-  for (const e of events) {
-    if (e.kind === "fill") {
-      const t = e.trade;
-      const vol = round2(t.qty * t.price);
-      s = addTx(s, { day: t.day, account: "depot", text: `${t.side === "buy" ? "Buy" : "Sell"} ${companyOf(t.sym).short}`, amount: t.side === "buy" ? -round2(vol + t.fee) : round2(vol - t.fee), qty: t.qty, sym: t.sym, price: t.price });
-    }
-  }
-  return s;
-}
 
 export const actions = {
   award(key: string, xp: number) {
@@ -148,7 +172,7 @@ export const actions = {
   },
   start(id: string | null) { update((s) => ({ ...s, active: id })); },
   setPersona(persona: PersonaId, answers: Answers | null, skipW1 = false) {
-    const s = fresh(persona);
+    const s = freshSave(persona);
     write({ ...s, answers, ...(skipW1 ? { proUnlocked: true, proCelebrated: true, done: ["1.1", "1.2", "1.3", "1.4", "1.5", "w1"] } : {}) });
   },
   unlockPro() { update((s) => ({ ...s, proUnlocked: true })); },
@@ -194,7 +218,7 @@ export const actions = {
   jump(days: number, stopAtMajor = false) {
     const s = read();
     const { sim, events } = advance(s.sim, days, { stopAtMajor });
-    write(logEvents({ ...s, sim }, events));
+    write(logSimEvents({ ...s, sim }, events));
     return events;
   },
   /** Fresh account for the Module 1 mission: money back on the current account, nothing in the portfolio. */

@@ -3,7 +3,7 @@ import { costBasis, depotValue, priceNow, totalValue } from "../market/engine.ts
 import { PERSONAS } from "../game/personas.ts";
 import type { Save } from "../game/store.ts";
 import type { Ui } from "../game/ui.ts";
-import { L, tr } from "../../shared/lib/i18n.ts";
+import { L, tr } from "../../shared/lib/i18n.core.ts";
 import "./chapters.de.ts";
 
 export type Ctx = { save: Save; ui: Ui };

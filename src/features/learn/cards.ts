@@ -1,6 +1,6 @@
 // The 12 concept cards of the MVP (idea.md §12). Front: one sentence. Back: example + one quiz question.
 // The longer roadmap list lives in concepts.ts.
-import { dict } from "../../shared/lib/i18n.ts";
+import { dict } from "../../shared/lib/i18n.core.ts";
 export type Card = {
   id: string;
   world: number;

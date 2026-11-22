@@ -1,5 +1,5 @@
 // German for the learning path (chapters.ts). Keys are the English source text; button names in quotes match the German UI.
-import { dict } from "../../shared/lib/i18n.ts";
+import { dict } from "../../shared/lib/i18n.core.ts";
 
 dict({
   // Modules

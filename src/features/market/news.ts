@@ -1,5 +1,5 @@
 import { rng } from "../../shared/lib/rng.ts";
-import { dict } from "../../shared/lib/i18n.ts";
+import { dict } from "../../shared/lib/i18n.core.ts";
 
 // The six hidden news types. The type is revealed only after the price reaction.
 export type NewsKind = "signal" | "noise" | "priced_in" | "rumor" | "sector" | "macro";

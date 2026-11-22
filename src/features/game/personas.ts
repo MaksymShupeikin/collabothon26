@@ -1,5 +1,5 @@
 // Persona names and numbers are placeholders (idea.md §3).
-import { dict } from "../../shared/lib/i18n.ts";
+import { dict } from "../../shared/lib/i18n.core.ts";
 
 export type PersonaId = "starter" | "builder" | "retiree";
 export type Persona = {

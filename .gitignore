@@ -45,3 +45,5 @@ next-env.d.ts
 
 # Local only
 idea.md
+.data/
+

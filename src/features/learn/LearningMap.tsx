@@ -117,6 +117,8 @@ export default function LearningMap() {
         {/* all play modes are open from the start, separate from the modules */}
         <ModeTile open icon="hourglass" title={t("History Mode", "Geschichtsmodus")} line={t("Real crashes, hidden dates.", "Echte Crashs, verdeckte Daten.")}
           onOpen={() => router.push("/history")} />
+        <ModeTile open icon="agent" title={t("AI Agent (MCP)", "KI-Agent (MCP)")} line={t("Connect Claude, Cursor & Co.", "Claude, Cursor & Co. verbinden.")}
+          onOpen={() => router.push("/mcp")} />
       </section>
 
       <section aria-labelledby="worlds-h">

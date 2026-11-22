@@ -48,6 +48,7 @@ comdirect already has the pieces, but they live apart:
 | **History mode** | Replay real market moments and see how your decisions would have played out |
 | **Investor simulator** | A life-long savings run: income, events and choices, decade by decade |
 | **Learning map** | Tutorials, concept cards, mini games, quick-check quizzes and bosses |
+| **AI Agent (MCP)** | Connect your own AI agent (Cursor, Claude Desktop, Claude Code) via Model Context Protocol for live account & position P/L briefings, exact deltas since your last check, and personalized concept tutoring (`/mcp`) |
 
 ### One path, three life stages
 
@@ -169,13 +170,31 @@ npm run check      # self-check of the money math, scripted markets and bots
 npm run build
 ```
 
-Progress lives in Postgres (`saves` table, created on first use), keyed by an anonymous `cd-edu-id` cookie. Set `DATABASE_URL` (e.g. in `.env.local`); without it the app runs but nothing is saved. Old `localStorage` progress is uploaded once on first load. "Reset progress" at the bottom of the hub starts over.
+Progress lives in Postgres (`saves` + `mcp_checkpoints` tables, created on first use) when `DATABASE_URL` is set, and automatically falls back to a local `.data/comdirect-edu-saves.json` file when `DATABASE_URL` is absent so both the web app and local MCP server stay synced out of the box.
+
+## AI Agent Integration (MCP)
+
+Open **`/mcp`** in the app to copy your personal pre-filled configuration or run live MCP briefings right from the browser.
+
+- **Streamable HTTP endpoint:** `POST /api/mcp?token=<player-uuid>` (or `Authorization: Bearer <player-uuid>`, `X-Player-Id`, or the `cd-edu-id` browser cookie)
+- **Stdio CLI / remote bridge (zero extra dependencies, runs with plain `node`):**
+  ```bash
+  # Local shared storage (Postgres or .data/comdirect-edu-saves.json)
+  npm run mcp -- --player <player-uuid>
+
+  # Bridge a stdio client (e.g. Claude Desktop) to a deployed instance
+  npm run mcp -- --url "https://comdirect.vokh.dev/api/mcp?token=<player-uuid>"
+  ```
+- **Capabilities:** 12 tools (`get_account_update`, `get_portfolio`, `list_market_instruments`, `get_stock_overview`, `get_learning_progress`, `list_concepts`, `explain_concept`, `review_trades`, `get_historical_replays`, `place_paper_order`, `advance_market`, `seed_demo_portfolio`), 5 live resources (`comdirect://portfolio`, `comdirect://learning-progress`, `comdirect://concepts`, `comdirect://market`, `comdirect://replays`), and 4 coaching prompts.
+- **No fabricated news:** The MCP server explicitly instructs connected AI agents never to invent real-time company news — only real sandbox numbers (P/L, fees, spread, price history, sector weights) and clearly labeled *Simulated* macro/sector events.
 
 ## Project structure
 
 | Path | What |
 |---|---|
-| `src/app/` | Routes only: thin pages that render a feature screen |
+| `src/app/` | Routes only: thin pages that render a feature screen, plus `/api/save` and `/api/mcp` |
+| `src/features/mcp/` | MCP JSON-RPC 2.0 server, portfolio P/L & checkpoint delta engine, shared Postgres/file storage, `/mcp` UI and self-checks |
+| `scripts/mcp-server.ts` | Zero-dependency MCP stdio server & remote HTTP bridge |
 | `src/features/market/` | Deterministic market and account (`engine.ts`), scripted lessons and historical replays, bots, news, companies. Runs under plain `node` for `npm run check` |
 | `src/features/game/` | The save (XP, cards, stars, persona), personas and the tour UI bus |
 | `src/features/tour/` | Chapters, missions, bosses, spotlight coach, plan comparison |

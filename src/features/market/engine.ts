@@ -1,7 +1,7 @@
 import { ALL_COMPANIES, type Company } from "./companies.ts";
 import type { News } from "./news.ts";
 import { gauss, rng } from "../../shared/lib/rng.ts";
-import { dict } from "../../shared/lib/i18n.ts";
+import { dict } from "../../shared/lib/i18n.core.ts";
 
 /**
  * Deterministic market + one player account.

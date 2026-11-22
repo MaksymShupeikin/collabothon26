@@ -13,6 +13,8 @@ const ICONS: Record<string, (c: C) => ReactNode> = {
   sprout: ({ fg }) => <><rect x="10" y="35" width="28" height="7" rx="3.5" fill={fg} /><rect x="13" y="27" width="22" height="7" rx="3.5" fill="none" stroke={fg} strokeWidth="3" /><path d="M24 27V13" stroke={fg} strokeWidth="4" strokeLinecap="round" /><path d="M24 21c-2-7-8-9-14-8 0 6 6 10 14 8zM24 14c2-7 8-9 14-8 0 6-6 10-14 8z" fill={ACC} /></>,
   flag: ({ fg }) => <><path d="M12 6v36" stroke={fg} strokeWidth="4" strokeLinecap="round" /><path d="M14 8h24l-6 8 6 8H14z" fill={fg} /></>,
   hourglass: ({ fg }) => <><path d="M10 7h28M10 41h28" stroke={fg} strokeWidth="4" strokeLinecap="round" /><path d="M14 7c0 10 8 13 8 17s-8 7-8 17h20c0-10-8-13-8-17s8-7 8-17z" fill="none" stroke={fg} strokeWidth="4" strokeLinejoin="round" /><path d="M19 14h10c-1 4-3 5-5 6-2-1-4-2-5-6zM18 37c1-3 3-5 6-5s5 2 6 5z" fill={ACC} /></>,
+  // MCP agent bridge: central hub linked to three external nodes
+  agent: ({ fg }) => <><path d="M24 24L12 12M24 24L36 12M24 24v15" stroke={fg} strokeWidth="3.5" strokeLinecap="round" /><circle cx="12" cy="12" r="4.5" fill={fg} /><circle cx="36" cy="12" r="4.5" fill={fg} /><circle cx="24" cy="39" r="4.5" fill={fg} /><circle cx="24" cy="24" r="7.5" fill={ACC} stroke={fg} strokeWidth="3" /></>,
   // bots
   waves: ({ fg }) => <><path d="M5 34l9-16 9 18 9-24 11 14" fill="none" stroke={fg} strokeWidth="4.5" strokeLinecap="round" strokeLinejoin="round" /><circle cx="32" cy="12" r="5" fill={ACC} /></>,
   max: ({ fg, bg }) => <><path d="M24 6c8 6 10 16 7 26H17C14 22 16 12 24 6z" fill={fg} /><circle cx="24" cy="19" r="4" fill={bg} /><path d="M17 26l-6 9h7M31 26l6 9h-7" fill={fg} /><path d="M19 34h10l-5 10z" fill={ACC} /></>,

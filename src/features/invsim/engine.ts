@@ -1,5 +1,5 @@
 import { gauss, rng } from "../../shared/lib/rng.ts";
-import { L } from "../../shared/lib/i18n.ts";
+import { L } from "../../shared/lib/i18n.core.ts";
 
 /**
  * Investor Simulator: 30 years of a life, one turn per year.

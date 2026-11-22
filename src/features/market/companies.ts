@@ -1,4 +1,4 @@
-import { dict } from "../../shared/lib/i18n.ts";
+import { dict } from "../../shared/lib/i18n.core.ts";
 
 // Real, widely known companies. Prices are mock values in EUR, not live data.
 // WKN/ISIN are the real identifiers so the search behaves like comdirect's (WKN, ISIN, Name).

@@ -1,5 +1,5 @@
 import { addJoy, COLLAPSE, CRASH, DIP, gain, income, move, pay, shock, START_AGE, type Game, type Tone } from "./engine.ts";
-import { L } from "../../shared/lib/i18n.ts";
+import { L } from "../../shared/lib/i18n.core.ts";
 import "./events.de.ts";
 
 // Static texts are English and translated where they render; functions that build numbers into text return the current language (they only run after a click).
