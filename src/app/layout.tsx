@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "@/app/globals.css";
 import XpGain from "@/features/game/XpGain";
+import McpNotice from "@/features/mcp/McpNotice";
 import { LangSync } from "@/features/shell/LangSwitch";
 
 export const metadata: Metadata = {
@@ -21,6 +22,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body>
         {children}
         <XpGain />
+        <McpNotice />
         <LangSync />
       </body>
     </html>

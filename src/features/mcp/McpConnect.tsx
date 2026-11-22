@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import {
   flushSave,
   reloadFromServer,
@@ -12,9 +12,8 @@ import { costBasis, depotValue, round2 } from "@/features/market/engine";
 import { cls, eur, pct, signed } from "@/shared/lib/format";
 import { useT } from "@/shared/lib/i18n";
 import Icon from "@/shared/ui/Icon";
+import QuickConnect from "./QuickConnect";
 import s from "./McpConnect.module.css";
-
-type ClientTab = "cursor" | "claude-desktop" | "claude-code" | "http";
 
 type AccountUpdateData = {
   hasAccount: boolean;
@@ -154,16 +153,12 @@ export default function McpConnect() {
   const loaded = useLoaded();
   const save = useGame();
   const meta = usePlayerMeta();
-  const [tab, setTab] = useState<ClientTab>("cursor");
   const [copied, setCopied] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<RunResult | null>(null);
 
-  const origin = loaded && typeof window !== "undefined" ? window.location.origin : "http://localhost:3000";
-
   const token = meta.playerId ?? "00000000-0000-4000-8000-000000000001";
-  const endpointUrl = `${origin}/api/mcp?token=${token}`;
   const relativeEndpoint = meta.playerId ? `/api/mcp?token=${meta.playerId}` : "/api/mcp";
 
   const holdingsCount = Object.values(save.sim.acct.holdings).filter((h) => h.qty > 0).length;
@@ -171,81 +166,6 @@ export default function McpConnect() {
   const basis = costBasis(save.sim);
   const pnlEur = round2(depVal - basis);
   const pnlPct = basis > 0 ? round2((pnlEur / basis) * 100) : 0;
-
-  const snippet = useMemo(() => {
-    if (tab === "cursor") {
-      return {
-        label: ".cursor/mcp.json",
-        hint: t(
-          "Paste into .cursor/mcp.json (or Cursor Settings → MCP) for instant Streamable HTTP access to your live sandbox account.",
-          "In .cursor/mcp.json (oder Cursor Settings → MCP) einfügen für direkten Streamable-HTTP-Zugriff auf dein Sandbox-Depot.",
-        ),
-        code: JSON.stringify(
-          {
-            mcpServers: {
-              "comdirect-edu": {
-                url: endpointUrl,
-              },
-            },
-          },
-          null,
-          2,
-        ),
-      };
-    }
-    if (tab === "claude-desktop") {
-      return {
-        label: "claude_desktop_config.json",
-        hint: t(
-          "Uses the built-in zero-dependency stdio bridge (Node 22+) to forward securely to your comdirect edu account.",
-          "Nutzt die eingebaute Stdio-Bridge (Node 22+) für den sicheren Zugriff auf dein comdirect edu Sandbox-Konto.",
-        ),
-        code: JSON.stringify(
-          {
-            mcpServers: {
-              "comdirect-edu": {
-                command: "node",
-                args: [
-                  "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
-                  "scripts/mcp-server.ts",
-                  "--url",
-                  endpointUrl,
-                ],
-              },
-            },
-          },
-          null,
-          2,
-        ),
-      };
-    }
-    if (tab === "claude-code") {
-      return {
-        label: "Terminal",
-        hint: t(
-          "Run once in your terminal to register comdirect edu as an HTTP MCP server in Claude Code.",
-          "Einmal im Terminal ausführen, um comdirect edu als HTTP-MCP-Server in Claude Code zu registrieren.",
-        ),
-        code: `claude mcp add --transport http comdirect-edu "${endpointUrl}"`,
-      };
-    }
-    return {
-      label: "Streamable HTTP (JSON-RPC 2.0)",
-      hint: t(
-        "Send standard MCP JSON-RPC 2.0 POST requests directly to your personal endpoint URL.",
-        "Sende Standard-MCP-JSON-RPC-2.0-POST-Anfragen direkt an deine persönliche Endpoint-URL.",
-      ),
-      code: [
-        `# Endpoint`,
-        `${endpointUrl}`,
-        ``,
-        `# Quick test: get live account update`,
-        `curl -sS -X POST "${endpointUrl}" \\`,
-        `  -H "Content-Type: application/json" \\`,
-        `  -d '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"get_account_update","arguments":{"lang":"${t.lang}"}}}'`,
-      ].join("\n"),
-    };
-  }, [tab, endpointUrl, t]);
 
   function copyText(key: string, value: string) {
     if (typeof navigator === "undefined" || !navigator.clipboard) return;
@@ -399,15 +319,15 @@ export default function McpConnect() {
           </Link>
           <span className={s.kicker}>
             <Icon name="agent" size={18} color="var(--color-accent)" />
-            {t("Model Context Protocol (MCP)", "Model Context Protocol (MCP)")}
+            {t("AI Chatbot · MCP", "KI-Chatbot · MCP")}
           </span>
           <h1 id="mcp-h">
-            {t("Connect your AI agent to comdirect edu", "Verbinde deinen KI-Agenten mit comdirect edu")}
+            {t("Connect Claude, ChatGPT, Gemini or Grok", "Verbinde Claude, ChatGPT, Gemini oder Grok")}
           </h1>
           <p className={s.heroSub}>
             {t(
-              "Plug Cursor, Claude Desktop, or Claude Code straight into your sandbox account. Ask your agent for live position P/L updates, track exact changes since your last check, and learn investing concepts tied to your own holdings — with real platform math and zero fabricated company news.",
-              "Verbinde Cursor, Claude Desktop oder Claude Code direkt mit deinem Sandbox-Konto. Frage deinen Agenten nach aktuellen G/V-Updates pro Position, verfolge exakte Veränderungen seit dem letzten Check und lerne Börsenkonzepte direkt an deinem Depot — mit echten Zahlen statt erfundener Unternehmensnews.",
+              "Link your favorite AI chatbot to your play-money portfolio in 2 clicks. Ask how your positions are doing or get plain-English explanations tied to your own holdings — with real numbers and zero made-up news.",
+              "Verbinde deinen Lieblings-KI-Chatbot in 2 Klicks mit deinem Übungs-Depot. Frag einfach nach dem Stand deiner Positionen oder lass dir Börsenbegriffe direkt an deinem Depot erklären — mit echten Zahlen, ohne erfundene News.",
             )}
           </p>
           <div className={s.heroActions}>
@@ -419,8 +339,8 @@ export default function McpConnect() {
               {busy === "seed"
                 ? t("Preparing demo depot…", "Demo-Depot wird geladen…")
                 : holdingsCount === 0
-                  ? t("Load demo depot & run briefing", "Demo-Depot laden & Update testen")
-                  : t("Run live account briefing", "Live-Konto-Update abrufen")}
+                  ? t("Load demo depot & try briefing", "Demo-Depot laden & testen")
+                  : t("Preview live account update", "Live-Depot-Update testen")}
             </button>
             <Link href="/pro" className="btn btn-outline-light">
               {t("Open trading area ›", "Handelsbereich öffnen ›")}
@@ -432,12 +352,12 @@ export default function McpConnect() {
           <div className={s.hudTop}>
             <span className={s.statusPill}>
               <span className={s.dot} aria-hidden />
-              {t("MCP Server Ready", "MCP-Server bereit")}
+              {t("Ready to connect", "Bereit zum Verbinden")}
             </span>
             <span className={s.hudBadge}>
               {meta.storage === "postgres"
-                ? t("Storage: Postgres", "Speicher: Postgres")
-                : t("Storage: Local file", "Speicher: Lokal")}
+                ? t("Synced · Postgres", "Synchron · Postgres")
+                : t("Synced · Local", "Synchron · Lokal")}
             </span>
           </div>
 
@@ -460,7 +380,7 @@ export default function McpConnect() {
 
           <div className={s.tokenRow}>
             <code title={token}>
-              {t("Session token:", "Session-Token:")} {token.slice(0, 8)}…{token.slice(-6)}
+              {t("Your ID:", "Deine ID:")} {token.slice(0, 8)}…{token.slice(-6)}
             </code>
             <button
               type="button"
@@ -478,7 +398,7 @@ export default function McpConnect() {
               disabled={busy !== null}
               onClick={() => void runSeedAndBrief()}
             >
-              {t("Seed demo (4 positions + 15d)", "Demo laden (4 Pos. + 15T)")}
+              {t("Load demo depot (4 stocks + 15d)", "Demo laden (4 Pos. + 15T)")}
             </button>
             <button
               type="button"
@@ -486,7 +406,7 @@ export default function McpConnect() {
               disabled={busy !== null}
               onClick={() => void reloadFromServer(true)}
             >
-              {t("Sync browser", "Browser synchronisieren")}
+              {t("Refresh", "Aktualisieren")}
             </button>
           </div>
         </div>
@@ -494,58 +414,24 @@ export default function McpConnect() {
 
       <section aria-labelledby="connect-h">
         <div className={s.sectionHead}>
-          <h2 id="connect-h">{t("Connect your AI client", "KI-Client verbinden")}</h2>
+          <h2 id="connect-h">{t("Connect in 2 clicks", "In 2 Klicks verbinden")}</h2>
           <span className="xs muted">
-            {t("Protocol: MCP JSON-RPC 2.0 (2025-03-26) · Streamable HTTP & Stdio", "Protokoll: MCP JSON-RPC 2.0 (2025-03-26) · Streamable HTTP & Stdio")}
+            {t("Pick your chatbot → copy your link → paste & chat.", "Chatbot wählen → Link kopieren → einfügen & fragen.")}
           </span>
         </div>
 
         <div className={s.card}>
-          <div className={s.tabs} role="tablist" aria-label={t("MCP clients", "MCP-Clients")}>
-            {([
-              ["cursor", "Cursor"],
-              ["claude-desktop", "Claude Desktop"],
-              ["claude-code", "Claude Code"],
-              ["http", t("HTTP / curl", "HTTP / curl")],
-            ] as const).map(([id, label]) => (
-              <button
-                key={id}
-                type="button"
-                role="tab"
-                aria-selected={tab === id}
-                className="chip"
-                onClick={() => setTab(id)}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-
-          <p className="small muted">{snippet.hint}</p>
-
-          <div className={s.codeWrap}>
-            <div className={s.codeHead}>
-              <span className={s.codeMeta}>{snippet.label}</span>
-              <button
-                type="button"
-                className={s.copyBtn}
-                onClick={() => copyText(tab, snippet.code)}
-              >
-                {copied === tab ? t("Copied ✓", "Kopiert ✓") : t("Copy config", "Konfiguration kopieren")}
-              </button>
-            </div>
-            <pre className={s.codePre}><code>{snippet.code}</code></pre>
-          </div>
+          <QuickConnect />
         </div>
       </section>
 
       <section aria-labelledby="console-h">
         <div className={s.sectionHead}>
-          <h2 id="console-h">{t("Live MCP agent console", "Live-MCP-Agentenkonsole")}</h2>
+          <h2 id="console-h">{t("Try what your chatbot will answer", "Teste, was dein Chatbot antwortet")}</h2>
           <span className="xs muted">
             {t(
-              "Calls your real POST /api/mcp endpoint using this browser session.",
-              "Ruft deinen echten POST /api/mcp Endpoint mit dieser Browser-Session auf.",
+              "Runs against your live sandbox account right here.",
+              "Läuft direkt gegen dein echtes Übungs-Depot.",
             )}
           </span>
         </div>
@@ -575,15 +461,15 @@ export default function McpConnect() {
               <div>
                 <h3>
                   {result
-                    ? t(`Agent tool response: ${result.toolName}`, `Agenten-Antwort: ${result.toolName}`)
-                    : t("Test what your AI agent sees", "Teste, was dein KI-Agent sieht")}
+                    ? t(`Live answer (${result.toolName})`, `Live-Antwort (${result.toolName})`)
+                    : t("Preview your chatbot’s briefing", "Vorschau der Chatbot-Antwort")}
                 </h3>
                 <p className="xs muted">
                   {busy
-                    ? t("Calling POST /api/mcp…", "Rufe POST /api/mcp auf…")
+                    ? t("Fetching live portfolio data…", "Lade aktuelle Depotdaten…")
                     : result
-                      ? t("Live JSON-RPC 2.0 response from your sandbox.", "Live-JSON-RPC-2.0-Antwort aus deiner Sandbox.")
-                      : t("Pick any sample prompt on the left or load the demo depot to inspect a real MCP briefing.", "Wähle links eine Beispielanfrage oder lade das Demo-Depot für ein echtes MCP-Briefing.")}
+                      ? t("Real data straight from your sandbox.", "Echte Daten direkt aus deiner Sandbox.")
+                      : t("Click any example question on the left or load the demo depot to see a live briefing.", "Wähle links eine Beispielfrage oder lade das Demo-Depot für eine Live-Vorschau.")}
                 </p>
               </div>
               {holdingsCount > 0 && (
@@ -598,11 +484,11 @@ export default function McpConnect() {
             {!result && !error && (
               <div className="empty">
                 <Icon name="agent" size={44} round />
-                <strong>{t("No MCP call run yet", "Noch kein MCP-Aufruf ausgeführt")}</strong>
+                <strong>{t("Try a question on the left", "Probier links eine Frage aus")}</strong>
                 <p className="xs muted">
                   {t(
-                    "Click “Account & P/L update” or “Load demo depot & run briefing” to see exact position gains/losses and deltas since the last check.",
-                    "Klicke auf „Konto- & G/V-Update“ oder „Demo-Depot laden & Update testen“, um exakte Gewinne/Verluste und Deltas seit dem letzten Check zu sehen.",
+                    "Click “Account & P/L update” or “Load demo depot & try briefing” to see exact gains, losses, and changes since your last check.",
+                    "Klicke auf „Konto- & G/V-Update“ oder „Demo-Depot laden & testen“, um exakte Gewinne, Verluste und Änderungen seit dem letzten Check zu sehen.",
                   )}
                 </p>
               </div>
@@ -637,8 +523,8 @@ export default function McpConnect() {
                   <div className={s.deltaBanner}>
                     <strong>
                       {t(
-                        `Change since previous agent check (${updateData.changesSinceLastCheck.daysElapsed} trading day(s)):`,
-                        `Veränderung seit letztem Agenten-Check (${updateData.changesSinceLastCheck.daysElapsed} Handelstage):`,
+                        `Change since previous check (${updateData.changesSinceLastCheck.daysElapsed} trading day(s)):`,
+                        `Veränderung seit letztem Check (${updateData.changesSinceLastCheck.daysElapsed} Handelstage):`,
                       )}
                     </strong>
                     <span className={`num ${cls(updateData.changesSinceLastCheck.depotValueChangeEur ?? 0)}`}>
@@ -698,17 +584,17 @@ export default function McpConnect() {
                 <div className={s.textBlock}>{result.text}</div>
 
                 <div className={s.honesty}>
-                  <span className={s.honestyTag}>{t("Data policy", "Datenprinzip")}</span>
+                  <span className={s.honestyTag}>{t("Honest data", "Ehrliche Daten")}</span>
                   <span>
                     {t(
-                      "No live news scraping is attached. The MCP server explicitly instructs connected AI agents never to fabricate company-specific news — only real account figures, price history, fees/spread, and clearly labeled Simulated macro/sector sandbox events.",
-                      "Es ist kein Echtzeit-News-Scraping angebunden. Der MCP-Server weist verbundene KI-Agenten ausdrücklich an, niemals unternehmensspezifische News zu erfinden — nur echte Kontokennzahlen, Kursverläufe, Gebühren/Spread und klar als „Simuliert“ markierte Makro-/Branchen-Events.",
+                      "No live news scraping is attached. Your chatbot is instructed never to make up company news — it explains your portfolio using real prices, fees, and clearly labeled Simulated sandbox events only.",
+                      "Es ist kein Echtzeit-News-Scraping angebunden. Dein Chatbot erfindet niemals Unternehmensnews — er erklärt dein Depot mit echten Kursen, Gebühren und klar markierten simulierten Ereignissen.",
                     )}
                   </span>
                 </div>
 
                 <details className={s.rawDetails}>
-                  <summary>{t("Inspect raw JSON-RPC 2.0 exchange", "Rohen JSON-RPC-2.0-Austausch ansehen")}</summary>
+                  <summary>{t("Inspect raw MCP JSON-RPC 2.0 exchange", "Rohen MCP-JSON-RPC-2.0-Austausch ansehen")}</summary>
                   <div className={s.rawGrid}>
                     <pre className={s.rawBox}>
                       <code>{JSON.stringify(result.requestPayload, null, 2)}</code>
@@ -724,13 +610,13 @@ export default function McpConnect() {
         </div>
       </section>
 
-      <section aria-labelledby="caps-h">
-        <div className={s.sectionHead}>
-          <h2 id="caps-h">{t("What your AI agent can access", "Worauf dein KI-Agent zugreifen kann")}</h2>
-          <span className="xs muted">
-            {t("12 tools · 5 live resources · 4 coaching prompts", "12 Tools · 5 Live-Ressourcen · 4 Coaching-Prompts")}
-          </span>
-        </div>
+      <details className={s.card}>
+        <summary className="small" style={{ cursor: "pointer", fontWeight: 700 }}>
+          {t(
+            "What your AI chatbot can access under the hood (12 tools · 5 resources · 4 prompts)",
+            "Worauf dein KI-Chatbot im Hintergrund zugreifen kann (12 Tools · 5 Ressourcen · 4 Prompts)",
+          )}
+        </summary>
 
         <div className={s.capGrid}>
           <div className={s.capCard}>
@@ -778,7 +664,7 @@ export default function McpConnect() {
             </ul>
           </div>
         </div>
-      </section>
+      </details>
     </main>
   );
 }

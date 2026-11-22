@@ -1,0 +1,205 @@
+/* Friendly floating MCP notification & 2-click quick-connect modal.
+   Uses only comdirect edu global design tokens. */
+
+.toast {
+  position: fixed;
+  z-index: 65;
+  right: var(--space-5);
+  bottom: var(--space-5);
+  width: min(392px, calc(100vw - 32px));
+  background: var(--color-ink);
+  color: var(--color-white);
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(255, 245, 0, 0.35);
+  box-shadow: 0 14px 34px -8px rgba(11, 31, 38, 0.5), var(--shadow-xl);
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  animation: mcpToastIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes mcpToastIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toast {
+    animation: none;
+  }
+}
+
+.toastHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.toastKicker {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-ink);
+  background: var(--color-accent);
+  padding: 2px var(--space-3);
+  border-radius: var(--radius-lg);
+}
+
+.closeBtn {
+  background: none;
+  border: 0;
+  color: var(--color-bg-dark);
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.closeBtn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--color-white);
+}
+
+.toastTitle {
+  font-size: var(--text-base);
+  line-height: 22px;
+  font-weight: 700;
+  color: var(--color-white);
+}
+
+.toastBody {
+  font-size: var(--text-xs);
+  line-height: 18px;
+  color: var(--color-bg-light);
+}
+
+.botPills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.botPill {
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--color-white);
+  border-radius: var(--radius-lg);
+  padding: 4px var(--space-4);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  transition: background-color var(--ease), border-color var(--ease), color var(--ease);
+}
+
+.botPill:hover {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: var(--color-ink);
+}
+
+.toastFoot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-top: var(--space-1);
+}
+
+.toastFoot :global(.btn-primary) {
+  flex: 1;
+}
+
+.toastMore {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  color: var(--color-bg-dark);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.toastMore:hover {
+  color: var(--color-white);
+}
+
+/* ── Quick-Connect Modal ── */
+.modal {
+  background: var(--color-white);
+  border-radius: var(--radius-md);
+  max-width: 760px;
+  width: 100%;
+  max-height: 92vh;
+  overflow: auto;
+  box-shadow: 0 20px 48px -12px rgba(11, 31, 38, 0.45);
+  display: flex;
+  flex-direction: column;
+}
+
+.modalHead {
+  background: var(--color-ink);
+  color: var(--color-white);
+  padding: var(--space-5) var(--space-6);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
+}
+
+.modalHeadText {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.modalHeadText h2 {
+  font-size: var(--text-lg);
+  line-height: 26px;
+  color: var(--color-white);
+}
+
+.modalHeadText p {
+  font-size: var(--text-xs);
+  line-height: 18px;
+  color: var(--color-bg-light);
+}
+
+.modalBody {
+  padding: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.modalFoot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-bg-light);
+}
+
+@media (max-width: 600px) {
+  .toast {
+    left: var(--space-4);
+    right: var(--space-4);
+    bottom: var(--space-4);
+    width: auto;
+    padding: var(--space-4);
+  }
+  .modalHead,
+  .modalBody {
+    padding: var(--space-4);
+  }
+}
