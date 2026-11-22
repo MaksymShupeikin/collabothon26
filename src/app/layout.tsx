@@ -3,6 +3,7 @@ import "@/app/globals.css";
 import XpGain from "@/features/game/XpGain";
 import McpNotice from "@/features/mcp/McpNotice";
 import { LangSync } from "@/features/shell/LangSwitch";
+import ChatPanel from "@/features/assistant/ChatPanel";
 
 export const metadata: Metadata = {
   title: "comdirect edu",
@@ -17,12 +18,14 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     // The boot script may set lang="de" before hydration.
     <html lang="en" suppressHydrationWarning>
       <head>
-        <script dangerouslySetInnerHTML={{ __html: LANG_BOOT }} />
+        {/* Extensions (e.g. popup blockers) inject their own <script> first in <head>; it already ran, so ignore the mismatch. */}
+        <script suppressHydrationWarning dangerouslySetInnerHTML={{ __html: LANG_BOOT }} />
       </head>
       <body>
         {children}
         <XpGain />
         <McpNotice />
+        <ChatPanel />
         <LangSync />
       </body>
     </html>

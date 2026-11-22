@@ -317,17 +317,13 @@ export default function McpConnect() {
           <Link href="/" className={`xs ${s.back}`}>
             {t("‹ Learning map", "‹ Lernpfad")}
           </Link>
-          <span className={s.kicker}>
-            <Icon name="agent" size={18} color="var(--color-accent)" />
-            {t("AI Chatbot · MCP", "KI-Chatbot · MCP")}
-          </span>
           <h1 id="mcp-h">
             {t("Connect Claude, ChatGPT, Gemini or Grok", "Verbinde Claude, ChatGPT, Gemini oder Grok")}
           </h1>
           <p className={s.heroSub}>
             {t(
-              "Link your favorite AI chatbot to your play-money portfolio in 2 clicks. Ask how your positions are doing or get plain-English explanations tied to your own holdings — with real numbers and zero made-up news.",
-              "Verbinde deinen Lieblings-KI-Chatbot in 2 Klicks mit deinem Übungs-Depot. Frag einfach nach dem Stand deiner Positionen oder lass dir Börsenbegriffe direkt an deinem Depot erklären — mit echten Zahlen, ohne erfundene News.",
+              "Ask your chatbot how your play-money positions are doing. Real numbers, no made-up news.",
+              "Frag deinen Chatbot, wie dein Übungs-Depot läuft. Echte Zahlen, keine erfundenen News.",
             )}
           </p>
           <div className={s.heroActions}>

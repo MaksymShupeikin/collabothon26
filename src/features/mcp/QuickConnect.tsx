@@ -154,7 +154,7 @@ export default function QuickConnect({
   const [devTab, setDevTab] = useState<DevTab>("cursor");
   const [copiedDev, setCopiedDev] = useState(false);
 
-  const origin = loaded && typeof window !== "undefined" ? window.location.origin : "http://localhost:3000";
+  const origin = "https://mcp.hop.vokh.dev"; // public MCP host on this VPS
   const token = meta.playerId ?? "00000000-0000-4000-8000-000000000001";
   const endpointUrl = `${origin}/api/mcp?token=${token}`;
   const relativeEndpoint = meta.playerId ? `/api/mcp?token=${meta.playerId}` : "/api/mcp";

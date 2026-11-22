@@ -463,7 +463,8 @@ export default function SimpleDesk(p: SimpleProps) {
                 })}
               </div>
             </section>
-            <section className="panel p-feed" aria-label={t("News and rivals", "News und Rivalen")} data-tour="w-news">
+            {/* Real Market data has no news and no rival bots, so the watchlist takes the whole column. */}
+            {!real && <section className="panel p-feed" aria-label={t("News and rivals", "News und Rivalen")} data-tour="w-news">
               <div className="tabs" role="tablist">
                 <button role="tab" aria-selected={tab === "news"} onClick={() => setTab("news")}>News</button>
                 <button role="tab" aria-selected={tab === "rivals"} onClick={() => setTab("rivals")}>{t("Rivals", "Rivalen")} {replay && <span className="count hot">{replay.bots.length}</span>}</button>
@@ -484,7 +485,7 @@ export default function SimpleDesk(p: SimpleProps) {
                   ? <ReplayRivals replay={replay} sim={sim} answers={p.answers} cover={cover} />
                   : <EmptyState icon="max" title={t("No rivals in this market", "Keine Rivalen in diesem Markt")} hint={t("Rival bots trade with you in boss rounds and History mode.", "Rivalen-Bots handeln mit dir in Bossrunden und im Geschichtsmodus.")} />)}
               </div>
-            </section>
+            </section>}
           </div>
 
           {/* Center: time controls (they drive the chart), then the chart of the selected stock */}

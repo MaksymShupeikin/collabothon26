@@ -108,7 +108,7 @@ function ConnectSheet({ onClose, onDone }: { onClose: () => void; onDone: () => 
   }, []);
 
   const host = typeof window === "undefined" ? "" : window.location.hostname;
-  const origin = typeof window === "undefined" ? "" : window.location.origin;
+  const origin = "https://mcp.hop.vokh.dev"; // public MCP host on this VPS
   const ready = !!meta.playerId; // the token arrives with the save; never hand out a link without it
   const link = `${origin}/api/mcp?token=${meta.playerId ?? ""}`;
   const offline = !!host && isLocal(host);
