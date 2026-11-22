@@ -18,13 +18,13 @@ const HIDDEN_PATHS = new Set(["/mcp", "/start", "/comdirect", "/ready"]);
 type BotId = "claude" | "chatgpt" | "gemini" | "grok";
 type Bot = { id: BotId; name: string; open: string; whereEn: string; whereDe: string; chat: string; noteEn?: string; noteDe?: string };
 
-// Connector pages and menu paths checked Nov 2026. All four need a link that is reachable on the internet.
+// Connector pages and menu paths checked Nov 2026 (ChatGPT tested end to end on 22 Nov 2026). All four need a link that is reachable on the internet.
 const BOTS: Bot[] = [
   { id: "claude", name: "Claude", open: "https://claude.ai/settings/connectors", chat: "https://claude.ai/new",
     whereEn: "Settings → Connectors → Add custom connector", whereDe: "Einstellungen → Connectors → Add custom connector" },
-  { id: "chatgpt", name: "ChatGPT", open: "https://chatgpt.com/#settings/Connectors", chat: "https://chatgpt.com/",
-    whereEn: "Settings → Connectors → Create", whereDe: "Einstellungen → Connectors → Create",
-    noteEn: "Custom connectors need developer mode in ChatGPT settings.", noteDe: "Eigene Connectors brauchen den Entwicklermodus in ChatGPT." },
+  { id: "chatgpt", name: "ChatGPT", open: "https://chatgpt.com/plugins", chat: "https://chatgpt.com/",
+    whereEn: "Plugins → Add → Add custom MCP server", whereDe: "Plugins → Hinzufügen → Eigenen MCP-Server hinzufügen",
+    noteEn: "In ChatGPT, set Authentication to “No authentication”: your link already holds your key.", noteDe: "Stell in ChatGPT die Authentifizierung auf „Keine“: Dein Link enthält den Schlüssel schon." },
   { id: "gemini", name: "Gemini", open: "https://gemini.google.com/app", chat: "https://gemini.google.com/app",
     whereEn: "Settings → Connected apps → Add a custom app", whereDe: "Einstellungen → Verbundene Apps → Eigene App hinzufügen",
     noteEn: "Gemini offers custom apps for personal accounts in some countries only.", noteDe: "Gemini bietet eigene Apps nur für private Konten in einigen Ländern." },
