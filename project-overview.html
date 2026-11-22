@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>comdirect-edu: обзор проекта</title>
+<style>
+  :root {
+    --bg: #f6f7f9; --card: #ffffff; --text: #1a1d21; --muted: #5b6470;
+    --line: #dfe3e8; --accent: #ffb400; --accent-ink: #1a1d21; --dark: #1f2933;
+    --up: #17803d; --down: #c0392b; --code: #eef0f3;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14171a; --card: #1d2125; --text: #eceef1; --muted: #9aa4af;
+      --line: #2e353c; --accent: #ffb400; --accent-ink: #14171a; --dark: #2b333b;
+      --up: #4cc17a; --down: #ff7a6b; --code: #262c32;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+    font: 16px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 32px 16px 64px; }
+  h1 { font-size: 2rem; line-height: 1.2; margin: 0 0 8px; }
+  h2 { font-size: 1.3rem; margin: 40px 0 12px; }
+  h3 { font-size: 1.05rem; margin: 0 0 6px; }
+  p { margin: 0 0 12px; }
+  .lead { font-size: 1.15rem; }
+  .muted { color: var(--muted); }
+  .note { border: 1px solid var(--accent); background: color-mix(in srgb, var(--accent) 12%, var(--card));
+    padding: 12px 16px; border-radius: 8px; margin: 20px 0; }
+  .grid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 16px; }
+  .card .tag { display: inline-block; font-size: .75rem; font-weight: 600; letter-spacing: .04em;
+    text-transform: uppercase; background: var(--accent); color: var(--accent-ink);
+    border-radius: 999px; padding: 2px 10px; margin-bottom: 8px; }
+  .stats { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); margin-top: 16px; }
+  .stat { background: var(--dark); color: #fff; border-radius: 12px; padding: 14px; text-align: center; }
+  .stat b { display: block; font-size: 1.7rem; line-height: 1.1; }
+  .stat span { font-size: .85rem; opacity: .85; }
+  ol.steps { padding-left: 1.2rem; margin: 0; }
+  ol.steps li { margin-bottom: 6px; }
+  table { width: 100%; border-collapse: collapse; background: var(--card);
+    border: 1px solid var(--line); border-radius: 12px; overflow: hidden; font-size: .95rem; }
+  th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { background: var(--code); font-weight: 600; }
+  tr:last-child td { border-bottom: 0; }
+  .scroll { overflow-x: auto; }
+  code { background: var(--code); border-radius: 4px; padding: 1px 6px; font-size: .9em; }
+  pre { background: var(--code); border-radius: 8px; padding: 12px 14px; overflow-x: auto; margin: 0 0 12px; }
+  pre code { background: none; padding: 0; }
+  .flow { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 12px 0; }
+  .flow span.box { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 6px 12px; }
+  .flow span.arrow { color: var(--muted); }
+  ul { margin: 0 0 12px; padding-left: 1.2rem; }
+  li { margin-bottom: 4px; }
+  footer { margin-top: 48px; font-size: .85rem; color: var(--muted); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>comdirect-edu</h1>
+  <p class="lead">Учебная игра по инвестициям. Игрок торгует «понарошку» и учится на своих ошибках.</p>
+
+  <div class="note">
+    <strong>Откуда эти факты.</strong>
+    Файлы <code>README.md</code> и <code>AGENTS.md</code> не описывают проект.
+    Это стандартные тексты Next.js. Описание ниже я составил по коду.
+  </div>
+
+  <h2>Идея</h2>
+  <p>Новичок боится потерять деньги. Поэтому он не начинает инвестировать.</p>
+  <p>Проект даёт ему безопасную площадку. У игрока есть 10 000 € игровых денег. Экран похож на торговый экран comdirect. Игрок изучает понятия как игру. Потом он проверяет себя на рынке с новостями, слухами и соперниками.</p>
+  <p class="muted">Слоган на главной странице: «Learn to invest without risking a cent».</p>
+
+  <div class="stats">
+    <div class="stat"><b>3</b><span>режима игры</span></div>
+    <div class="stat"><b>30</b><span>учебных карточек</span></div>
+    <div class="stat"><b>5</b><span>тем обучения</span></div>
+    <div class="stat"><b>14</b><span>бумаг на рынке</span></div>
+    <div class="stat"><b>6</b><span>ботов-соперников</span></div>
+    <div class="stat"><b>6</b><span>раундов истории</span></div>
+  </div>
+
+  <h2>Три режима</h2>
+  <div class="grid">
+    <div class="card">
+      <span class="tag">Тур</span>
+      <h3>Start the tour</h3>
+      <p>Пошаговая подсказка на реальном экране симулятора. Игрок ищет акцию, вводит количество, выбирает тип ордера и делает первую сделку.</p>
+      <p class="muted">12 шагов. При первом прохождении: 10 XP за каждый шаг и 50 XP в конце. Повтор тура XP не даёт.</p>
+    </div>
+    <div class="card">
+      <span class="tag">Симулятор</span>
+      <h3>Market Simulator</h3>
+      <p>Живой рынок на 120 дней. Новости двигают цены. Большинство новостей — шум. Игрок ищет сигнал и соревнуется с ботами.</p>
+    </div>
+    <div class="card">
+      <span class="tag">История</span>
+      <h3>History Mode</h3>
+      <p>Реальные заголовки. Дата скрыта. Игрок предсказывает: рынок вырастет, упадёт или не изменится. Потом он указывает уверенность: 50, 70 или 90 %.</p>
+      <p class="muted">В конце игра показывает, был ли игрок слишком уверен в себе.</p>
+    </div>
+  </div>
+
+  <h2>Учебный материал</h2>
+  <p>Материал состоит из 30 карточек в 5 темах. Каждая карточка имеет одно предложение-определение, пример с числами и вопрос с тремя ответами. Верный ответ даёт 25 XP.</p>
+  <div class="scroll">
+  <table>
+    <tr><th>Тема</th><th>Понятия</th></tr>
+    <tr><td>1. Basics</td><td>акция, облигация, ETF, дивиденд, капитализация</td></tr>
+    <tr><td>2. Trading mechanics</td><td>спред, рыночный ордер, лимитный ордер, stop-loss, комиссии и TER, часы торгов</td></tr>
+    <tr><td>3. Risk &amp; return</td><td>риск и доход, волатильность, просадка, диверсификация, корреляция, ликвидность</td></tr>
+    <tr><td>4. Time &amp; growth</td><td>сложный процент, инфляция, сберегательный план, усреднение, ребалансировка, горизонт</td></tr>
+    <tr><td>5. Reading the market</td><td>отчётность, «уже в цене», ставки, слухи, P/E, бык и медведь, налоги</td></tr>
+  </table>
+  </div>
+  <p style="margin-top:12px">Тема открывается после двух собранных карточек предыдущей темы. Четыре понятия имеют мини-игру: ETF (корзина), комиссии (дырявое ведро), диверсификация (падающие яйца), сложный процент (снежный ком).</p>
+
+  <h2>Как работает симулятор</h2>
+  <div class="flow">
+    <span class="box">Новости дня</span><span class="arrow">→</span>
+    <span class="box">Цены меняются</span><span class="arrow">→</span>
+    <span class="box">Боты торгуют</span><span class="arrow">→</span>
+    <span class="box">Игрок решает</span><span class="arrow">→</span>
+    <span class="box">Разбор: что было сигналом</span>
+  </div>
+  <ul>
+    <li><strong>Рынок.</strong> 13 акций (Apple, SAP, Siemens, adidas и другие) и один ETF на мировой рынок. Цены вымышленные. Это не живые данные.</li>
+    <li><strong>Новости.</strong> Генератор создаёт 1–3 шумовых заголовка каждый день. Каждые 5–10 дней приходит важная новость. Важная новость ставит игру на паузу.</li>
+    <li><strong>Виды новостей.</strong> сигнал, «уже в цене», «хорошо, но хуже ожиданий», слух, новость сектора, макроновость, отложенная реакция, шум. После новости игра объясняет, что произошло.</li>
+    <li><strong>Издержки как в жизни.</strong> Спред 0,1 %. Комиссия 4,90 € плюс 0,25 % с каждой сделки.</li>
+    <li><strong>Ордера.</strong> Рыночный, лимитный и стоп.</li>
+    <li><strong>Оценка.</strong> Результат равен доходности минус половина максимальной просадки. Ставка «всё на одну акцию» редко выигрывает.</li>
+    <li><strong>Скорость.</strong> Пауза, 1 день в секунду, 1 неделя в секунду.</li>
+  </ul>
+
+  <h2>Боты-соперники</h2>
+  <p>У каждого бота есть одна вредная привычка. Бот торгует на тех же новостях. Через 10 дней игра проверяет, сработала ли его сделка. Игрок заранее угадывает результат.</p>
+  <div class="scroll">
+  <table>
+    <tr><th>Бот</th><th>Привычка</th><th>Чему учит</th></tr>
+    <tr><td>FOMO Max</td><td>Покупает каждый слух и хайп</td><td>«Покупай слух, продавай новость»</td></tr>
+    <tr><td>Panic Paula</td><td>Продаёт всё после падения портфеля на 8 %</td><td>Просадка</td></tr>
+    <tr><td>All-in Alex</td><td>Вкладывает всё в одну акцию</td><td>Диверсификация</td></tr>
+    <tr><td>Day-trader Dan</td><td>Торгует каждые 3 дня</td><td>Комиссии и спред</td></tr>
+    <tr><td>Headline Hanna</td><td>Реагирует на каждый заголовок</td><td>«Уже в цене»</td></tr>
+    <tr><td>Steady Sam</td><td>Каждые 20 дней покупает ETF и не продаёт</td><td>Сберегательный план</td></tr>
+  </table>
+  </div>
+
+  <h2>Прогресс игрока</h2>
+  <ul>
+    <li>Игрок получает XP за карточки, тур и верные прогнозы в History Mode (10, 15 или 20 XP — по уверенности).</li>
+    <li>Пять рангов: Saver (0), Beginner (100), Investor (300), Strategist (600), Market Reader (1000).</li>
+    <li>Прогресс хранится в <code>localStorage</code> браузера. Сервера нет.</li>
+  </ul>
+
+  <h2>Технологии</h2>
+  <ul>
+    <li>Next.js 16 (App Router), React 19, TypeScript.</li>
+    <li>Графики: <code>lightweight-charts</code> (свечи) и свой линейный график.</li>
+    <li>Рынок и новости генерируются по seed. Один seed даёт один и тот же рынок.</li>
+    <li>Тесты рынка: скрипт <code>npm run check</code>.</li>
+  </ul>
+
+  <h2>Карта репозитория</h2>
+  <div class="scroll">
+  <table>
+    <tr><th>Путь</th><th>Что внутри</th></tr>
+    <tr><td><code>src/app/page.tsx</code></td><td>Главная: три режима, ранг, учебный материал</td></tr>
+    <tr><td><code>src/app/(platform)/</code></td><td>Страницы: <code>simulator</code>, <code>tour</code>, <code>learn</code>, <code>history</code></td></tr>
+    <tr><td><code>src/components/Simulator.tsx</code></td><td>Главный экран торговли (468 строк) и шаги тура</td></tr>
+    <tr><td><code>src/lib/market.ts</code>, <code>news.ts</code></td><td>Движок рынка, сделки, боты, генератор новостей</td></tr>
+    <tr><td><code>src/lib/data/</code></td><td>Компании, 30 понятий, 6 раундов истории</td></tr>
+    <tr><td><code>src/lib/progress.ts</code></td><td>XP, ранги, сохранение в браузере</td></tr>
+    <tr><td><code>references/</code></td><td>Скриншоты интерфейса comdirect для дизайна</td></tr>
+  </table>
+  </div>
+
+  <h2>Что нужно знать</h2>
+  <ul>
+    <li>Цены и новости вымышленные. Реальные данные не используются.</li>
+    <li>В <code>history.ts</code> стоит комментарий: проверьте числа перед публичной демонстрацией.</li>
+    <li>В <code>progress.ts</code> стоит пометка: прогресс пока хранится только в браузере. Позже его можно перенести в профиль comdirect.</li>
+    <li>Бэкенда нет.</li>
+  </ul>
+
+  <h2>Как запустить</h2>
+  <ol class="steps">
+    <li>Откройте папку проекта.</li>
+    <li>Выполните <code>npm install</code>.</li>
+    <li>Выполните <code>npm run dev</code>.</li>
+    <li>Откройте <code>http://localhost:3000</code>.</li>
+  </ol>
+
+  <footer>Файл создан по коду репозитория на коммит 803c9b1 (2026-11-21).</footer>
+</div>
+</body>
+</html>
