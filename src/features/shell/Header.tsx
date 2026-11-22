@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { actions, rankOf, useGame } from "@/features/game/store";
+import { chapterById, simpleOnlyChapter } from "@/features/tour/chapters";
 import { Wordmark } from "@/shared/ui/Wordmark";
 import { USER } from "@/shared/lib/user";
 import { useT } from "@/shared/lib/i18n";
@@ -13,6 +14,8 @@ export default function Header() {
   const path = usePathname();
   const rank = rankOf(save.xp);
   const t = useT();
+  // On the simple trading area after "Simple view", the tab is the way back to ProTrader.
+  const backToPro = path === "/pro" && save.simpleChosen && !simpleOnlyChapter(save.active ? chapterById(save.active) : undefined);
   return (
     <header className="header">
       <div className="header-inner">
@@ -21,7 +24,7 @@ export default function Header() {
           <span className="logo-edu">edu</span>
         </Link>
         <LangSwitch />
-        {save.persona && !["/", "/history", "/invest", "/pro"].includes(path) && (
+        {save.persona && (backToPro || !["/", "/history", "/invest", "/pro"].includes(path)) && (
           <nav className="hnav" aria-label="comdirect edu">
             {path === "/real-market" || save.proTrader || save.simpleChosen
               // Same as "Switch to ProTrader": /pro shows the ProTrader layout once save.proTrader is set.
