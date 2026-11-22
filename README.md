@@ -1,8 +1,4 @@
 <p align="center">
-  <img src="docs/readme-banner.svg" alt="comdirect edu: Practice first, then invest" width="100%">
-</p>
-
-<p align="center">
   <img src="https://img.shields.io/badge/Next.js-16-002E3C?style=flat-square" alt="Next.js 16">
   <img src="https://img.shields.io/badge/React-19-506C74?style=flat-square" alt="React 19">
   <img src="https://img.shields.io/badge/money-play_only-FFD700?style=flat-square&labelColor=002E3C" alt="Play money only">
@@ -15,12 +11,7 @@ A play-money training sandbox on the real comdirect screens that guides first-ti
 
 **No theory first: you act from the very first minute, and every concept sticks because you just did it yourself.**
 
-<table>
-  <tr>
-    <td width="50%"><img src="docs/screenshots/learning-hub.webp" alt="Learning hub with rank ring, XP, stars, cards and the learning path"><br><sub><b>Learning hub:</b> rank, XP, stars, cards and the four tutorials</sub></td>
-    <td width="50%"><img src="docs/screenshots/protrader.webp" alt="ProTrader sandbox: a 1:1 replica of the comdirect workspace with the time machine"><br><sub><b>ProTrader:</b> a 1:1 replica of the comdirect workspace, plus our time machine</sub></td>
-  </tr>
-</table>
+[View the pitch presentation (PDF)](docs/finance-quest.pdf)
 
 ## Why
 
@@ -207,7 +198,7 @@ On the VPS, `DATABASE_URL` sits in `~/collabothon26/.env` (read by `docker-compo
 | `src/features/pro/` | Trading area, ProTrader widgets, chart, order window, replay |
 | `src/features/shell/` | App header and sandbox bar |
 | `src/shared/` | Shared `ui/`, `charts/` and `lib/` (format, rng) |
-| `docs/replay-sources.md` | Fact-check notes and sources for the replays |
+| `docs/finance-quest.pdf` | Finance Quest pitch presentation |
 
 ## Disclaimer
 
