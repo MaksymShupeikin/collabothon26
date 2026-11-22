@@ -2,7 +2,7 @@
   "slide_count": 10,
   "duration_seconds": 60,
   "seconds_per_slide": 6,
-  "spoken_words": 120,
+  "spoken_words": 127,
   "html_errors": 0,
   "overflowing_slides": 0,
   "pdf_pages": 10,
@@ -16,10 +16,11 @@
   "circular_backgrounds": "passed",
   "slide_numbers_and_top_right_labels": "removed",
   "learning_order": [
-    "Learn",
-    "Understand",
-    "Practise",
-    "Apply"
+    "Get a hint",
+    "Try it",
+    "Get feedback",
+    "Understand why",
+    "Ask your agent"
   ],
   "comparison": [
     "comdirect Academy",
@@ -28,9 +29,13 @@
     "Trading 212",
     "comdirect edu"
   ],
-  "visual_review": "updated comparison page reviewed at 1440px",
+  "visual_review": "updated guided practice slide reviewed",
   "comparison_layout": "features as rows, platforms as columns",
   "comparison_feature_rows": 7,
   "comparison_platform_columns": 5,
-  "highlight": "comdirect edu column"
+  "highlight": "comdirect edu column",
+  "learning_model": "learning through guided practice",
+  "heading_periods": "removed",
+  "mcp_mcpo": "Planned capability in speaker notes; no technical label on slide",
+  "agent_step_condition": "Still unsure?"
 }

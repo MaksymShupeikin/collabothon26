@@ -15,8 +15,11 @@ const { chromium } = require('/Users/mshupeikin/.cache/codex-runtimes/codex-prim
   const count = await page.evaluate(() => window.pitch.slideCount);
   if(count !== 10) throw new Error('The deck must have exactly 10 slides');
   if(await page.locator('.slide-number,.brandbar .topic,#counter').count()) throw new Error('Unwanted slide labels remain');
+  const headingDots = await page.locator('.slide h1,.slide h2,.slide h3').evaluateAll(headings => headings.filter(h=>/\.(?=\s|$)/.test(h.innerText)).map(h=>h.innerText));
+  if(headingDots.length) throw new Error('Periods remain in slide headings: '+headingDots.join(', '));
+  if(await page.locator('.agent-path-note').count()!==1) throw new Error('Planned MCP learning step is missing');
   const order = await page.locator('.path-step strong').allTextContents();
-  if(order.join('/') !== 'Learn/Understand/Practise/Apply') throw new Error('Learning order is incorrect');
+  if(order.join('/') !== 'Get a hint/Try it/Get feedback/Understand why/Ask your agent') throw new Error('Guided practice sequence is incorrect');
   const checks = [];
   for (let i=0;i<count;i++) {
     await page.evaluate(i => window.pitch.show(i), i);
