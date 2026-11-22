@@ -91,21 +91,44 @@ Three onboarding questions pick a persona, and everything is tailored to it: exa
 
 | | |
 |---|---|
-| ✅ **Working** | Onboarding with three personas · all four tutorials end to end, each with a mission and a boss · five History replays (Wirecard, GameStop, VW, NVIDIA, COVID crash) · investor simulator · learning map with XP, ranks, stars and cards · ProTrader replica with the time machine · English and German |
-| 🟡 **Simulated on purpose** | Prices are scripted, not live · the photoTAN step is a mock · "Ready for real?" links to comdirect.de |
+| ✅ **Working** | Onboarding with three personas · all four tutorials end to end, each with a mission and a boss · five History replays (Wirecard, GameStop, VW, NVIDIA, COVID crash) · investor simulator · learning map with XP, ranks, stars and cards · ProTrader replica with the time machine · Real Market with historical quotes and intraday charts · backend progress saving in PostgreSQL · English and German |
+| 🟡 **Simulated on purpose** | Tutorial prices are scripted; Real Market uses historical quotes · all trades use play money · the photoTAN step is a mock · "Ready for real?" links to comdirect.de |
+| 🔜 **Planned integration** | Customer profile and identity from the bank platform · progress linked to that identity across devices · MCP access for the customer's own agent |
 
 ## Tech stack
 
-| | |
-|---|---|
-| **Language** | TypeScript |
-| **Framework** | Next.js 16 (App Router), React 19 |
-| **Charts** | TradingView lightweight-charts (candles, volume) |
-| **Data** | The market engine runs in the browser; progress is saved in Postgres through one API route (see [Saving progress](#saving-progress)) |
-| **Deploy** | Docker behind Caddy on a VPS |
-| **Quality** | ESLint, `node:assert` self-checks run with plain `node` |
+| Layer | Technology | What it does |
+|---|---|---|
+| **Frontend** | TypeScript, React 19, Next.js 16 App Router | The comdirect-style screens, guided missions, learning map and interactive simulators |
+| **Simulation** | Our TypeScript market and game engines | Run play-money trades and check mission actions in the browser; calculate XP, stars and learning progress |
+| **Charts** | TradingView lightweight-charts | Draw candlestick, volume and historical price charts |
+| **Backend** | Node.js, Next.js Route Handlers | Load and save progress through `/api/save`; serve intraday quotes through `/api/real-market/bars` |
+| **Database** | PostgreSQL, Postgres.js (`postgres`) | Store each learner's save as JSONB, with an ID and update timestamp |
+| **Market data** | Bundled Yahoo Finance daily quotes; Python, uv, yfinance and exchange-calendars | Supply historical daily data and server-side intraday bars for Real Market; an optional local archive supports older intraday data |
+| **Deployment** | Docker, Docker Compose, Caddy, VPS | Run the app and Python worker in a container, connect to PostgreSQL and serve the app over HTTPS |
+| **Quality** | ESLint, `node:assert` | Check code quality and verify the simulation's money math and scenario rules |
 
-No paid APIs, cloud services or hardware.
+The frontend and backend are part of the same Next.js application. PostgreSQL runs as a separate service. No paid API subscription is required for the prototype.
+
+### Platform data and learning progress
+
+**The bank platform provides the customer context; edu stores the learning journey.** In the intended integration, the customer opens edu from their existing signed-in comdirect session. Their identity and profile details come from the platform, so they do not create another account or enter the same details again. The platform remains the source of truth for customer data.
+
+Our backend stores what the learner does in edu: onboarding answers and persona, completed chapters and missions, XP, collected cards, stars, concept-answer progress, unlocked features, the current task, play-money account state and transactions, and the Investor Simulator personal best. Ranks are calculated from XP. These are practice balances and trades.
+
+The data flow is:
+
+1. **comdirect platform → edu:** provide the signed-in customer identity and relevant profile context through a future bank integration.
+2. **edu frontend → edu backend → PostgreSQL:** save the learning and sandbox state as the customer practises.
+3. **PostgreSQL → edu backend → edu frontend:** restore progress when the customer returns. Linking saves to the platform identity would also allow progress to follow them across devices.
+
+**In the current prototype,** the progress backend is implemented, while the bank connection is still planned. The profile is the fixed "Max Mustermann" placeholder, and an anonymous browser cookie identifies each save. See [Saving progress](#saving-progress) for the current behaviour.
+
+### MCP integration — planned
+
+We plan to expose app help and learning context through **Model Context Protocol (MCP)**, so customers can use their own compatible agent while practising. They could ask "What does this field mean?", "Why use a limit order here?" or "What should I try next?" and get an explanation grounded in the app and their current learning step.
+
+This extends the learning loop: **get a hint → try it → get feedback → understand why → ask your agent if still unsure**. MCP support is not yet implemented on `main`. The planned integration would expose authorised app and learning context; real trading remains in the bank's existing services.
 
 ## Behind the build
 
@@ -113,12 +136,12 @@ No paid APIs, cloud services or hardware.
 
 **Key decisions.**
 - **Deterministic markets.** Prices depend only on the scenario, never on the player, so every demo and every test plays the same way and only the account needs saving.
-- **One step = one trading day.** Enough to show news, orders and compounding without an intraday engine.
-- **A tiny backend.** One route saves progress to Postgres; there is still nothing to sign up for.
-- **A mock account by default.** In the real product the learner is already signed in to comdirect, so their first name and surname would come from their Commerzbank account, not from a sign-up form of ours. We don't have access to that for the prototype, so every player sees the same placeholder account holder, "Max Mustermann" ([`user.ts`](src/shared/lib/user.ts)). We didn't build our own sign-up, because it would be thrown away once the bank login is connected.
+- **One tutorial step = one trading day.** Enough to show news, orders and compounding. Real Market separately supports historical daily and intraday charts.
+- **A focused backend.** Next.js handles progress storage in PostgreSQL and intraday market-data requests. The browser runs the learning and simulation logic; the server persists the resulting save.
+- **Reuse the bank identity.** The intended product gets customer details from the signed-in comdirect platform and adds a learning record keyed to that identity. The prototype uses a placeholder profile ([`user.ts`](src/shared/lib/user.ts)) and an anonymous save cookie until that integration is connected.
 - **Code by feature** (`src/features/*`), with thin routes in `src/app/`.
 
-**Built on:** Next.js, React and lightweight-charts.
+**Built on:** Next.js, React, PostgreSQL, Postgres.js, lightweight-charts and the Python market-data tools listed above.
 **Built by us during the hackathon (20–22 Nov 2026), about 50 commits:** everything else. The market engine, scenarios, replays and bots, the tour and missions, the game systems, the comdirect replica screens, the investor simulator and the German translation.
 
 ## Challenges and what we learned
@@ -138,13 +161,16 @@ No paid APIs, cloud services or hardware.
 **What we're most proud of.** The first-stock mission: you move money, buy with a limit order and find your profit, on a 1:1 comdirect replica, with nobody holding your hand.
 
 **Current limitations.**
-- One price per trading day with a fixed spread, and no dividends or tax.
+- Tutorial simulations use one price per trading day with a fixed spread; dividends and tax are not modelled.
 - Rival bots only appear in the History replays, not in free play.
+- The bank profile/identity connection and MCP integration are planned; current saves follow a browser rather than a customer across devices.
 - Not tested with real first-time investors yet.
 
 **Next.**
 - Test with real first-time investors and measure who places a real first trade.
-- Intraday prices with a wider night spread, plus dividends and tax on profits.
+- Connect the existing bank identity and profile, so learning progress follows the customer across devices.
+- Add MCP support for app questions through the customer's own agent.
+- Extend the simulation with a wider night spread, dividends and tax on profits.
 - Bring the rival bots into free play.
 
 ## Quick start
@@ -167,18 +193,18 @@ Real Market's intraday charts (5m to 4h) run `scripts/read-intraday.py` through 
 
 ### Saving progress
 
-There are no user accounts. A player is a browser:
+The prototype has a working progress backend, with no separate edu sign-up. Until the bank identity is connected, a save belongs to a browser:
 
 1. On the first visit the app calls `GET /api/save`. The server finds no `cd-edu-id` cookie, makes a random UUID and sets it (httpOnly, HTTPS only, 400 days).
 2. Every later request sends the cookie, and the server uses it as the key of the player's row in the `saves` table (`id uuid`, `data jsonb`, `updated_at`). The table is created on first use.
 3. The client loads the save once on startup and writes the whole save back about a second after each change, plus once when the tab closes ([`store.ts`](src/features/game/store.ts), [`route.ts`](src/app/api/save/route.ts)).
 
 What that means:
-- Same browser: progress is always there. Another browser, device or incognito window starts empty.
+- After a successful save, the same browser can restore its progress. Another browser, device or incognito window starts empty.
 - Clearing cookies orphans the old save; nothing links two browsers to one person.
-- If the server is unreachable, the app still runs but does not save, so it never overwrites real progress with an empty one.
+- If the initial load fails, the app still runs but disables saving for that session, so an empty local state cannot overwrite the stored save. Later failed writes are not persisted; there is no offline save queue.
 - Progress from the old `localStorage` version is uploaded once on first load.
-- The "Max Mustermann" in the header is a fixed mock user ([`user.ts`](src/shared/lib/user.ts)), not tied to the cookie. Real accounts would mean a login (e.g. comdirect SSO) and keying `saves` on that user id.
+- The "Max Mustermann" in the header is a fixed mock profile ([`user.ts`](src/shared/lib/user.ts)), not tied to the cookie. The intended bank integration would use the existing platform session and customer ID to identify saves, with profile data supplied by the platform.
 
 On the VPS, `DATABASE_URL` sits in `~/collabothon26/.env` (read by `docker-compose.yml`) and points at the shared Postgres container on the `db_default` network.
 
@@ -186,7 +212,9 @@ On the VPS, `DATABASE_URL` sits in `~/collabothon26/.env` (read by `docker-compo
 
 | Path | What |
 |---|---|
-| `src/app/` | Routes only: thin pages that render a feature screen |
+| `src/app/` | App Router pages that render feature screens, plus backend API routes |
+| `src/app/api/save/` | Backend API for loading and saving learning progress in PostgreSQL |
+| `src/app/api/real-market/bars/` | Backend API for historical intraday market data |
 | `src/features/market/` | Deterministic market and account (`engine.ts`), scripted lessons and historical replays, bots, news, companies. Runs under plain `node` for `npm run check` |
 | `src/features/game/` | The save (XP, cards, stars, persona), personas and the tour UI bus |
 | `src/features/tour/` | Chapters, missions, bosses, spotlight coach, plan comparison |
@@ -198,6 +226,7 @@ On the VPS, `DATABASE_URL` sits in `~/collabothon26/.env` (read by `docker-compo
 | `src/features/pro/` | Trading area, ProTrader widgets, chart, order window, replay |
 | `src/features/shell/` | App header and sandbox bar |
 | `src/shared/` | Shared `ui/`, `charts/` and `lib/` (format, rng) |
+| `scripts/read-intraday.py` | Python worker that loads and aggregates intraday quotes |
 | `docs/finance-quest.pdf` | Finance Quest pitch presentation |
 
 ## Disclaimer
