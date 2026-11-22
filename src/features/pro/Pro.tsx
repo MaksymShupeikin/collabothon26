@@ -50,7 +50,7 @@ export default function Pro({ realMarket = false }: { realMarket?: boolean }) {
   // History mode (world 0) always plays on the simple trading area.
   const simpleOnly = pro?.world === 2 || pro?.world === 0;
   const layout: Layout = simpleOnly || !save.proTrader ? "simple" : "pro";
-  const offerSwitch = proTraderOffered(save) && !save.proTrader && !simpleOnly;
+  const offerSwitch = proTraderOffered(save) && !save.proTrader && !save.simpleChosen && !simpleOnly;
   return <Desk key={`${save.active ?? "free"}:${layout}`} mode={mode} chapter={pro} layout={layout} offerSwitch={offerSwitch} />;
 }
 
@@ -312,7 +312,7 @@ function Desk({ mode, chapter, layout, offerSwitch, realSim }: { mode: Mode; cha
 
   return (
     <div className="pt">
-      <SandboxBar dark />
+      <SandboxBar dark onSimple={actions.switchToSimple} />
       <header className="pt-head" data-tour="pt-header">
         <span className="pt-logo"><Wordmark width={96} /></span>
         <span className="pt-icon" aria-hidden>☰</span>

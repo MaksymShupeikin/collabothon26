@@ -7,7 +7,7 @@ import { useT } from "@/shared/lib/i18n";
 import LangSwitch from "@/features/shell/LangSwitch";
 
 /** Thin bar above the copied comdirect screens: makes clear this is the training sandbox (🆕, not comdirect). */
-export default function SandboxBar({ clock, dark = false }: { clock?: string; dark?: boolean }) {
+export default function SandboxBar({ clock, dark = false, onSimple }: { clock?: string; dark?: boolean; onSimple?: () => void }) {
   const save = useGame();
   const rank = rankOf(save.xp);
   const t = useT();
@@ -22,6 +22,7 @@ export default function SandboxBar({ clock, dark = false }: { clock?: string; da
           <span><strong>{t(rank.name)}</strong> <span className="num sbar-xp"><TickingXp value={save.xp} /> XP</span></span>
         </span>
         <LangSwitch />
+        {onSimple && <button type="button" className="sbar-link" onClick={onSimple}>{t("Simple view", "Einfache Ansicht")}</button>}
         <Link href="/" className="sbar-link">{t("Learning map", "Lernpfad")}</Link>
       </span>
     </div>

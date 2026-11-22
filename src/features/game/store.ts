@@ -22,6 +22,7 @@ export type Save = {
   proUnlocked: boolean;
   proCelebrated: boolean;
   proTrader: boolean; // the learner confirmed the switch from the simple trading area to ProTrader (offered after the Module 2 mission)
+  simpleChosen: boolean; // the learner went back from ProTrader to the simple area: don't offer the switch again
   allUnlocked: boolean; // demo switch on the learning map
   active: string | null; // chapter / mission currently running
   giro: number;
@@ -34,7 +35,7 @@ export type Save = {
 const LEGACY_KEY = "cd-edu-v3", LEGACY_BEST = "cd-edu-invsim-best";
 const fresh = (persona: PersonaId | null = null): Save => ({
   v: 3, persona, answers: null, xp: 0, earned: [], cards: [], done: [], stars: {}, understanding: 0,
-  proUnlocked: false, proCelebrated: false, proTrader: false, allUnlocked: false, active: null,
+  proUnlocked: false, proCelebrated: false, proTrader: false, simpleChosen: false, allUnlocked: false, active: null,
   giro: persona ? PERSONAS[persona].start : 0, sim: newSim("main", 0), tx: [], nextTx: 1, invBest: null,
 });
 const EMPTY = fresh();
@@ -154,7 +155,8 @@ export const actions = {
   unlockPro() { update((s) => ({ ...s, proUnlocked: true })); },
   celebratePro() { update((s) => ({ ...s, proCelebrated: true })); },
   /** The learner acknowledged the move from the simple trading area to ProTrader. */
-  switchToProTrader() { update((s) => ({ ...s, proTrader: true })); },
+  switchToProTrader() { update((s) => ({ ...s, proTrader: true, simpleChosen: false })); },
+  switchToSimple() { update((s) => ({ ...s, proTrader: false, simpleChosen: true })); },
   setAllUnlocked(on: boolean) { update((s) => ({ ...s, allUnlocked: on, proUnlocked: s.proUnlocked || on })); },
   reset() { write(EMPTY); },
   setInvBest(b: Save["invBest"]) { update((s) => ({ ...s, invBest: b })); },

@@ -140,6 +140,7 @@ h3 { font-size: var(--text-base); line-height: 24px; font-weight: 700; }
 .sbar-right { margin-left: auto; display: flex; align-items: center; gap: var(--space-5); }
 .sbar-rank { display: flex; align-items: center; gap: var(--space-3); }
 .sbar-link { color: var(--color-white); font-weight: 700; }
+button.sbar-link { background: none; border: 0; padding: 0; font: inherit; font-weight: 700; text-decoration: underline; cursor: pointer; }
 .sbar-link:hover { color: var(--color-accent); }
 
 /* ── comdirect web cabinet ── */
