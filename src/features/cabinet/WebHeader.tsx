@@ -4,7 +4,7 @@ import { ALL_COMPANIES, COMPANIES, type Company } from "@/features/market/compan
 import { Wordmark } from "@/shared/ui/Wordmark";
 import { dict, useT } from "@/shared/lib/i18n";
 
-// Layout copied from the comdirect web customer area (references/01, 1_web-kundenbereich/*); text in English.
+// Layout copied from the comdirect web customer area.
 export const MAIN_NAV = ["Personal area", "Informer", "Current account", "Portfolio", "Trading"] as const;
 export const SUB_NAV = ["Portfolio", "Order", "Account & card"] as const;
 // Nav names stay English as ids; this is what the customer reads.

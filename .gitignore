@@ -42,3 +42,6 @@ next-env.d.ts
 
 # from the repo: local Claude settings
 .claude/
+
+# Local only
+idea.md

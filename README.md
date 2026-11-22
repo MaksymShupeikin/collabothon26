@@ -11,7 +11,7 @@
 
 # comdirect edu
 
-A training sandbox inside comdirect. It looks like the real comdirect screens, runs on play money and walks you through them one game step at a time, so buying your first stock feels like something you have already done.
+A play-money training sandbox on the real comdirect screens that guides first-time investors, from 22 to 58, step by step to their first stock trade.
 
 **No theory first: you act from the very first minute, and every concept sticks because you just did it yourself.**
 
@@ -92,11 +92,72 @@ Three onboarding questions pick a persona, and everything is tailored to it: exa
 
 ## What we copy and what we invent
 
-**Copied 1:1 from comdirect:** start page, account table, depot overview, transactions, search, security detail page, order form, and the ProTrader workspace with its widgets. Layout, element positions, table columns, field order and the German number and date formats (`1.001,16 EUR`, `14.03.2024`) match the real screens. All text is in English for now, so a German version only means swapping text.
+**Copied 1:1 from comdirect:** start page, account table, depot overview, transactions, search, security detail page, order form, and the ProTrader workspace with its widgets. Layout, element positions, table columns, field order and the German number and date formats (`1.001,16 EUR`, `14.03.2024`) match the real screens. The app runs in English and German (EN/DE switch in the header).
 
 **Invented by us:** the entry banner, onboarding and personas, the spotlight coach, missions, XP, ranks, cards and stars, the simple trading area between the web cabinet and ProTrader, the time machine, historical replays, rival bots, Spot the habit, Mistake Cam, boss rounds, the leaderboard and the clearly marked "Add play money" sandbox button.
 
+## What works today
+
+| | |
+|---|---|
+| ✅ **Working** | Onboarding with three personas · all four tutorials end to end, each with a mission and a boss · five History replays (Wirecard, GameStop, VW, NVIDIA, COVID crash) · investor simulator · learning map with XP, ranks, stars and cards · ProTrader replica with the time machine · English and German |
+| 🟡 **Simulated on purpose** | Prices are scripted, not live · the photoTAN step is a mock · "Ready for real?" links to comdirect.de |
+
+## Tech stack
+
+| | |
+|---|---|
+| **Language** | TypeScript |
+| **Framework** | Next.js 16 (App Router), React 19 |
+| **Charts** | TradingView lightweight-charts (candles, volume) |
+| **Data** | No backend: the market engine runs in the browser, progress is saved in `localStorage` |
+| **Deploy** | Docker behind Caddy on a VPS |
+| **Quality** | ESLint, `node:assert` self-checks run with plain `node` |
+
+No paid APIs, cloud services or hardware.
+
+## Behind the build
+
+**How the pieces fit.** One deterministic engine ([`engine.ts`](src/features/market/engine.ts)) holds the account, fees (4,90 € + 0,25 %), orders and scripted prices. Every screen reads from it: the web cabinet, the simple trading area, ProTrader and the replays. The tour and missions check the sandbox state ("does the depot hold the stock, bought with a limit order?"), not a quiz answer.
+
+**Key decisions.**
+- **Deterministic markets.** Prices depend only on the scenario, never on the player, so every demo and every test plays the same way and only the account needs saving.
+- **One step = one trading day.** Enough to show news, orders and compounding without an intraday engine.
+- **No backend.** Nothing to sign up for, nothing to host but static pages, and it runs anywhere.
+- **Code by feature** (`src/features/*`), with thin routes in `src/app/`.
+
+**Built on:** Next.js, React and lightweight-charts.
+**Built by us during the hackathon (20–22 Nov 2026), about 50 commits:** everything else. The market engine, scenarios, replays and bots, the tour and missions, the game systems, the comdirect replica screens, the investor simulator and the German translation.
+
+## Challenges and what we learned
+
+- **The scoring rewarded luck.** In our first COVID replay FOMO Max bought at the record high and still won the round, which taught the wrong lesson. We rescripted it and score by risk-adjusted return (return − ½ × worst drawdown), so all-in play rarely wins.
+- **We dropped "guess the price direction".** It rewarded guessing, exactly what regulators criticise in gamified trading. "Spot the habit" replaced it: you name the risk, not the next price.
+- **Fake company news.** Our first news generator wrote headlines like "SAP opens office in Lisbon". We made "never invent news about a real company" a rule, and the self-check enforces it.
+- **The Starter couldn't afford the replays.** With 100 €, one Wirecard share plus the fee is out of reach and diversifying is impossible. Replays now give everyone a 1.000 € budget and score in %.
+- **A visible name spoils the replay.** Nobody makes a real decision on Wirecard if they know it's Wirecard, so replays hide the company name and date until the reveal.
+
+## Results and next steps
+
+**What we achieved.** A complete learning path from the comdirect start page to a first trade, three bosses and five replays of real market events, all on screens that match comdirect.
+
+**How we validated it.** `npm run check` asserts the money math, order fills and expiry, 120 savings-plan executions over ten years, the replay prices, that every boss loses to the careful strategy, and that no simulated news is about a real company. We played all four tutorials end to end.
+
+**What we're most proud of.** The first-stock mission: you move money, buy with a limit order and find your profit, on a 1:1 comdirect replica, with nobody holding your hand.
+
+**Current limitations.**
+- One price per trading day with a fixed spread, and no dividends or tax.
+- Rival bots only appear in the History replays, not in free play.
+- Not tested with real first-time investors yet.
+
+**Next.**
+- Test with real first-time investors and measure who places a real first trade.
+- Intraday prices with a wider night spread, plus dividends and tax on profits.
+- Bring the rival bots into free play.
+
 ## Quick start
+
+Live demo: **[comdirect.vokh.dev](https://comdirect.vokh.dev)**
 
 ```bash
 npm install
@@ -127,8 +188,6 @@ Progress lives in `localStorage` (`cd-edu-v3`). "Reset progress" at the bottom o
 | `src/features/shell/` | App header and sandbox bar |
 | `src/shared/` | Shared `ui/`, `charts/` and `lib/` (format, rng) |
 | `docs/replay-sources.md` | Fact-check notes and sources for the replays |
-
-The full concept is in [`idea.md`](idea.md).
 
 ## Disclaimer
 

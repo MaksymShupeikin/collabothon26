@@ -142,7 +142,7 @@ h3 { font-size: var(--text-base); line-height: 24px; font-weight: 700; }
 .sbar-link { color: var(--color-white); font-weight: 700; }
 .sbar-link:hover { color: var(--color-accent); }
 
-/* ── comdirect web cabinet (references/01, 1_web-kundenbereich/*) ── */
+/* ── comdirect web cabinet ── */
 .web { min-height: 100vh; background: var(--color-white); }
 .wh { max-width: 1180px; margin: 0 auto; padding: 0 var(--space-5); }
 .wh-top { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--space-5); }
