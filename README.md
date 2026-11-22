@@ -9,8 +9,6 @@
   <img src="https://img.shields.io/badge/Collabothon-2026-83989F?style=flat-square" alt="Collabothon 2026">
 </p>
 
-# comdirect edu
-
 A play-money training sandbox on the real comdirect screens that guides first-time investors, from 22 to 58, step by step to their first stock trade.
 
 **No theory first: you act from the very first minute, and every concept sticks because you just did it yourself.**
