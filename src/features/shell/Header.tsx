@@ -23,7 +23,7 @@ export default function Header() {
         <LangSwitch />
         {save.persona && !["/", "/history", "/invest", "/pro"].includes(path) && (
           <nav className="hnav" aria-label="comdirect edu">
-            {path === "/real-market" || save.proTrader
+            {path === "/real-market" || save.proTrader || save.simpleChosen
               // Same as "Switch to ProTrader": /pro shows the ProTrader layout once save.proTrader is set.
               ? <Link href="/pro" onClick={() => actions.switchToProTrader()}>ProTrader</Link>
               : <Link href="/pro">{t("Trading area", "Handelsbereich")}</Link>}
