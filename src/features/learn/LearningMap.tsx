@@ -148,7 +148,13 @@ export default function LearningMap() {
 
 
       <section aria-labelledby="cards-h">
-        <h2 id="cards-h" className={s.sectionHead}>{t("Concept cards", "Wissenskarten")}</h2>
+        <div className={s.cardsHeading}>
+          <h2 id="cards-h">{t("Concept cards", "Wissenskarten")}</h2>
+          <p className={s.collectionReward}>
+            {t(`Collect all ${CARDS.length} cards`, `Sammle alle ${CARDS.length} Karten`)}
+            {" · "}<strong>{t("25 € account bonus", "25 € Kontobonus")}</strong>
+          </p>
+        </div>
         <ul className={s.cards}>
           {CARDS.map((c) => {
             const has = save.cards.includes(c.id);
