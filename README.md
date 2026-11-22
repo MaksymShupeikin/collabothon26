@@ -110,7 +110,7 @@ Three onboarding questions pick a persona, and everything is tailored to it: exa
 | **Language** | TypeScript |
 | **Framework** | Next.js 16 (App Router), React 19 |
 | **Charts** | TradingView lightweight-charts (candles, volume) |
-| **Data** | No backend: the market engine runs in the browser, progress is saved in `localStorage` |
+| **Data** | The market engine runs in the browser; progress is saved in Postgres through one API route (see [Saving progress](#saving-progress)) |
 | **Deploy** | Docker behind Caddy on a VPS |
 | **Quality** | ESLint, `node:assert` self-checks run with plain `node` |
 
@@ -123,7 +123,8 @@ No paid APIs, cloud services or hardware.
 **Key decisions.**
 - **Deterministic markets.** Prices depend only on the scenario, never on the player, so every demo and every test plays the same way and only the account needs saving.
 - **One step = one trading day.** Enough to show news, orders and compounding without an intraday engine.
-- **No backend.** Nothing to sign up for, nothing to host but static pages, and it runs anywhere.
+- **A tiny backend.** One route saves progress to Postgres; there is still nothing to sign up for.
+- **A mock account by default.** In the real product the learner is already signed in to comdirect, so their first name and surname would come from their Commerzbank account, not from a sign-up form of ours. We don't have access to that for the prototype, so every player sees the same placeholder account holder, "Max Mustermann" ([`user.ts`](src/shared/lib/user.ts)). We didn't build our own sign-up, because it would be thrown away once the bank login is connected.
 - **Code by feature** (`src/features/*`), with thin routes in `src/app/`.
 
 **Built on:** Next.js, React and lightweight-charts.
@@ -169,7 +170,24 @@ npm run check      # self-check of the money math, scripted markets and bots
 npm run build
 ```
 
-Progress lives in Postgres (`saves` table, created on first use), keyed by an anonymous `cd-edu-id` cookie. Set `DATABASE_URL` (e.g. in `.env.local`); without it the app runs but nothing is saved. Old `localStorage` progress is uploaded once on first load. "Reset progress" at the bottom of the hub starts over.
+Set `DATABASE_URL` (e.g. in `.env.local`) to save progress; without it the app runs but nothing is saved. "Reset progress" at the bottom of the hub starts over.
+
+### Saving progress
+
+There are no user accounts. A player is a browser:
+
+1. On the first visit the app calls `GET /api/save`. The server finds no `cd-edu-id` cookie, makes a random UUID and sets it (httpOnly, HTTPS only, 400 days).
+2. Every later request sends the cookie, and the server uses it as the key of the player's row in the `saves` table (`id uuid`, `data jsonb`, `updated_at`). The table is created on first use.
+3. The client loads the save once on startup and writes the whole save back about a second after each change, plus once when the tab closes ([`store.ts`](src/features/game/store.ts), [`route.ts`](src/app/api/save/route.ts)).
+
+What that means:
+- Same browser: progress is always there. Another browser, device or incognito window starts empty.
+- Clearing cookies orphans the old save; nothing links two browsers to one person.
+- If the server is unreachable, the app still runs but does not save, so it never overwrites real progress with an empty one.
+- Progress from the old `localStorage` version is uploaded once on first load.
+- The "Max Mustermann" in the header is a fixed mock user ([`user.ts`](src/shared/lib/user.ts)), not tied to the cookie. Real accounts would mean a login (e.g. comdirect SSO) and keying `saves` on that user id.
+
+On the VPS, `DATABASE_URL` sits in `~/collabothon26/.env` (read by `docker-compose.yml`) and points at the shared Postgres container on the `db_default` network.
 
 ## Project structure
 
