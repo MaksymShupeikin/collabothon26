@@ -23,7 +23,7 @@ export default function Header() {
         <LangSwitch />
         {save.persona && !["/", "/history", "/invest", "/pro"].includes(path) && (
           <nav className="hnav" aria-label="comdirect edu">
-            <Link href={path === "/real-market" ? path : "/pro"}>{path === "/real-market" ? t("Real Market", "Echter Markt") : save.proTrader ? "ProTrader" : t("Trading area", "Handelsbereich")}</Link>
+            <Link href="/pro">{path === "/real-market" || save.proTrader ? "ProTrader" : t("Trading area", "Handelsbereich")}</Link>
           </nav>
         )}
         <div className="user" aria-label={t(`Your profile: ${USER.name}, level ${rank.level} ${rank.name}, ${save.xp} XP`, `Dein Profil: ${USER.name}, Level ${rank.level} ${t(rank.name)}, ${save.xp} XP`)}>
