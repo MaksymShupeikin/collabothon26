@@ -19,7 +19,7 @@ export default function Header() {
         </Link>
         {save.persona && save.proUnlocked && path !== "/" && (
           <nav className="hnav" aria-label="comdirect edu">
-            <Link href="/pro">{save.proTrader ? "ProTrader" : "Trading area"}</Link>
+            <Link href={path === "/real-market" ? path : "/pro"}>{path === "/real-market" ? "Real Market" : save.proTrader ? "ProTrader" : "Trading area"}</Link>
           </nav>
         )}
         <div className="user" aria-label={`Your profile: ${USER.name}, level ${rank.level} ${rank.name}, ${save.xp} XP`}>

@@ -112,8 +112,8 @@ export default function LearningMap() {
       </section>
 
       <section className={s.modes} aria-label="Play modes">
-        <ModeTile open={proOpen} lockText="After World 1" icon="chart" title="Real Market" line="Simple or Pro view. Beat the bots."
-          onOpen={() => { actions.start(null); setUi({}); router.push("/pro"); }} />
+        <ModeTile open={proOpen} lockText="After World 1" icon="chart" title="Real Market" line="Practice with historical stock prices."
+          onOpen={() => router.push("/real-market")} />
         {/* shortcut: the game isn't built yet, so the tile opens nothing; wire onOpen when it exists. */}
         <ModeTile open icon="sprout" title="Investor Simulator" line="30 years of life in 10 minutes." onOpen={() => {}} />
         <ModeTile open={!!replay} lockText="In World 2" icon="hourglass" title="History Mode" line={replay ? replay.title.replace(/^Boss: /, "vs. ") : "Real crashes, hidden dates."}

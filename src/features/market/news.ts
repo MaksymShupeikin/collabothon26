@@ -5,6 +5,7 @@ export type NewsKind = "signal" | "noise" | "priced_in" | "rumor" | "sector" | "
 export type Effect = { target: string; from: number; days: number; total: number }; // target: SYM | "sector:X" | "*"
 export type News = {
   id: string;
+  session?: string; // first historical trading session reflecting the headline
   day: number; // game day the headline appears
   time: string; // HH:MM:SS, German format
   kind: NewsKind;

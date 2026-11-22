@@ -2,6 +2,7 @@
 // WKN/ISIN are the real identifiers so the search behaves like comdirect's (WKN, ISIN, Name).
 export type Company = {
   sym: string;
+  venue?: string;
   name: string; // comdirect-style instrument name
   short: string; // short name for tight spots
   wkn: string;

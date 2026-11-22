@@ -836,3 +836,381 @@ html:has(.trade), body:has(.trade) { background: color-mix(in srgb, var(--color-
 .btn-arrow { width: 1em; height: 1em; flex-shrink: 0; vertical-align: -0.125em; margin-left: var(--space-2); transition: transform var(--ease); }
 .btn:hover:not(:disabled) .btn-arrow { transform: translateX(3px); }
 @media (prefers-reduced-motion: reduce) { .btn-arrow { transition: none; } }
+
+.g-chart .candle-chart { flex: 1; min-height: 240px; width: 100%; }
+.chart-tools:has(> .btn) { align-items: center; justify-content: space-between; gap: var(--space-2); }
+
+.trade .chart-head-real {
+  align-items: flex-start;
+  flex-direction: row;
+  gap: 16px;
+  padding: 20px 20px 12px;
+}
+.chart-head-real .chart-company { min-width: 0; overflow-wrap: anywhere; }
+.trade .chart-head-real h2 { color: var(--color-ink); font-size: 21px; line-height: 1.15; font-weight: 650; margin: 0 0 4px; }
+.trade .chart-head-real .chart-price {
+  flex-shrink: 0; display: flex; align-items: baseline; gap: 7px; white-space: nowrap;
+}
+.trade .chart-head-real .chart-price strong { font-size: clamp(24px, 2.6vw, 36px); line-height: 1; letter-spacing: -.045em; }
+.trade .chart-head-real .chg { font-size: 13px; }
+.real-desk .p-chart { container-type: inline-size; }
+.real-desk .chart-body { justify-content: flex-start; padding: 0 14px 8px; gap: 4px; }
+.real-desk .chart-timeframes { align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: 10px; padding: 3px 0 8px; border-bottom: 1px solid var(--color-bg-light); }
+.real-desk .chart-timeframes .seg {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  padding: var(--space-1);
+  border: 0;
+  border-radius: var(--radius-lg);
+  background: var(--color-bg-light);
+}
+.real-desk .chart-timeframes .seg button {
+  min-height: 32px;
+  padding: 4px 10px;
+  border-radius: var(--radius-lg);
+  color: var(--color-ink-2);
+  font-weight: 700;
+}
+.real-desk .chart-timeframes .seg button[aria-pressed="true"] {
+  background: var(--color-white);
+  box-shadow: 0 1px 2px rgb(11 31 38 / 14%);
+  color: var(--color-ink);
+}
+.real-desk .chart-timeframes .seg button:focus-visible { outline-offset: -2px; }
+.real-desk .candle-chart { order: 1; }
+.real-desk .chart-body > .chart-tools:not(.chart-timeframes) { order: 2; padding: 0 4px; }
+.real-desk .chart-body > .quote-origin, .real-desk .chart-body > p[role="status"] { order: 3; margin: 0; padding: 0 4px; font-size: 11px; line-height: 1.5; }
+.real-desk .chart-tools > .btn { border: 0; padding: 4px 0; font-size: 12px; color: var(--color-ink-2); }
+@container (max-width: 390px) {
+  .trade .chart-head-real { gap: 8px; padding: 14px 12px 10px; }
+  .trade .chart-head-real h2 { font-size: 17px; }
+  .trade .chart-head-real .chart-price { flex-direction: column; align-items: flex-end; gap: 3px; }
+  .real-desk .chart-timeframes { gap: 4px; }
+  .real-desk .chart-timeframes .seg button { padding-inline: 6px; }
+}
+@media (max-width: 1100px) {
+  .real-desk .p-chart { order: 2; }
+  .real-desk .p-watch { order: 3; }
+}
+.bt-inline { margin-block: 4px; }
+.bt-inline dl { display: flex; gap: 16px; flex-wrap: wrap; margin: 4px 0; }
+.bt-inline dt { font-size: 12px; color: var(--color-ink-2); }
+.bt-inline dd { margin: 0; font-weight: 700; }
+
+.replay-test { width: min(680px, 94vw); margin: auto; max-height: 92dvh; overflow: auto; color: var(--color-ink); border: 1px solid var(--color-border); border-radius: 14px; padding: 18px; }
+.replay-test::backdrop { background: #0b1f2670; }
+.replay-test header,.replay-controls { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.replay-test header { justify-content:space-between; margin-bottom:12px; }
+.replay-test p { margin:8px 0; }
+.replay-test .candle-chart { height:clamp(230px,38vh,360px); }
+.replay-controls select { padding:5px; }
+.chart-body > button:has(+ .replay-test) { align-self:flex-start; }
+
+/* Order ticket fields: full pill (radius = half the height), same shape as the Buy/Sell toggle and the Buy button. */
+.ticket .stepper { border-radius: 999px; grid-template-columns: 44px minmax(0, 1fr) 44px; }
+.ticket .field > select, .ticket .field > input { border-radius: 999px; padding-left: var(--space-5); }
+.ticket .field > select { background-position: right var(--space-5) center; padding-right: calc(var(--space-5) + 20px); }
+
+/* ── Backtest (TradingView-style bar replay) ──
+   Uses the exact comdirect pill/card tokens: white hairline surface, petrol ink, yellow reserved for Play. */
+
+/* Responsive desktop grid so the center clock + Backtest button never clip on laptop widths (1101–1420px). */
+@media (min-width: 1101px) and (max-width: 1420px) {
+  .trade .trade-grid { grid-template-columns: minmax(256px, 312px) minmax(0, 1fr) minmax(308px, 356px); }
+}
+
+.trade .clock { min-width: 0; }
+.trade .clock .clock-date { min-width: 0; }
+.trade .clock .clock-actions { margin-left: auto; display: flex; align-items: center; gap: var(--space-3); flex-shrink: 0; }
+.trade .clock .clock-actions .seg { margin-left: 0; }
+
+/* Live clock Backtest entry pill — matches .seg and .btn-sm radius/height */
+.trade .bt-enter {
+  display: inline-flex; align-items: center; gap: var(--space-2); flex-shrink: 0;
+  min-height: 36px; padding: var(--space-2) var(--space-4);
+  border: 1px solid var(--color-border); border-radius: var(--radius-lg);
+  background: var(--color-white); color: var(--color-ink);
+  font: inherit; font-size: var(--text-xs); font-weight: 700; line-height: 18px; white-space: nowrap; cursor: pointer;
+  transition: background-color var(--ease), border-color var(--ease), color var(--ease), transform 0.1s;
+}
+.trade .bt-enter:hover { background: var(--color-bg-light); border-color: var(--color-ink); }
+.trade .bt-enter:active { transform: scale(0.97); }
+.trade .bt-enter .glyph { color: var(--color-ink); }
+
+/* Active backtest bar: same surface as live .clock (white, 1px bg-light border, radius-md); grows to three tidy rows */
+.trade .trade-col > .clock-bt {
+  height: auto; flex-direction: column; align-items: stretch; gap: var(--space-3);
+  padding: var(--space-4) var(--space-5) var(--space-4);
+  background: var(--color-white); border: 1px solid var(--color-bg-light); box-shadow: none;
+}
+
+/* Row 1: big date + mode badge & delta on left, Select bar + Exit pills on right */
+.trade .bt-head { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--space-4); min-width: 0; flex-wrap: wrap; }
+.trade .bt-when { flex: 1; min-width: 180px; display: flex; flex-direction: column; gap: var(--space-1); }
+.trade .bt-date { font-size: var(--text-lg); line-height: 28px; font-weight: 700; letter-spacing: -0.01em; color: var(--color-ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.trade .bt-sub { display: inline-flex; align-items: center; gap: var(--space-2); font-size: var(--text-xs); line-height: 18px; color: var(--color-ink-2); min-width: 0; }
+.trade .bt-mode-pill {
+  display: inline-flex; align-items: center; flex-shrink: 0;
+  padding: 0 var(--space-3); border-radius: var(--radius-lg);
+  background: var(--color-ink); color: var(--color-accent);
+  font-size: 11px; font-weight: 700; line-height: 18px;
+}
+.trade .clock-bt .num, .trade .bt-speed button { font-variant-numeric: tabular-nums; }
+
+.trade .bt-head-actions { display: flex; align-items: center; gap: var(--space-2); flex-shrink: 0; }
+
+/* Select-bar toggle & Exit pill buttons */
+.trade .bt-chip, .trade .bt-exit {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2); flex-shrink: 0;
+  min-height: 34px; padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-lg);
+  font: inherit; font-size: var(--text-xs); font-weight: 700; line-height: 18px; white-space: nowrap; cursor: pointer;
+  transition: background-color var(--ease), border-color var(--ease), color var(--ease), transform 0.1s;
+}
+.trade .bt-chip { border: 1px solid var(--color-border); background: var(--color-white); color: var(--color-ink); }
+.trade .bt-chip:hover { background: var(--color-bg-light); border-color: var(--color-ink); }
+.trade .bt-chip[aria-pressed="true"] { background: var(--color-ink); color: var(--color-accent); border-color: var(--color-ink); }
+.trade .bt-chip:active, .trade .bt-exit:active { transform: scale(0.97); }
+
+.trade .bt-exit { border: 1px solid var(--color-ink); background: var(--color-white); color: var(--color-ink); }
+.trade .bt-exit:hover { background: var(--color-bg-light); }
+.trade .bt-exit-sm { min-height: 30px; padding: var(--space-1) var(--space-4); }
+
+/* Row 2: hairline scrubber, ink up to the cursor (thin yellow on white fails 3:1) */
+.trade .bt-scrub {
+  --p: 100%;
+  -webkit-appearance: none; appearance: none; display: block;
+  width: 100%; height: 28px; margin: 0; padding: 0; background: transparent; cursor: pointer;
+}
+.trade .bt-scrub::-webkit-slider-runnable-track {
+  height: 3px; border-radius: 2px;
+  background: linear-gradient(to right, var(--color-ink) var(--p), var(--color-bg-light) var(--p));
+}
+.trade .bt-scrub::-moz-range-track { height: 3px; border-radius: 2px; background: var(--color-bg-light); }
+.trade .bt-scrub::-moz-range-progress { height: 3px; border-radius: 2px; background: var(--color-ink); }
+.trade .bt-scrub::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none; width: 14px; height: 14px; margin-top: -5.5px;
+  border: 0; border-radius: 50%; background: var(--color-ink); transition: transform var(--ease);
+}
+.trade .bt-scrub::-moz-range-thumb { width: 14px; height: 14px; border: 0; border-radius: 50%; background: var(--color-ink); transition: transform var(--ease); }
+.trade .bt-scrub:hover::-webkit-slider-thumb, .trade .bt-scrub:focus-visible::-webkit-slider-thumb { transform: scale(1.28); }
+.trade .bt-scrub:hover::-moz-range-thumb, .trade .bt-scrub:focus-visible::-moz-range-thumb { transform: scale(1.28); }
+.trade .bt-scrub:focus-visible { box-shadow: none; outline: none; }
+.trade .bt-scrub:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 2px var(--color-white), 0 0 0 4px var(--color-ink); }
+.trade .bt-scrub:focus-visible::-moz-range-thumb { box-shadow: 0 0 0 2px var(--color-white), 0 0 0 4px var(--color-ink); }
+
+/* Row 3: transport (step back / yellow play / step forward) + segmented speed selector */
+.trade .bt-ctrl { display: flex; align-items: center; flex-wrap: wrap; gap: var(--space-3) var(--space-4); min-width: 0; }
+.trade .bt-transport { display: flex; align-items: center; gap: var(--space-2); }
+.trade .bt-icon {
+  width: 38px; height: 38px; flex-shrink: 0; display: grid; place-items: center;
+  border: 1px solid var(--color-bg-light); border-radius: 50%; background: var(--color-white); color: var(--color-ink); cursor: pointer;
+  transition: background-color var(--ease), border-color var(--ease), transform 0.1s;
+}
+.trade .bt-icon:hover:not([aria-disabled="true"]) { background: var(--color-bg-light); border-color: var(--color-border); }
+.trade .bt-icon:active:not([aria-disabled="true"]) { transform: scale(0.95); }
+.trade .bt-icon[aria-disabled="true"] { opacity: 0.38; cursor: not-allowed; }
+.trade .bt-icon[aria-disabled="true"]:hover { background: var(--color-white); border-color: var(--color-bg-light); }
+.trade .clock-bt .play-btn { width: 40px; height: 40px; }
+/* base rule sets pointer-events:none on disabled play; keep not-allowed cursor visible on aria-disabled */
+.trade .clock-bt .play-btn[aria-disabled="true"] { opacity: 0.38; cursor: not-allowed; }
+.trade .clock-bt .play-btn[aria-disabled="true"]:hover { background: var(--color-accent); }
+
+.trade .bt-speed-wrap { display: flex; align-items: center; gap: var(--space-3); margin-left: auto; flex-shrink: 0; }
+.trade .bt-speed-label { font-weight: 600; }
+.trade .bt-speed.seg { margin-left: 0; }
+.trade .bt-speed.seg button { padding: var(--space-2) var(--space-3); font-size: var(--text-xs); min-width: 36px; white-space: nowrap; }
+
+/* Chart toolbar inside backtest mode: preserves Line/Candles styling and shows bar-pick hint */
+.trade .bt-chart-controls { display: inline-flex; align-items: center; gap: var(--space-3); margin-left: auto; }
+.trade .bt-pick-hint {
+  display: inline-flex; align-items: center; gap: var(--space-2); margin-right: auto;
+  padding: var(--space-1) var(--space-4); border-radius: var(--radius-lg);
+  background: var(--tint-accent); color: var(--color-ink); font-weight: 700;
+}
+.trade .bt-tf-pill {
+  display: inline-flex; align-items: center; min-height: 32px; padding: var(--space-1) var(--space-4);
+  border-radius: var(--radius-lg); background: var(--color-bg-light); color: var(--color-ink-2);
+  font-weight: 700; white-space: nowrap;
+}
+.trade .candle-chart.is-picking { cursor: crosshair; }
+
+/* Trading unavailable state during backtest: muted gray surface + grayscale inert ticket + clear lock banner */
+.trade .p-order.is-locked {
+  cursor: not-allowed;
+  background: color-mix(in srgb, var(--color-bg-light) 35%, var(--color-white));
+  border-color: var(--color-bg-light);
+}
+.trade .p-order.is-locked .ticket { filter: grayscale(1); opacity: 0.42; user-select: none; pointer-events: none; }
+.trade .lock-note {
+  display: flex; align-items: center; gap: var(--space-3);
+  padding: var(--space-4) var(--space-5);
+  background: color-mix(in srgb, var(--color-bg-light) 70%, var(--color-white));
+  border-bottom: 1px solid var(--color-bg-light);
+  font-size: var(--text-xs); line-height: 18px; color: var(--color-ink-2); cursor: default;
+}
+.trade .lock-note:empty { padding: 0; border: 0; background: none; }
+.trade .lock-icon {
+  width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0;
+  display: grid; place-items: center;
+  background: var(--color-white); border: 1px solid var(--color-bg-light); color: var(--color-ink);
+}
+.trade .lock-copy { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--space-1); }
+.trade .lock-copy strong { color: var(--color-ink); font-weight: 700; font-size: var(--text-xs); line-height: 16px; }
+.trade .lock-copy span { color: var(--color-ink-2); font-size: var(--text-xs); line-height: 16px; }
+.trade .acct.is-locked .btn:disabled, .trade .p-order .btn:disabled { filter: grayscale(1); opacity: 0.45; cursor: not-allowed; }
+.trade .acct .btn:disabled:hover, .trade .p-book .btn:disabled:hover { background: none; }
+
+/* Phones / narrow: comfortable 44px touch targets */
+@media (max-width: 700px) {
+  .trade .bt-icon, .trade .clock-bt .play-btn { width: 44px; height: 44px; }
+  .trade .bt-enter, .trade .bt-chip, .trade .bt-exit { min-height: 44px; }
+  .trade .bt-scrub { height: 44px; }
+  .trade .bt-ctrl { flex-wrap: wrap; row-gap: var(--space-3); }
+  .trade .bt-speed-wrap { width: 100%; justify-content: space-between; margin-left: 0; }
+  .trade .bt-speed.seg button { min-width: 44px; min-height: 40px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .trade .bt-enter, .trade .bt-chip, .trade .bt-exit, .trade .bt-icon,
+  .trade .bt-scrub::-webkit-slider-thumb, .trade .bt-scrub::-moz-range-thumb { transition: none; }
+  .trade .bt-scrub:hover::-webkit-slider-thumb, .trade .bt-scrub:focus-visible::-webkit-slider-thumb,
+  .trade .bt-scrub:hover::-moz-range-thumb, .trade .bt-scrub:focus-visible::-moz-range-thumb { transform: none; }
+}
+
+/* Narrow 3-column desktop: keep speed + Backtest cleanly visible with compact padding */
+@media (min-width: 1101px) and (max-width: 1220px) {
+  .trade .clock { padding: var(--space-3); gap: var(--space-2); }
+  .trade .clock .seg button { padding: var(--space-2); }
+  .trade .clock .bt-enter { padding: var(--space-2) var(--space-3); }
+}
+
+/* Screen-reader-only text (announcements) */
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+
+/* ── Rewind dialog (1 day/s · 1 week/s): centered, page behind dimmed + blurred ── */
+.rewind-dialog {
+  border: 0; padding: 0; border-radius: 20px; width: min(440px, calc(100vw - 32px));
+  color: var(--color-ink); background: var(--color-white);
+  box-shadow: 0 24px 64px rgba(11, 31, 38, 0.28), 0 2px 8px rgba(11, 31, 38, 0.12);
+}
+.rewind-dialog[open] { animation: rewind-in 240ms cubic-bezier(0.2, 0.8, 0.2, 1); }
+.rewind-dialog::backdrop { background: rgba(11, 31, 38, 0.34); backdrop-filter: blur(6px) saturate(0.85); -webkit-backdrop-filter: blur(6px) saturate(0.85); }
+.rewind-dialog[open]::backdrop { animation: rewind-fade 240ms ease-out; }
+@keyframes rewind-in { from { opacity: 0; transform: translateY(10px) scale(0.98); } }
+@keyframes rewind-fade { from { opacity: 0; } }
+.rewind-form { display: flex; flex-direction: column; gap: var(--space-5); padding: var(--space-6); }
+.rewind-head { display: flex; gap: var(--space-4); align-items: flex-start; }
+.rewind-head h2 { font-size: var(--text-lg); line-height: 28px; }
+.rewind-head p { margin-top: var(--space-1); }
+.rewind-icon { display: grid; place-items: center; width: 40px; height: 40px; flex-shrink: 0; border-radius: 50%; background: var(--color-accent); color: var(--color-ink); }
+.rewind-seg { display: grid; grid-template-columns: 1fr 1fr; padding: 4px; border-radius: 999px; background: var(--color-bg-light); }
+.rewind-seg button { min-height: 40px; border: 0; border-radius: 999px; background: none; font: inherit; font-weight: 700; font-size: var(--text-sm); color: var(--color-ink-2); cursor: pointer; transition: background-color var(--ease), color var(--ease), box-shadow var(--ease); }
+.rewind-seg button[aria-pressed="true"] { background: var(--color-white); color: var(--color-ink); box-shadow: 0 1px 3px rgba(11, 31, 38, 0.14); }
+.rewind-field { display: flex; flex-direction: column; gap: var(--space-2); }
+.rewind-input { display: flex; align-items: baseline; gap: var(--space-3); border: 1px solid var(--color-border); border-radius: 16px; padding: var(--space-3) var(--space-5); transition: border-color var(--ease), box-shadow var(--ease); }
+.rewind-input:focus-within { border-color: var(--color-ink); box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent) 70%, transparent); }
+.rewind-input input { flex: 1; min-width: 0; border: 0; outline: none; padding: 0; background: none; font: inherit; font-size: 40px; line-height: 48px; font-weight: 700; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; color: var(--color-ink); -moz-appearance: textfield; }
+.rewind-input input::-webkit-outer-spin-button, .rewind-input input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.rewind-unit { font-size: var(--text-base); font-weight: 600; color: var(--color-ink-2); }
+.rewind-help { margin-top: calc(-1 * var(--space-3)); min-height: 18px; }
+.rewind-error { color: var(--color-loss); }
+.rewind-actions { display: flex; justify-content: flex-end; gap: var(--space-3); }
+.rewind-actions .btn { min-width: 112px; }
+@media (max-width: 700px) { .rewind-seg button, .rewind-actions .btn { min-height: 44px; } }
+
+/* Rewind animation: the chart slides back in time bar by bar (driven in JS); a soft cue sits on top. */
+.trade .p-chart .chart-body { position: relative; }
+.trade .bt-rewind-badge {
+  position: absolute; z-index: 3; left: 50%; top: 45%; transform: translate(-50%, -50%);
+  display: inline-flex; align-items: center; gap: var(--space-2); padding: var(--space-2) var(--space-5);
+  border-radius: 999px; background: var(--color-ink); color: var(--color-white); font-size: var(--text-sm); font-weight: 700;
+  pointer-events: none; animation: rewind-badge 1.2s ease-out both;
+}
+.trade .bt-rewind-badge .glyph { color: var(--color-accent); animation: rewind-spin 0.9s linear infinite reverse; }
+@keyframes rewind-badge { 0% { opacity: 0; transform: translate(-40%, -50%); } 15% { opacity: 1; transform: translate(-50%, -50%); } 85% { opacity: 1; } 100% { opacity: 0; transform: translate(-60%, -50%); } }
+@keyframes rewind-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .rewind-dialog[open], .rewind-dialog[open]::backdrop, .trade .bt-rewind-badge, .trade .bt-rewind-badge .glyph { animation: none; }
+}
+/* The global reset sets margin:0 on everything, which un-centres a modal <dialog>; put the centring back. */
+.rewind-dialog { position: fixed; inset: 0; margin: auto; height: fit-content; max-height: calc(100dvh - 32px); overflow: auto; }
+.rewind-input input:focus-visible { box-shadow: none; outline: none; } /* the field wrapper shows the focus ring */
+/* Blur the page behind the rewind dialog. (backdrop-filter on ::backdrop is dropped by the CSS pipeline here,
+   so the content itself is blurred; it is a sibling of the dialog, never its ancestor, so the dialog stays sharp.) */
+.trade-grid, body > header, .trade ~ header { transition: filter 240ms ease-out; }
+body:has(.rewind-dialog[open]) .trade-grid,
+body:has(.rewind-dialog[open]) header { filter: blur(3px) saturate(0.85); }
+@media (prefers-reduced-motion: reduce) { .trade-grid { transition: none; } }
+.rewind-note { padding: var(--space-3) var(--space-4); border-radius: 12px; background: color-mix(in srgb, var(--color-bg-light) 50%, var(--color-white)); }
+
+/* ───────── Phones (≤700px): Real Market / trading desk ─────────
+   Content first: time → chart → account → ticket → positions → watchlist → news;
+   44px touch targets; a sticky trade bar; the rewind dialog becomes a bottom sheet. */
+.m-tradebar { display: none; }
+@media (max-width: 700px) {
+  /* Order of panels in the single column */
+  .trade .clock, .trade .clock-bt { order: 1; }
+  .trade .p-chart, .real-desk .p-chart { order: 2; min-height: 0; }
+  .trade .acct { order: 3; }
+  .trade .p-order { order: 4; }
+  .trade .p-book { order: 5; max-height: none; }
+  .trade .p-watch, .real-desk .p-watch { order: 6; max-height: min(62vh, 520px); }
+  .trade .p-feed { order: 7; max-height: 480px; }
+
+  /* Time bar: date on its own row, controls full width below (no more clipped date) */
+  .trade .clock:not(.clock-bt) { flex-wrap: wrap; height: auto; row-gap: var(--space-3); padding: var(--space-3) var(--space-4); }
+  .trade .clock:not(.clock-bt) .clock-date { flex: 1; min-width: 0; }
+  .trade .clock .clock-actions { width: 100%; display: flex; align-items: stretch; gap: var(--space-3); margin-left: 0; }
+  .trade .clock .clock-actions .seg { flex: 1; margin-left: 0; display: flex; }
+  .trade .clock .clock-actions .seg button { flex: 1; min-height: 44px; font-size: var(--text-sm); }
+  .trade .clock .clock-actions .bt-enter { min-height: 44px; flex-shrink: 0; }
+  .trade .clock .bt-enter-label { position: static; width: auto; height: auto; overflow: visible; clip: auto; }
+
+  /* Chart: compact header, chart tall enough to read, controls easy to hit */
+  .trade .p-chart .chart-body { min-height: 300px; }
+  .trade .candle-chart { min-height: 280px; }
+  .trade .chart-timeframes { flex-wrap: wrap; row-gap: var(--space-2); }
+  .trade .chart-timeframes .seg button, .trade .bt-chart-controls .seg button { min-height: 40px; }
+
+  /* Watchlist rows and inputs: comfortable taps, 16px text so iOS does not zoom */
+  .trade .watch-row { min-height: 56px; }
+  .trade input:not([type="range"]), .trade select { font-size: max(16px, 1em); } /* the rewind number keeps its 40px */
+  .trade .rewind-input input { font-size: 40px; }
+  .trade .watch-search input { min-height: 44px; }
+
+  /* Account card wraps cleanly */
+  .trade .acct { flex-wrap: wrap; row-gap: var(--space-2); }
+
+  /* Sticky trade bar */
+  .m-tradebar {
+    display: flex; align-items: center; justify-content: space-between; gap: var(--space-4);
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 40;
+    padding: var(--space-3) var(--space-4) calc(var(--space-3) + env(safe-area-inset-bottom));
+    background: color-mix(in srgb, var(--color-white) 92%, transparent);
+    -webkit-backdrop-filter: saturate(1.4) blur(10px); backdrop-filter: saturate(1.4) blur(10px);
+    border-top: 1px solid var(--color-bg-light);
+    transition: transform 220ms cubic-bezier(0.2, 0.8, 0.2, 1), opacity 220ms ease-out;
+  }
+  .m-tradebar.is-hidden { transform: translateY(110%); opacity: 0; pointer-events: none; }
+  .m-tradebar-info { display: flex; flex-direction: column; min-width: 0; line-height: 20px; }
+  .m-tradebar-info strong { font-size: var(--text-sm); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .m-tradebar-info .num { font-size: var(--text-sm); font-weight: 600; }
+  .m-tradebar .btn { min-height: 48px; min-width: 128px; font-size: var(--text-base); }
+  .real-desk { padding-bottom: calc(84px + env(safe-area-inset-bottom)); }
+
+  /* Rewind dialog as a bottom sheet */
+  .rewind-dialog { inset: auto 0 0 0; margin: 0; width: 100%; max-width: none; border-radius: 20px 20px 0 0; max-height: 92dvh; }
+  .rewind-dialog[open] { animation: rewind-sheet 260ms cubic-bezier(0.2, 0.8, 0.2, 1); }
+  .rewind-form { padding: var(--space-6) var(--space-5) calc(var(--space-5) + env(safe-area-inset-bottom)); }
+  .rewind-actions { flex-direction: column-reverse; }
+  .rewind-actions .btn { width: 100%; min-height: 48px; }
+}
+@keyframes rewind-sheet { from { transform: translateY(100%); } }
+@media (prefers-reduced-motion: reduce) { .m-tradebar { transition: none; } .rewind-dialog[open] { animation: none; } }
+
+/* Quantity stepper: the focus ring belongs to the whole pill, not the clipped inner input
+   (on iPhone the input's own ring showed as two yellow slivers). */
+.stepper input:focus-visible, .stepper input:focus { box-shadow: none; outline: none; }
+.stepper:focus-within { box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent) 75%, transparent); border-color: var(--color-ink); }
