@@ -47,8 +47,10 @@ export default function Pro({ realMarket = false }: { realMarket?: boolean }) {
   const mode: Mode = pro?.replay ? { kind: "replay", replay: REPLAYS[pro.replay] } : pro?.lesson ? { kind: "lesson", id: SIM_LESSONS[pro.lesson as keyof typeof SIM_LESSONS].id } : { kind: "main" };
   // The learner starts on the simple trading area. Module 2 always runs there; ProTrader takes over
   // from Module 3 (and in free play) only after the learner has confirmed the switch.
-  const layout: Layout = pro?.world === 2 || !save.proTrader ? "simple" : "pro";
-  const offerSwitch = proTraderOffered(save) && !save.proTrader && pro?.world !== 2;
+  // History mode (world 0) always plays on the simple trading area.
+  const simpleOnly = pro?.world === 2 || pro?.world === 0;
+  const layout: Layout = simpleOnly || !save.proTrader ? "simple" : "pro";
+  const offerSwitch = proTraderOffered(save) && !save.proTrader && !simpleOnly;
   return <Desk key={`${save.active ?? "free"}:${layout}`} mode={mode} chapter={pro} layout={layout} offerSwitch={offerSwitch} />;
 }
 
