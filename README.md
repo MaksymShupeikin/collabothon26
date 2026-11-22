@@ -15,7 +15,7 @@ A play-money training sandbox on the real comdirect screens that guides first-ti
 
 **No theory first: you act from the very first minute, and every concept sticks because you just did it yourself.**
 
-[View the pitch presentation (PDF)](docs/finance-quest.pdf)
+**[Live demo](https://comdirect.vokh.dev)** · [Pitch presentation (PDF)](docs/finance-quest.pdf)
 
 <table>
   <tr>
@@ -169,7 +169,7 @@ This extends the learning loop: **get a hint → try it → get feedback → und
 - **Code by feature** (`src/features/*`), with thin routes in `src/app/`.
 
 **Built on:** Next.js, React, PostgreSQL, Postgres.js, lightweight-charts and the Python market-data tools listed above.
-**Built by us during the hackathon (20–22 Nov 2026), about 50 commits:** everything else. The market engine, scenarios, replays and bots, the tour and missions, the game systems, the comdirect replica screens, the investor simulator and the German translation.
+**Built by us during the hackathon (20–22 Nov 2026):** everything else. The market engine, scenarios, replays and bots, the tour and missions, the game systems, the comdirect replica screens, the investor simulator and the German translation.
 
 ## Challenges and what we learned
 
