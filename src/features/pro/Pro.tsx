@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { companyOf, ETF_SYM } from "@/features/market/companies";
 import { cls, dateDE, dateLocale, eur, num, pct, qtyFmt, shortDay, signed } from "@/shared/lib/format";
@@ -125,6 +126,7 @@ type Toast = { id: number; text: string };
 
 function Desk({ mode, chapter, layout, offerSwitch, realSim }: { mode: Mode; chapter?: Chapter; layout: Layout; offerSwitch: boolean; realSim?: RealSim }) {
   const t = useT();
+  const router = useRouter();
   const save = useGame();
   const replay = mode.kind === "replay" ? mode.replay : undefined;
   const universeId = mode.kind === "main" ? "main" : mode.kind === "replay" ? mode.replay.universe.id : mode.id;
@@ -311,7 +313,8 @@ function Desk({ mode, chapter, layout, offerSwitch, realSim }: { mode: Mode; cha
 
   return (
     <div className="pt">
-      <SandboxBar dark onSimple={actions.switchToSimple} />
+      {/* Free-play ProTrader is reached from Real Market, so its simple view is the Real Market one. */}
+      <SandboxBar dark onSimple={() => { actions.switchToSimple(); if (mode.kind === "main" && !chapter) router.push("/real-market"); }} />
       <header className="pt-head" data-tour="pt-header">
         <span className="pt-logo"><Wordmark width={96} /></span>
         <span className="pt-icon" aria-hidden>☰</span>

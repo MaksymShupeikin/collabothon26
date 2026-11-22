@@ -27,8 +27,8 @@ export default function Header() {
         {save.persona && (backToPro || !["/", "/history", "/invest", "/pro"].includes(path)) && (
           <nav className="hnav" aria-label="comdirect edu">
             {path === "/real-market" || save.proTrader || save.simpleChosen
-              // Same as "Switch to ProTrader": /pro shows the ProTrader layout once save.proTrader is set.
-              ? <Link href="/pro" onClick={() => actions.switchToProTrader()}>ProTrader</Link>
+              // Same as "Switch to ProTrader"; an open Module 2 / History chapter would keep /pro on the simple layout, so leave it.
+              ? <Link href="/pro" onClick={() => { if (simpleOnlyChapter(save.active ? chapterById(save.active) : undefined)) actions.start(null); actions.switchToProTrader(); }}>ProTrader</Link>
               : <Link href="/pro">{t("Trading area", "Handelsbereich")}</Link>}
           </nav>
         )}
