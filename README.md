@@ -172,6 +172,8 @@ npm run build
 
 Set `DATABASE_URL` (e.g. in `.env.local`) to save progress; without it the app runs but nothing is saved. "Reset progress" at the bottom of the hub starts over.
 
+Real Market's intraday charts (5m to 4h) run `scripts/read-intraday.py` through [uv](https://docs.astral.sh/uv/) (`brew install uv`). Without it, `npm run dev` logs `[intraday] warm-up failed: spawn uv ENOENT` and those charts show "temporarily unavailable"; daily and weekly charts still work. The first run downloads about 20 MB of Python packages. Set `REAL_MARKET_UV` if uv is not on your `PATH`. The Docker image installs uv and the packages at build time.
+
 ### Saving progress
 
 There are no user accounts. A player is a browser:

@@ -10,7 +10,7 @@ let sql: postgres.Sql | undefined;
 let ready: Promise<void> | undefined;
 const db = async () => {
   if (!process.env.DATABASE_URL) throw new Error("DATABASE_URL is not set");
-  sql ??= postgres(process.env.DATABASE_URL, { max: 5 });
+  sql ??= postgres(process.env.DATABASE_URL, { max: 5, onnotice: () => {} }); // silence "table already exists" notices
   ready ??= sql`create table if not exists saves (id uuid primary key, data jsonb not null, updated_at timestamptz not null default now())`
     .then(() => {}, (e) => { ready = undefined; throw e; });
   await ready;
