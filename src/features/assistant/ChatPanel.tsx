@@ -18,7 +18,7 @@ const CITE = /\[((?:concept|card|module|chapter|replay|lesson|company|persona|li
 function suggestions(path: string, t: ReturnType<typeof useT>): string[] {
   if (path.startsWith("/history")) return [t("How do I tell signal from noise?", "Wie erkenne ich Signal und Rauschen?"), t("Why is one stock risky?", "Warum ist eine einzelne Aktie riskant?")];
   if (path.startsWith("/invest")) return [t("Should I sell in a crash?", "Soll ich im Crash verkaufen?"), t("How does compound interest work?", "Wie funktioniert der Zinseszins?")];
-  if (path.startsWith("/pro") || path.startsWith("/real-market")) return [t("What is a stop-loss?", "Was ist ein Stop-Loss?"), t("What does volatility mean?", "Was bedeutet Volatilität?")];
+  if (path.startsWith("/trade") || path.startsWith("/real-market")) return [t("What is a stop-loss?", "Was ist ein Stop-Loss?"), t("What does volatility mean?", "Was bedeutet Volatilität?")];
   return [t("What is an ETF?", "Was ist ein ETF?"), t("Market or limit order?", "Market- oder Limit-Order?"), t("Why do fees matter so much?", "Warum sind Gebühren so wichtig?")];
 }
 

@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { companyOf, ETF_SYM } from "@/features/market/companies";
 import { cls, dateDE, dateLocale, eur, num, pct, qtyFmt, shortDay, signed } from "@/shared/lib/format";
 import { dict, useT } from "@/shared/lib/i18n";
@@ -127,6 +127,9 @@ type Toast = { id: number; text: string };
 function Desk({ mode, chapter, layout, offerSwitch, realSim }: { mode: Mode; chapter?: Chapter; layout: Layout; offerSwitch: boolean; realSim?: RealSim }) {
   const t = useT();
   const router = useRouter();
+  // Free-play "Simple view" leaves for /real-market; flipping the layout only on unmount keeps /trade from flashing its simple desk first.
+  const toRealMarket = useRef(false);
+  useLayoutEffect(() => () => { if (toRealMarket.current) actions.switchToSimple(); }, []);
   const save = useGame();
   const replay = mode.kind === "replay" ? mode.replay : undefined;
   const universeId = mode.kind === "main" ? "main" : mode.kind === "replay" ? mode.replay.universe.id : mode.id;
@@ -314,7 +317,7 @@ function Desk({ mode, chapter, layout, offerSwitch, realSim }: { mode: Mode; cha
   return (
     <div className="pt">
       {/* Free-play ProTrader is reached from Real Market, so its simple view is the Real Market one. */}
-      <SandboxBar dark onSimple={() => { actions.switchToSimple(); if (mode.kind === "main" && !chapter) router.push("/real-market"); }} />
+      <SandboxBar dark onSimple={() => { if (mode.kind === "main" && !chapter) { toRealMarket.current = true; router.push("/real-market"); } else actions.switchToSimple(); }} />
       <header className="pt-head" data-tour="pt-header">
         <span className="pt-logo"><Wordmark width={96} /></span>
         <span className="pt-icon" aria-hidden>☰</span>

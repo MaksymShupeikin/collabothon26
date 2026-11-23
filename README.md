@@ -244,7 +244,7 @@ On the VPS, `DATABASE_URL` sits in `~/collabothon26/.env` (read by `docker-compo
 
 Open **`/mcp`** in the app to copy your personal pre-filled configuration or run live MCP briefings right from the browser.
 
-- **Streamable HTTP endpoint:** `POST /api/mcp?token=<player-uuid>` (or `Authorization: Bearer <player-uuid>`, `X-Player-Id`, or the `cd-edu-id` browser cookie)
+- **Streamable HTTP endpoint:** `POST /api/mcp?token=<player-uuid>` (or `Authorization: Bearer <player-uuid>`, `X-Player-Id`, or the `cd-edu-id` browser cookie). A request without a player id gets `401`; there is no shared fallback player.
 - **Stdio CLI / remote bridge (zero extra dependencies, runs with plain `node`):**
   ```bash
   # Local shared storage (Postgres or .data/comdirect-edu-saves.json)

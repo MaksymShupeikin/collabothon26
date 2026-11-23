@@ -30,7 +30,7 @@ export default function Ready() {
           <p>{t("A savings plan of", "Ein Sparplan über")} <strong className="num">{num(p.plan, 0)} {t("€ a month", "€ im Monat")}</strong> {t("on a world ETF, like the one you set up in Module 4.", "auf einen Welt-ETF, wie der, den du in Modul 4 eingerichtet hast.")}</p>
           <div className="row">
             <a className="btn btn-primary btn-lg" href="https://www.comdirect.de/" target="_blank" rel="noopener noreferrer">{t("Open my real portfolio ›", "Mein echtes Depot öffnen ›")}</a>
-            <Link className="btn btn-outline btn-lg" href="/pro">{t("More practice in free play", "Weiter üben im freien Spiel")}</Link>
+            <Link className="btn btn-outline btn-lg" href="/trade">{t("More practice in free play", "Weiter üben im freien Spiel")}</Link>
           </div>
           <p className="xs muted">{t("Opens comdirect.de. Investing involves risk; past performance is no guide to the future. comdirect edu is a training sandbox, not advice.", "Öffnet comdirect.de. Geldanlage ist mit Risiken verbunden; vergangene Wertentwicklungen sind kein verlässlicher Indikator für die Zukunft. comdirect edu ist eine Trainings-Sandbox, keine Anlageberatung.")}</p>
         </div>

@@ -103,8 +103,9 @@ h3 { font-size: var(--text-base); line-height: 24px; font-weight: 700; }
 .logo-mark { --x: calc(max(0px, (100cqw - 1180px) / 2) + var(--space-5)); --out: min(var(--space-9), var(--x)); display: flex; align-items: center; height: 64px; background: var(--color-accent); color: var(--color-ink); margin-left: calc(-1 * var(--out)); padding: 0 var(--space-6) 0 var(--out); }
 .logo-edu { color: var(--color-accent); font-weight: 700; font-size: var(--text-lg); }
 .hnav { display: flex; align-self: stretch; gap: var(--space-6); }
-.hnav a { display: flex; white-space: nowrap; flex-shrink: 0; align-items: center; font-weight: 700; font-size: var(--text-sm); text-decoration: none; color: var(--color-bg-dark); border-bottom: 3px solid transparent; border-top: 3px solid transparent; transition: color var(--ease), border-color var(--ease); }
-.hnav a:hover { color: var(--color-white); }
+.hnav a, .hnav button { display: flex; white-space: nowrap; flex-shrink: 0; align-items: center; font-weight: 700; font-size: var(--text-sm); text-decoration: none; color: var(--color-bg-dark); border-bottom: 3px solid transparent; border-top: 3px solid transparent; transition: color var(--ease), border-color var(--ease); }
+.hnav button { background: none; border-left: 0; border-right: 0; padding: 0; font-family: inherit; cursor: pointer; }
+.hnav a:hover, .hnav button:hover { color: var(--color-white); }
 .hnav a[aria-current="page"] { color: var(--color-white); border-bottom-color: var(--color-accent); }
 .user { margin-left: auto; display: flex; align-items: center; gap: var(--space-4); }
 .user-text { display: flex; flex-direction: column; align-items: flex-end; line-height: 18px; }

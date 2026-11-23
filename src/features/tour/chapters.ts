@@ -369,5 +369,5 @@ export function isOpen(save: Save, ch: Chapter): boolean {
 }
 
 export const nextChapter = (save: Save) => CHAPTERS.find((c) => !save.done.includes(c.id) && isOpen(save, c));
-export const surfaceHref = (ch: Chapter) => (ch.surface === "cabinet" ? "/cabinet" : "/pro");
+export const surfaceHref = (ch: Chapter) => (ch.surface === "cabinet" ? "/cabinet" : "/trade");
 export { costBasis, DAX_ETF };

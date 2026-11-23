@@ -6,7 +6,7 @@
    "id": "concept:stock",
    "type": "concept",
    "title": "Stock",
-   "href": "/learn",
+   "href": "/",
    "text": "Stock (learning world 1: Basics)\nA stock is a small piece of a company.\nExample: SAP has about 1.2 billion shares. Buy one and you own a tiny slice of SAP.\nMini game: Slice the pizza\nQuiz: You buy 1 share of Siemens. What do you own? Options: A loan to Siemens / A tiny piece of Siemens / A Siemens product voucher",
    "world": 1,
    "spoiler": {
@@ -18,7 +18,7 @@
    "id": "concept:bond",
    "type": "concept",
    "title": "Bond",
-   "href": "/learn",
+   "href": "/",
    "text": "Bond (learning world 1: Basics)\nWith a bond you lend money and get interest back.\nExample: Lend 1,000 € at 3% for 5 years → 30 € interest every year, 1,000 € back at the end.\nMini game: Lend & collect\nQuiz: What do you usually get from a bond? Options: Fixed interest / A vote at the AGM / A share of every product sold",
    "world": 1,
    "spoiler": {
@@ -30,7 +30,7 @@
    "id": "concept:etf",
    "type": "concept",
    "title": "ETF",
-   "href": "/learn",
+   "href": "/",
    "text": "ETF (learning world 1: Basics)\nAn ETF is a basket of hundreds of companies in one purchase.\nExample: 100 € in an MSCI World ETF spreads across ~1,400 companies — Apple, Microsoft, NVIDIA and more.\nMini game: Fill the basket\nQuiz: One company in your MSCI World ETF crashes 50%. Your ETF… Options: Falls about 50% / Barely moves / Is closed",
    "world": 1,
    "spoiler": {
@@ -42,7 +42,7 @@
    "id": "concept:dividend",
    "type": "concept",
    "title": "Dividend",
-   "href": "/learn",
+   "href": "/",
    "text": "Dividend (learning world 1: Basics)\nA dividend is a part of the profit paid out to shareholders.\nExample: Allianz pays a dividend per share once a year. 10 shares → 10× the dividend into your account.\nMini game: Payday\nQuiz: Who receives the dividend? Options: Only employees / Everyone who owns the shares / Only the bank",
    "world": 1,
    "spoiler": {
@@ -54,7 +54,7 @@
    "id": "concept:market-cap",
    "type": "concept",
    "title": "Market cap",
-   "href": "/learn",
+   "href": "/",
    "text": "Market cap (learning world 1: Basics)\nMarket cap = share price × number of shares — the company's price tag.\nExample: Price 30 € × 5 billion shares = 150 billion € market cap.\nMini game: Guess the giant\nQuiz: Company A: 10 € × 10bn shares. Company B: 500 € × 100m shares. Which is bigger? Options: A (100bn) / B (50bn) / Same size",
    "world": 1,
    "spoiler": {
@@ -66,7 +66,7 @@
    "id": "concept:spread",
    "type": "concept",
    "title": "Bid / Ask / Spread",
-   "href": "/learn",
+   "href": "/",
    "text": "Bid / Ask / Spread (learning world 2: Trading mechanics)\nThe buy price is a bit higher than the sell price — the gap is the spread, and it costs you.\nExample: Ask 100.10 €, bid 99.90 € → buy and sell right away and you lose 0.20 € per share.\nMini game: Market stall\nQuiz: You buy at the ask and immediately sell at the bid. You… Options: Break even / Lose the spread / Earn the spread",
    "world": 2,
    "spoiler": {
@@ -78,7 +78,7 @@
    "id": "concept:market-order",
    "type": "concept",
    "title": "Market order",
-   "href": "/learn",
+   "href": "/",
    "text": "Market order (learning world 2: Trading mechanics)\nA market order buys now, at whatever the current price is.\nExample: Fast, but in a jumpy market you might pay more than the price you saw.\nMini game: Speed round\nQuiz: What does a market order guarantee? Options: The price / Execution / Profit",
    "world": 2,
    "spoiler": {
@@ -90,7 +90,7 @@
    "id": "concept:limit-order",
    "type": "concept",
    "title": "Limit order",
-   "href": "/learn",
+   "href": "/",
    "text": "Limit order (learning world 2: Trading mechanics)\nA limit order buys only at your price or better.\nExample: Limit 120 € → the order fills only if the price drops to 120 € or below.\nMini game: Set the trap\nQuiz: Limit buy at 50 €, price is 55 €. What happens? Options: Buys at 55 € / Waits until 50 € or lower / Cancels instantly",
    "world": 2,
    "spoiler": {
@@ -102,7 +102,7 @@
    "id": "concept:stop-loss",
    "type": "concept",
    "title": "Stop-loss",
-   "href": "/learn",
+   "href": "/",
    "text": "Stop-loss (learning world 2: Trading mechanics)\nA stop-loss sells automatically if the price falls to a level you set.\nExample: Bought at 100 €, stop at 90 € → you lose at most about 10% (plus gaps).\nMini game: Safety net\nQuiz: Why set a stop-loss? Options: To limit losses / To pay lower fees / To get dividends",
    "world": 2,
    "spoiler": {
@@ -114,7 +114,7 @@
    "id": "concept:fees",
    "type": "concept",
    "title": "Fees & TER",
-   "href": "/learn",
+   "href": "/",
    "text": "Fees & TER (learning world 2: Trading mechanics)\nEvery trade costs an order fee, and every fund charges a yearly fee (TER).\nExample: 14 trades × ~5 € = 70 € gone. A 1.8% TER vs 0.2% can cost thousands over 30 years.\nMini game: Leaky bucket\nQuiz: Which costs you more over 30 years? Options: TER 0.2% / TER 1.8% / No difference",
    "world": 2,
    "spoiler": {
@@ -126,7 +126,7 @@
    "id": "concept:trading-hours",
    "type": "concept",
    "title": "Trading hours",
-   "href": "/learn",
+   "href": "/",
    "text": "Trading hours (learning world 2: Trading mechanics)\nOutside main exchange hours fewer people trade, so spreads get wider.\nExample: The same order at 14:00 and at 22:00 can cost you a different price.\nMini game: Night market\nQuiz: When are spreads usually widest? Options: Midday on a weekday / Late at night / They never change",
    "world": 2,
    "spoiler": {
@@ -138,7 +138,7 @@
    "id": "concept:risk-return",
    "type": "concept",
    "title": "Risk vs. return",
-   "href": "/learn",
+   "href": "/",
    "text": "Risk vs. return (learning world 3: Risk & return)\nHigher possible gains always come with higher possible losses.\nExample: Savings account: ~2%, almost no risk. Single tech stock: +80% or −50% in a year.\nMini game: The slider\nQuiz: An offer promises 20% a year with no risk. That's… Options: A great deal / A red flag / Normal",
    "world": 3,
    "spoiler": {
@@ -150,7 +150,7 @@
    "id": "concept:volatility",
    "type": "concept",
    "title": "Volatility",
-   "href": "/learn",
+   "href": "/",
    "text": "Volatility (learning world 3: Risk & return)\nVolatility is how wildly a price swings.\nExample: Tesla can move ±5% on a normal day; an MSCI World ETF usually ±1%.\nMini game: Rollercoaster\nQuiz: Which usually swings more? Options: A single growth stock / A world ETF / A savings account",
    "world": 3,
    "spoiler": {
@@ -162,7 +162,7 @@
    "id": "concept:drawdown",
    "type": "concept",
    "title": "Drawdown",
-   "href": "/learn",
+   "href": "/",
    "text": "Drawdown (learning world 3: Risk & return)\nA drawdown is how far your portfolio fell from its highest point.\nExample: 10,000 € → 7,000 € is a 30% drawdown. To get back you need +43%.\nMini game: The cliff\nQuiz: After a 50% drop, how much do you need to get back to start? Options: +50% / +100% / +25%",
    "world": 3,
    "spoiler": {
@@ -174,7 +174,7 @@
    "id": "concept:diversification",
    "type": "concept",
    "title": "Diversification",
-   "href": "/learn",
+   "href": "/",
    "text": "Diversification (learning world 3: Risk & return)\nDon't put all your eggs in one basket.\nExample: One stock collapses 90%: all-in → −90%. Spread across 10 → about −9%.\nMini game: Egg drop\nQuiz: Why diversify? Options: To guarantee profit / So one bad company can't ruin you / To pay less tax",
    "world": 3,
    "spoiler": {
@@ -186,7 +186,7 @@
    "id": "concept:correlation",
    "type": "concept",
    "title": "Correlation",
-   "href": "/learn",
+   "href": "/",
    "text": "Correlation (learning world 3: Risk & return)\nSome stocks tend to move together.\nExample: A scandal at one carmaker often drags Mercedes, VW and BMW down together.\nMini game: Dominoes\nQuiz: You own 5 car makers. Are you well diversified? Options: Yes, 5 companies / Not really — they move together / Only if they're German",
    "world": 3,
    "spoiler": {
@@ -198,7 +198,7 @@
    "id": "concept:liquidity",
    "type": "concept",
    "title": "Liquidity",
-   "href": "/learn",
+   "href": "/",
    "text": "Liquidity (learning world 3: Risk & return)\nLiquidity is how fast you can sell without losing value.\nExample: A big stock sells in seconds. A flat can take months.\nMini game: Garage sale\nQuiz: Which is most liquid? Options: Apple shares / A holiday flat / A rare painting",
    "world": 3,
    "spoiler": {
@@ -210,7 +210,7 @@
    "id": "concept:compound",
    "type": "concept",
    "title": "Compound interest",
-   "href": "/learn",
+   "href": "/",
    "text": "Compound interest (learning world 4: Time & growth)\nYour profit earns its own profit — it snowballs.\nExample: 50 €/month at 7% for 30 years: you pay in 18,000 €, it grows to about 61,000 €.\nMini game: Snowball\nQuiz: What makes compounding strongest? Options: Time / Trading often / Checking prices daily",
    "world": 4,
    "spoiler": {
@@ -222,7 +222,7 @@
    "id": "concept:inflation",
    "type": "concept",
    "title": "Inflation",
-   "href": "/learn",
+   "href": "/",
    "text": "Inflation (learning world 4: Time & growth)\nInflation makes money lose buying power over time.\nExample: At 3% inflation, 100 € buys only about 74 € worth of stuff after 10 years.\nMini game: Shrinking cart\nQuiz: Cash under the mattress for 10 years with 3% inflation… Options: Keeps its value / Loses buying power / Grows",
    "world": 4,
    "spoiler": {
@@ -234,7 +234,7 @@
    "id": "concept:savings-plan",
    "type": "concept",
    "title": "Savings plan",
-   "href": "/learn",
+   "href": "/",
    "text": "Savings plan (learning world 4: Time & growth)\nA savings plan invests the same amount every month, automatically.\nExample: 25 € every month into an ETF — no timing, no stress.\nMini game: Autopilot\nQuiz: Main advantage of a savings plan? Options: You never have to decide when to buy / Guaranteed profit / No fees ever",
    "world": 4,
    "spoiler": {
@@ -246,7 +246,7 @@
    "id": "concept:cost-average",
    "type": "concept",
    "title": "Cost-average effect",
-   "href": "/learn",
+   "href": "/",
    "text": "Cost-average effect (learning world 4: Time & growth)\nWhen prices are low, the same monthly amount buys more shares.\nExample: Price drops 30% → your 100 € buys about 43% more shares that month.\nMini game: Sale season\nQuiz: For a monthly saver, a market dip means… Options: Buying more shares cheaply / Losing the savings plan / Paying higher fees",
    "world": 4,
    "spoiler": {
@@ -258,7 +258,7 @@
    "id": "concept:rebalancing",
    "type": "concept",
    "title": "Rebalancing",
-   "href": "/learn",
+   "href": "/",
    "text": "Rebalancing (learning world 4: Time & growth)\nRebalancing brings your portfolio back to your planned mix.\nExample: Plan 70/30 stocks/bonds; after a rally it's 80/20 → sell some stocks, buy bonds.\nMini game: Balance the scale\nQuiz: Stocks rallied and now are 85% instead of 70%. Rebalancing means… Options: Buying more stocks / Selling some stocks / Doing nothing ever",
    "world": 4,
    "spoiler": {
@@ -270,7 +270,7 @@
    "id": "concept:horizon",
    "type": "concept",
    "title": "Investment horizon",
-   "href": "/learn",
+   "href": "/",
    "text": "Investment horizon (learning world 4: Time & growth)\nWhen you need the money changes how much risk you can take.\nExample: Money for a flat in 2 years ≠ money for retirement in 30 years.\nMini game: Two clocks\nQuiz: Money needed in 1 year should mostly be… Options: In a single stock / Safe and easy to access / In crypto",
    "world": 4,
    "spoiler": {
@@ -282,7 +282,7 @@
    "id": "concept:earnings",
    "type": "concept",
    "title": "Earnings report",
-   "href": "/learn",
+   "href": "/",
    "text": "Earnings report (learning world 5: Reading the market)\nCompanies report results every quarter — prices react to how they compare with expectations.\nExample: Profit +10% sounds great — but if +15% was expected, the stock can fall.\nMini game: Beat or miss\nQuiz: Profit up 10%, analysts expected 15%. The stock likely… Options: Rises / Falls / Doesn't trade",
    "world": 5,
    "spoiler": {
@@ -294,7 +294,7 @@
    "id": "concept:priced-in",
    "type": "concept",
    "title": "Priced in",
-   "href": "/learn",
+   "href": "/",
    "text": "Priced in (learning world 5: Reading the market)\nThe market often moves before the news — when it's announced, it's already in the price.\nExample: A dividend hike everyone expected barely moves the price on the day.\nMini game: Too late\nQuiz: Expected news is finally announced. The price… Options: Usually jumps a lot / Often barely moves / Always falls",
    "world": 5,
    "spoiler": {
@@ -306,7 +306,7 @@
    "id": "concept:interest-rates",
    "type": "concept",
    "title": "Interest rates",
-   "href": "/learn",
+   "href": "/",
    "text": "Interest rates (learning world 5: Reading the market)\nWhen central bank rates change, almost everything moves.\nExample: Rates up → bonds more attractive, loans pricier → stocks, especially tech, often fall.\nMini game: Rate lever\nQuiz: The central bank raises rates. Growth/tech stocks usually… Options: Rise / Fall / Aren't affected",
    "world": 5,
    "spoiler": {
@@ -318,7 +318,7 @@
    "id": "concept:rumor",
    "type": "concept",
    "title": "Buy the rumor, sell the news",
-   "href": "/learn",
+   "href": "/",
    "text": "Buy the rumor, sell the news (learning world 5: Reading the market)\nPrices rise on hope and often fall on confirmation — or when the rumor turns out false.\nExample: 'Takeover talks!' → +8%. 'Company denies talks' → −12%.\nMini game: Hype cycle\nQuiz: A stock jumps 10% on an unconfirmed rumor. The risk is… Options: None / It falls if the rumor is wrong / It gets delisted",
    "world": 5,
    "spoiler": {
@@ -330,7 +330,7 @@
    "id": "concept:pe-ratio",
    "type": "concept",
    "title": "P/E ratio",
-   "href": "/learn",
+   "href": "/",
    "text": "P/E ratio (learning world 5: Reading the market)\nP/E shows how many years of today's profit the price equals.\nExample: Price 100 €, profit 5 € per share → P/E 20.\nMini game: Expensive or cheap\nQuiz: Price 60 €, profit 3 € per share. P/E is… Options: 20 / 3 / 180",
    "world": 5,
    "spoiler": {
@@ -342,7 +342,7 @@
    "id": "concept:bull-bear",
    "type": "concept",
    "title": "Bull & bear market",
-   "href": "/learn",
+   "href": "/",
    "text": "Bull & bear market (learning world 5: Reading the market)\nA bull market is a long rise, a bear market a long fall (usually −20% or more).\nExample: 2020: a sharp bear market in March, then a strong bull market.\nMini game: Weather forecast\nQuiz: Markets fell 25% over months. That's a… Options: Bull market / Bear market / Dividend",
    "world": 5,
    "spoiler": {
@@ -354,7 +354,7 @@
    "id": "concept:taxes",
    "type": "concept",
    "title": "Taxes & allowance",
-   "href": "/learn",
+   "href": "/",
    "text": "Taxes & allowance (learning world 5: Reading the market)\nInvestment profits are taxed, but there is a yearly tax-free allowance.\nExample: Set a Freistellungsauftrag at your bank so profits up to the allowance stay tax-free.\nMini game: Tax shield\nQuiz: Without a Freistellungsauftrag, your bank… Options: Withholds tax right away / Never taxes you / Closes your portfolio",
    "world": 5,
    "spoiler": {
@@ -366,7 +366,7 @@
    "id": "card:stock",
    "type": "card",
    "title": "Stock",
-   "href": "/learn",
+   "href": "/",
    "text": "Stock (concept card, world 1)\nA stock is a small piece of a company.\nExample: Buy one share of Deutsche Telekom and you own a tiny slice of Deutsche Telekom.\nQuiz: You buy 1 share of Siemens. What do you own? Options: A loan to Siemens / A tiny piece of Siemens / A Siemens voucher",
    "world": 1,
    "spoiler": {
@@ -378,7 +378,7 @@
    "id": "card:order-types",
    "type": "card",
    "title": "Market vs. limit order",
-   "href": "/learn",
+   "href": "/",
    "text": "Market vs. limit order (concept card, world 1)\nA market order buys now at any price. A limit order buys only at your price or better.\nExample: Limit 30,00 € on a share at 30,20 € → your order waits until the price is 30,00 € or lower.\nQuiz: What does a limit order protect you from? Options: Paying more than you planned / Any loss / Order fees",
    "world": 1,
    "spoiler": {
@@ -390,7 +390,7 @@
    "id": "card:fees",
    "type": "card",
    "title": "Fees & spread",
-   "href": "/learn",
+   "href": "/",
    "text": "Fees & spread (concept card, world 1)\nEvery order costs a fee, and you buy a little above and sell a little below the mid price.\nExample: A 4,90 € fee is almost 5 % of a 100 € order, but only 0,5 % of a 1.000 € order.\nQuiz: Why do small single orders hurt more? Options: The fixed fee is a bigger share of the amount / Small orders are taxed more / They don't",
    "world": 1,
    "spoiler": {
@@ -402,7 +402,7 @@
    "id": "card:pnl",
    "type": "card",
    "title": "Profit & loss",
-   "href": "/learn",
+   "href": "/",
    "text": "Profit & loss (concept card, world 1)\nProfit or loss is today's value minus what you paid, costs included.\nExample: Bought for 65,05 € incl. costs, worth 66,10 € now → +1,05 € (+1,6 %), on paper until you sell.\nQuiz: Your position shows −3 %. Have you lost money? Options: Only on paper, until you sell / Yes, it's gone / No, losses don't count",
    "world": 1,
    "spoiler": {
@@ -414,7 +414,7 @@
    "id": "card:signal-noise",
    "type": "card",
    "title": "Signal vs. noise",
-   "href": "/learn",
+   "href": "/",
    "text": "Signal vs. noise (concept card, world 2)\nMost headlines are noise. A signal is new information that changes a company's future.\nExample: \"Auditor can't confirm 1,9 bn €\" is a signal. \"Analyst on TV is excited\" is noise.\nQuiz: Which one is a signal? Options: A blogger says the chart looks weak / A company cuts its profit forecast / Rainy weekend in Frankfurt",
    "world": 2,
    "spoiler": {
@@ -426,7 +426,7 @@
    "id": "card:priced-in",
    "type": "card",
    "title": "Priced in",
-   "href": "/learn",
+   "href": "/",
    "text": "Priced in (concept card, world 2)\nWhen everyone expects a piece of news, it's already in the price before it's announced.\nExample: The ECB keeps rates unchanged, as expected: the market barely moves.\nQuiz: Expected news is finally announced. The price usually… Options: Jumps / Barely moves / Always falls",
    "world": 2,
    "spoiler": {
@@ -438,7 +438,7 @@
    "id": "card:rumor",
    "type": "card",
    "title": "Buy the rumor, sell the news",
-   "href": "/learn",
+   "href": "/",
    "text": "Buy the rumor, sell the news (concept card, world 2)\nPrices rise on hope and often fall when the rumor is confirmed or denied.\nExample: \"Purchase bonus for e-cars, sources say\" → car stocks +6 %. \"No bonus planned\" → −8 %.\nQuiz: A stock jumps on an unconfirmed rumor. The risk is… Options: None / It falls if the rumor is wrong / It gets delisted",
    "world": 2,
    "spoiler": {
@@ -450,7 +450,7 @@
    "id": "card:volatility",
    "type": "card",
    "title": "Volatility & drawdown",
-   "href": "/learn",
+   "href": "/",
    "text": "Volatility & drawdown (concept card, world 3)\nVolatility is how wildly a price swings. Drawdown is how far it fell from its peak.\nExample: From 1.000 € to 700 € is a 30 % drawdown. To get back, you need +43 %.\nQuiz: After a 50 % drop, how much do you need to get back? Options: +50 % / +100 % / +25 %",
    "world": 3,
    "spoiler": {
@@ -462,7 +462,7 @@
    "id": "card:diversification",
    "type": "card",
    "title": "Diversification",
-   "href": "/learn",
+   "href": "/",
    "text": "Diversification (concept card, world 3)\nDon't put all your eggs in one basket.\nExample: One stock collapses by 90 %: all-in → −90 %. Spread over 10 → about −9 %.\nQuiz: Why diversify? Options: To guarantee profit / So one bad company can't ruin you / To pay less tax",
    "world": 3,
    "spoiler": {
@@ -474,7 +474,7 @@
    "id": "card:etf",
    "type": "card",
    "title": "ETF",
-   "href": "/learn",
+   "href": "/",
    "text": "ETF (concept card, world 3)\nAn ETF is a basket of hundreds of companies you buy in one order.\nExample: 100 € in an MSCI World ETF spreads across about 1.400 companies, for one order fee.\nQuiz: One company in your world ETF crashes 50 %. Your ETF… Options: Falls about 50 % / Barely moves / Is closed",
    "world": 3,
    "spoiler": {
@@ -486,7 +486,7 @@
    "id": "card:compound",
    "type": "card",
    "title": "Compound interest",
-   "href": "/learn",
+   "href": "/",
    "text": "Compound interest (concept card, world 4)\nYour gains earn their own gains. Over time, it snowballs.\nExample: 25 €/month at 7 % for 30 years: you pay in 9.000 €, it grows to about 30.000 €.\nQuiz: What makes compounding strongest? Options: Time / Trading often / Checking prices daily",
    "world": 4,
    "spoiler": {
@@ -498,7 +498,7 @@
    "id": "card:savings-plan",
    "type": "card",
    "title": "Savings plan & cost averaging",
-   "href": "/learn",
+   "href": "/",
    "text": "Savings plan & cost averaging (concept card, world 4)\nA savings plan invests the same amount every month. When prices are low, it buys more shares.\nExample: Price drops 30 % → your 25 € buy about 43 % more shares that month.\nQuiz: For a monthly saver, a market dip means… Options: Buying more shares cheaply / The plan stops / Higher fees",
    "world": 4,
    "spoiler": {
@@ -510,7 +510,7 @@
    "id": "module:1",
    "type": "module",
    "title": "Module 1: First steps",
-   "href": "/learn",
+   "href": "/",
    "text": "Learning path module 1: First steps. Played on: Web cabinet.\nTop up, find a stock, place your first order.\nChapters: 1.1 Your cabinet; 1.2 Top up; 1.3 Find a stock; 1.4 Read a stock page; 1.5 Place an order; ★ Your first stock",
    "world": 1
   },
@@ -518,7 +518,7 @@
    "id": "module:2",
    "type": "module",
    "title": "Module 2: Reading news",
-   "href": "/learn",
+   "href": "/",
    "text": "Learning path module 2: Reading news. Played on: Trading area.\nSignal or noise? Learn what really moves prices.\nChapters: 2.1 Your trading area; 2.2 Signal or noise?; 2.3 The market was faster; 2.4 Rumors; ★ Read before you click; 👾 Boss: FOMO Max",
    "world": 2
   },
@@ -526,7 +526,7 @@
    "id": "module:3",
    "type": "module",
    "title": "Module 3: Risk",
-   "href": "/learn",
+   "href": "/",
    "text": "Learning path module 3: Risk. Played on: ProTrader.\nUps and downs, and why one basket is a bad idea.\nChapters: 3.1 Ups and downs; 3.2 One basket; 3.3 Hundreds of companies in one click; ★ Don't put all eggs in one basket; 👾 Boss: All-in Alex",
    "world": 3
   },
@@ -534,7 +534,7 @@
    "id": "module:4",
    "type": "module",
    "title": "Module 4: Time",
-   "href": "/learn",
+   "href": "/",
    "text": "Learning path module 4: Time. Played on: ProTrader + years.\nLet time and a savings plan do the work.\nChapters: 4.1 Money that grows on its own; 4.2 Same amount, every month; ★ Set and forget; 👾 Boss: Panic Paula",
    "world": 4
   },
@@ -542,7 +542,7 @@
    "id": "chapter:1.1",
    "type": "chapter",
    "title": "Module 1.1: Your cabinet",
-   "href": "/learn",
+   "href": "/",
    "text": "Your cabinet: chapter in module 1 (First steps), on the web cabinet.\nCurrent account, trading account and portfolio: what each one is for.\nWelcome to your sandbox\nThis is the comdirect overview, copied 1:1. Everything here runs on play money.\nCurrent account\nTrading account\nThis is your cash for trading. It's separate from your current account, and it's empty for now.\nPortfolio\nYour portfolio holds the stocks and ETFs you own. Nothing yet.\nLook inside\nEvery account has its own page.\nTask: Open your portfolio.\nEmpty portfolio\nThis is where your first stock will show up, with its profit or loss.\nBack to the overview\nThe overview is always one click away.\nTask: Go back to the overview.\nSandbox button\nNeed more play money later? This adds some. It's a sandbox control, not a real comdirect function.",
    "world": 1
   },
@@ -550,7 +550,7 @@
    "id": "chapter:1.2",
    "type": "chapter",
    "title": "Module 1.2: Top up",
-   "href": "/learn",
+   "href": "/",
    "text": "Top up: chapter in module 1 (First steps), on the web cabinet.\nMove money to your trading account and confirm with photoTAN.\nMoney first\nTo buy a stock, your money has to be on the trading account.\nTask: Click \"Transfer\" next to the current account.\nFrom and to\nFrom your current account to your trading account. Both are already filled in.\nAmount\nLet's try a small amount first.\nTask: Enter 20 €.\nCheck and send\nEvery transfer is confirmed with a TAN, a one-time code.\nTask: Click \"Next\".\nphotoTAN\nIn real life you scan this mosaic with the photoTAN app. Here, the phone next to it is simulated.\nTask: Type the TAN shown on the phone and confirm.\nDid it work?\nEvery movement of money is listed in your transactions.\nTask: Open \"Transactions\".\nHere it is\n20 € left the current account and arrived on your trading account.",
    "world": 1
   },
@@ -558,7 +558,7 @@
    "id": "chapter:1.3",
    "type": "chapter",
    "title": "Module 1.3: Find a stock",
-   "href": "/learn",
+   "href": "/",
    "text": "Find a stock: chapter in module 1 (First steps), on the web cabinet.\nSearch by name, WKN or ISIN, or browse the Aktien-Finder.\nTeaches concept cards: stock\nSearch\nSearch by name, WKN or ISIN, exactly like on comdirect.\nTask: Search for SAP and open it.\nWKN and ISIN\nEvery security has two IDs: the 6-character WKN and the 12-character ISIN. Same company, no mix-ups.\nAktien-Finder\nDon't know a name yet? The Aktien-Finder filters by country, index and sector.\nTask: Open the Aktien-Finder.\nFilter\nNarrow it down by sector.\nTask: Pick the sector \"Telecom\".\nResults\nOne hit left.\nTask: Open Deutsche Telekom.",
    "world": 1
   },
@@ -566,7 +566,7 @@
    "id": "chapter:1.4",
    "type": "chapter",
    "title": "Module 1.4: Read a stock page",
-   "href": "/learn",
+   "href": "/",
    "text": "Read a stock page: chapter in module 1 (First steps), on the web cabinet.\nPrice, daily change, chart periods, key numbers and news.\nA stock page\nLet's read the page of Deutsche Telekom, top to bottom.\nPrice\nThe last price, when it was paid, and on which exchange.\nDaily change\nHow much the price moved since yesterday's close. Green up, red down.\nChart periods\nOne day says little. Zoom out.\nTask: Switch the chart to 1 year (1Y).\nKey numbers\nYesterday's close, today's range and the 52-week range show how much the price usually moves.\nNews\nNews about the market. In this sandbox it's simulated and only about the economy, never invented company stories.",
    "world": 1
   },
@@ -574,7 +574,7 @@
    "id": "chapter:1.5",
    "type": "chapter",
    "title": "Module 1.5: Place an order",
-   "href": "/learn",
+   "href": "/",
    "text": "Place an order: chapter in module 1 (First steps), on the web cabinet.\nBuy or sell, quantity, exchange, market vs. limit, costs.\nTeaches concept cards: order-types, fees\nOpen the order form\nFrom any stock page you can go straight to the order form.\nBuy or sell\nYou can only sell what you own. We want to buy.\nQuantity\nHow many shares. Always whole shares here.\nTask: Enter 2.\nExchange\nWhere the trade happens. Xetra and Tradegate are the big ones, with tight prices.\nMarket or limit?\nMarket buys now at any price. Limit buys only at your price or better.\nTask: Choose \"Limit\".\nYour limit\nThe most you're willing to pay per share.\nTask: Enter a limit, for example today's price.\nValidity\nHow long your order waits if the price isn't reached. \"Good for day\" ends at today's close.\nCosts\nEvery order has a fee, plus a small spread.\nTask: Click \"Show order costs\".\nLook at the fee\nThat's the form\nYou know every field now. In the mission you'll do it for real, on your own.",
    "world": 1
   },
@@ -582,7 +582,7 @@
    "id": "chapter:w1",
    "type": "chapter",
    "title": "Module ★: Your first stock",
-   "href": "/learn",
+   "href": "/",
    "text": "Your first stock: mission in module 1 (First steps), on the web cabinet.\nTop up and buy, on your own. Then ⏩ one week later.\nTeaches concept cards: pnl",
    "world": 1
   },
@@ -590,7 +590,7 @@
    "id": "chapter:2.1",
    "type": "chapter",
    "title": "Module 2.1: Your trading area",
-   "href": "/learn",
+   "href": "/",
    "text": "Your trading area: chapter in module 2 (Reading news), on the trading area / ProTrader.\nA guided tour of the trading screen: everything on one screen.\nThe trading area\nEverything on one screen, and time that moves. It's the same portfolio as in the web cabinet. After Module 2 you move on to ProTrader.\nYour account\nTotal value, cash and profit or loss. Low on cash? Top up here.\nFind a stock\nType a name, ticker or WKN, then pick the stock from the list.\nTask: Search for SAP and pick it.\nChart\nCandles: each one is one day. Green closed higher, red lower. Your trades show up as arrows.\nOrder ticket\nBuy or sell, quantity, order type and costs, always in view.\nTask: Enter a quantity of 5.\nPositions and orders\nWhat you own, and your limit and stop orders waiting for their price.\nNews\nSimulated macro and sector news. Big headlines pause the time.\nTime\nPlay moves the market day by day. Pick 1 day/s or 1 week/s.\nTask: Press Play.",
    "world": 2
   },
@@ -598,7 +598,7 @@
    "id": "chapter:2.2",
    "type": "chapter",
    "title": "Module 2.2: Signal or noise?",
-   "href": "/learn",
+   "href": "/",
    "text": "Signal or noise?: chapter in module 2 (Reading news), on the trading area / ProTrader.\nA simulated week: three headlines, and one that hits a company it never names.\nTeaches concept cards: signal-noise\nA simulated week\nMade-up headlines, real lessons. Watch the news and the car stocks.\nFollow a carmaker\nPick a car stock to follow.\nTask: Search for Volkswagen and pick it.\nPlay\nHeadlines arrive as time moves. Big ones pause the game.\nTask: Press Play.\nQuiz: A star investor says \"Telecom stocks are boring, I sold them all\". Signal or noise? Options: Signal: new information about telecom companies / Noise: one person's opinion\nKeep going\nSomething real is coming.\nTask: Press Play until the chip supplier headline appears.\nQuiz: A fire stops a chip supplier's deliveries. Whose shares are hit hardest? Options: Carmakers: no chips, no cars / Telecom companies / Nobody: it's only one factory\nTwo days later\nWatch the next headline.\nTask: Press Play until the viral post appears.\nQuiz: \"Carmakers will all be bankrupt by Christmas!\" goes viral. Signal or noise? Options: Signal: everyone is sharing it / Noise: a loud claim without facts\nThe takeaway\nAsk two questions about every headline: is it new information, and whose business does it really change? The fire was signal, and it hit the carmakers. The podcast and the viral post were noise.",
    "world": 2,
    "spoiler": {
@@ -610,7 +610,7 @@
    "id": "chapter:2.3",
    "type": "chapter",
    "title": "Module 2.3: The market was faster",
-   "href": "/learn",
+   "href": "/",
    "text": "The market was faster: chapter in module 2 (Reading news), on the trading area / ProTrader.\nWhy expected news barely moves prices.\nTeaches concept cards: priced-in\nSimulated week\nA simulated week with central bank news. Watch the MSCI World ETF.\nPlay\nEveryone reads the same forecasts.\nTask: Press Play until the ECB decision.\nNothing happened?\nThe decision was big news, but the price barely moved.\nQuiz: Why didn't the ECB decision move prices? Options: Everyone expected it: it was priced in / Nobody read it / Markets were closed\nNow a surprise\nKeep going.\nTask: Press Play.\nA surprise moves prices\nInflation fell more than expected. This time prices moved, because it was new.",
    "world": 2,
    "spoiler": {
@@ -622,7 +622,7 @@
    "id": "chapter:2.4",
    "type": "chapter",
    "title": "Module 2.4: Rumors",
-   "href": "/learn",
+   "href": "/",
    "text": "Rumors: chapter in module 2 (Reading news), on the trading area / ProTrader.\nBuy the rumor, sell the news.\nTeaches concept cards: rumor\nSources say…\nSimulated: a rumor about a purchase bonus for electric cars. Watch the car stocks.\nCar stocks\nPick a carmaker to follow.\nTask: Search for Volkswagen and pick it.\nThe rumor\nLet's hear it.\nTask: Press Play.\nUnconfirmed\n\"Sources say\" means nobody confirmed it.\nQuiz: Car stocks jump on \"sources say\". What's the risk? Options: None, it's in the news / The price falls if the rumor is wrong / The stock gets delisted\nAnd then\nKeep going.\nTask: Press Play until the government answers.\nDenied\nThe government said no. The jump is gone, and then some. Whoever bought the rumor lost money.",
    "world": 2,
    "spoiler": {
@@ -634,7 +634,7 @@
    "id": "chapter:w2",
    "type": "chapter",
    "title": "Module ★: Read before you click",
-   "href": "/learn",
+   "href": "/",
    "text": "Read before you click: mission in module 2 (Reading news), on the trading area / ProTrader.\nThree headlines in one simulated week. Act or ignore?",
    "world": 2
   },
@@ -642,7 +642,7 @@
    "id": "chapter:b2",
    "type": "chapter",
    "title": "Module 👾: Boss: FOMO Max",
-   "href": "/learn",
+   "href": "/",
    "text": "Boss: FOMO Max: boss round in module 2 (Reading news), on the trading area / ProTrader.\nA simulated tech hype. Don't buy it once it's running.\nTeaches concept cards: rumor",
    "world": 2
   },
@@ -650,7 +650,7 @@
    "id": "chapter:3.1",
    "type": "chapter",
    "title": "Module 3.1: Ups and downs",
-   "href": "/learn",
+   "href": "/",
    "text": "Ups and downs: chapter in module 3 (Risk), on the trading area / ProTrader.\nA simulated year: a wild stock next to a calm ETF.\nTeaches concept cards: volatility\nOne year, two rides\nA simulated year. Follow a wild stock, then compare it with a calm ETF.\nThe wild one\nElectric-car stocks are known for big swings.\nTask: Search for Tesla and pick it.\nFast-forward\nUse the jumps to move a month at a time.\nTask: Jump +1 month four times.\nSwings\nBig moves both ways, sometimes 10 % in a week. That's volatility.\nKeep going\nLet's see the rest of the year.\nTask: Play until the end of the year.\nThe calm one\nNow look at the ETF over the same year.\nTask: Click the MSCI World ETF.\nQuiz: What does volatility tell you about a stock? Options: How much its price swings, up and down / Whether the company is good / How much the price will rise\nThe takeaway\nThe wild stock jumped on the subsidies and fell just as fast in the price war. The ETF moved far less. The bigger the swings, the deeper the drops you have to sit through.",
    "world": 3,
    "spoiler": {
@@ -662,7 +662,7 @@
    "id": "chapter:3.2",
    "type": "chapter",
    "title": "Module 3.2: One basket",
-   "href": "/learn",
+   "href": "/",
    "text": "One basket: chapter in module 3 (Risk), on the trading area / ProTrader.\nWhy one bad company shouldn't be able to ruin you.\nTeaches concept cards: diversification\nEggs and baskets\nDrop a few years and watch what happens to one basket versus ten.\nYour portfolio\nLook at the weight of each position: how much of your portfolio is in one stock?\nThe rule of thumb\nMany investors keep any single stock below 10–30 % of their portfolio.\nQuiz: Your portfolio is 80 % one stock. If it falls 50 %, your portfolio falls about… Options: 5 % / 40 % / 80 %",
    "world": 3,
    "spoiler": {
@@ -674,7 +674,7 @@
    "id": "chapter:3.3",
    "type": "chapter",
    "title": "Module 3.3: Hundreds of companies in one click",
-   "href": "/learn",
+   "href": "/",
    "text": "Hundreds of companies in one click: chapter in module 3 (Risk), on the trading area / ProTrader.\nWhat an ETF is, and why it's the cheap way to diversify.\nTeaches concept cards: etf\nOne order, 1.400 companies\nMove the slider: see where your money goes in an MSCI World ETF.\nFind the ETF\nThe MSCI World ETF is in your watchlist.\nTask: Click the MSCI World ETF.\nCalmer\nCompare the candles: an ETF usually swings much less than a single stock.\nFees\nWith small amounts, fees matter.\nQuiz: You have 100 €. Four single stocks or one ETF? Options: Four stocks: 4 × 4,90 € ≈ 20 % in fees / One ETF: one fee, about 1.400 companies",
    "world": 3,
    "spoiler": {
@@ -686,7 +686,7 @@
    "id": "chapter:w3",
    "type": "chapter",
    "title": "Module ★: Don't put all eggs in one basket",
-   "href": "/learn",
+   "href": "/",
    "text": "Don't put all eggs in one basket: mission in module 3 (Risk), on the trading area / ProTrader.\nSpread your money so no single stock is above 30 %.",
    "world": 3
   },
@@ -694,7 +694,7 @@
    "id": "chapter:b3",
    "type": "chapter",
    "title": "Module 👾: Boss: All-in Alex",
-   "href": "/learn",
+   "href": "/",
    "text": "Boss: All-in Alex: boss round in module 3 (Risk), on the trading area / ProTrader.\nA simulated summer. Keep a diversified portfolio.\nTeaches concept cards: diversification",
    "world": 3
   },
@@ -702,7 +702,7 @@
    "id": "chapter:4.1",
    "type": "chapter",
    "title": "Module 4.1: Money that grows on its own",
-   "href": "/learn",
+   "href": "/",
    "text": "Money that grows on its own: chapter in module 4 (Time), on the trading area / ProTrader.\nCompound interest, made visible.\nTeaches concept cards: compound\nThe snowball\nMove the years: your gains start earning their own gains.\nYears, not days\nModule 4 unlocks +1 year and +10 years in the time machine.\nCheck\nOne more question.\nQuiz: Two people save the same monthly amount. One starts at 25, one at 35. Who ends up with more at 65? Options: The one who started at 25, by a lot / About the same / The one who started later",
    "world": 4,
    "spoiler": {
@@ -714,7 +714,7 @@
    "id": "chapter:4.2",
    "type": "chapter",
    "title": "Module 4.2: Same amount, every month",
-   "href": "/learn",
+   "href": "/",
    "text": "Same amount, every month: chapter in module 4 (Time), on the trading area / ProTrader.\nSet up a savings plan and fast-forward.\nTeaches concept cards: savings-plan\nA savings plan\nSame amount every month, automatically. No timing, no stress.\nOpen the order window\nSavings plans are set up in the order window.\nTask: Open the order window.\nSavings plan tab\nSwitch to the savings plan tab.\nFast-forward\nNow let time work.\nTask: Jump +1 year three times.\nCost averaging\nIn the bad year your plan bought more shares for the same money. That's the cost-average effect.",
    "world": 4
   },
@@ -722,7 +722,7 @@
    "id": "chapter:w4",
    "type": "chapter",
    "title": "Module ★: Set and forget",
-   "href": "/learn",
+   "href": "/",
    "text": "Set and forget: mission in module 4 (Time), on the trading area / ProTrader.\nSavings plan on an ETF, then ⏩ 10 years.",
    "world": 4
   },
@@ -730,7 +730,7 @@
    "id": "chapter:b4",
    "type": "chapter",
    "title": "Module 👾: Boss: Panic Paula",
-   "href": "/learn",
+   "href": "/",
    "text": "Boss: Panic Paula: boss round in module 4 (Time), on the trading area / ProTrader.\nA simulated crash, fast-forwarded. Stay calm.\nTeaches concept cards: volatility",
    "world": 4
   },
@@ -841,175 +841,175 @@
    "id": "replay:hype",
    "type": "replay",
    "title": "Simulated round: NVIDIA",
-   "href": "/learn",
+   "href": "/",
    "text": "A simulated boss round on the learning path about \"NVIDIA\".\nConcept: rumor. Rule to win: Don't buy tech stocks once the hype is running (from day 6), and beat Max's risk-adjusted score.\nStarting budget: 1000 € play money.\nHeadlines:\n- Conference talk: start-up claims a breakthrough in quantum chips (rumor: A claim, not a product. Nobody has checked it yet.)\n- Forum users: \"Quantum will make every chip stock 10×\" (rumor: Hype, not information about any business.)\n- Influencer posts huge gains on tech stocks; the rally speeds up (noise: A post is not a business result.)\n- Independent lab: the quantum breakthrough could not be reproduced (signal: The claim didn't hold. The hope leaves the prices again, faster than it came.)\n- Tech stocks keep sliding as the hype fades (noise: Latecomers sell. Prices drift back toward what the businesses earn.)\nBot moves:\n- Bot sam (buy): \"World ETF, like every month.\"\n- Bot paula (buy): \"A bit of everything. Calm and spread out.\"\n- Bot alex (buy): \"I only trust one company. All in Microsoft.\"\n- Bot max (buy): \"Tech is up 30 % in a week! Everyone's getting rich. All in!\" → mistake: Buying after the hype already ran. Prices had already jumped on a claim and forum posts. Nothing about the businesses had changed.\n- Bot max (sell): \"It's crashing! Get me out!\" → mistake: Selling in panic after buying the hype. Bought high on hype, sold low in panic: the FOMO round trip."
   },
   {
    "id": "replay:sneakers",
    "type": "replay",
    "title": "Simulated round: adidas",
-   "href": "/learn",
+   "href": "/",
    "text": "A simulated boss round on the learning path about \"adidas\".\nConcept: diversification. Rule to win: Never have more than 30 % of your portfolio in one stock, and beat Alex's risk-adjusted score.\nStarting budget: 1000 € play money.\nHeadlines:\n- Summer football tournament starts: sporting-goods makers expect record sales (sector: Real, but everyone knows it. Hopes are already high.)\n- Fan forum: \"Sneaker stocks can only go up this summer\" (noise: An opinion, not information.)\n- Big retailers cancel sports-shoe orders: warehouses are overflowing (sector: Real, bad news for sporting-goods makers. One stock can lose a third in days.)\n- Rest of the market shrugs: DAX little changed (noise: The problem is in one corner of the market, not everywhere.)\n- Sporting-goods makers cut their outlook for the year (sector: The bad news keeps coming. Cheaper wasn't the same as safe.)\nBot moves:\n- Bot alex (buy): \"Tournament summer, everyone buys sneakers. All in adidas!\" → mistake: Everything in one stock. There's no sure thing. One stock can always fall hard, for reasons nobody expected.\n- Bot sam (buy): \"Same as every month: the whole world.\"\n- Bot paula (buy): \"A bit of everything. I feel safe.\"\n- Bot paula (sell): \"Sneaker stocks crashed! Sell everything, now!\" → mistake: Selling everything over news about a stock she doesn't own. Paula doesn't even own adidas. Her stocks barely moved.\n- Bot max (buy): \"It's down 30 %, that's a bargain! All in!\" → mistake: Buying because it's cheaper, not on facts. \"Cheaper\" isn't \"safe\". The orders really were cancelled, and the outlook cut came next."
   },
   {
    "id": "replay:scare",
    "type": "replay",
    "title": "Simulated round: MSCI World ETF",
-   "href": "/learn",
+   "href": "/",
    "text": "A simulated boss round on the learning path about \"MSCI World ETF\".\nConcept: volatility. Rule to win: Don't sell during the crash (days 20–45), and beat Paula's risk-adjusted score.\nStarting budget: 1000 € play money.\nHeadlines:\n- DAX closes at a record high (noise: Looking back, the top. Nobody can see that in the moment.)\n- Large bank fails overnight; regulators call an emergency weekend meeting (macro: A real shock. Fear spreads faster than facts.)\n- Banking fears spread: worst week for stock markets in years (macro: Panic. The drop is now about a quarter.)\n- Central banks guarantee deposits and cut interest rates (macro: Help arrives. The low often comes when things feel worst.)\n- Bank stress fades; lending back to normal (macro: The recovery was well underway before the all-clear.)\n- Economy grows faster than expected (macro: A real surprise: prices move.)\n- Inflation back at target; stocks keep climbing (macro: One year on, the panic is a dip in the chart.)\nBot moves:\n- Bot paula (buy): \"A nice diversified start.\"\n- Bot sam (buy): \"World ETF. And then: nothing.\"\n- Bot alex (buy): \"Insurers always win. All in Allianz!\"\n- Bot max (buy): \"Record high! Everyone's getting rich. All in!\" → mistake: Buying on euphoria, not on facts. A record high says nothing about tomorrow. He bought on a feeling, all in one stock.\n- Bot paula (sell): \"Down 25 %?! Get me out before it goes to zero!\" → mistake: Selling after a big drop, near the bottom. Selling locks in the loss. Her horizon is years, not weeks.\n- Bot paula (buy): \"OK, it's been rising for months. Safe to get back in now!\" → mistake: Buying back higher than she sold. She sold low and bought back higher: the cost of panic."
   },
   {
    "id": "lesson:priced",
    "type": "lesson",
    "title": "Simulated lesson: priced",
-   "href": "/learn",
+   "href": "/",
    "text": "A short simulated market lesson (10 trading days, simulated newswire).\n- Survey: economists expect the ECB to keep rates unchanged on Thursday (noise: An expectation everyone can read. Prices adjust to it right away.; concept priced-in)\n- ECB keeps key rate unchanged, as widely expected (priced_in: Everyone expected it, so it was already in the price. Nothing new, no move.; concept priced-in)\n- Inflation falls more than expected (macro: This was a surprise: new information, so prices moved.; concept priced-in)"
   },
   {
    "id": "lesson:rumor",
    "type": "lesson",
    "title": "Simulated lesson: rumor",
-   "href": "/learn",
+   "href": "/",
    "text": "A short simulated market lesson (12 trading days, simulated newswire).\n- Report: government considers new purchase bonus for electric cars, sources say (rumor: An unconfirmed rumor. Car stocks rose on hope alone.; concept rumor)\n- Government: no new purchase bonus for electric cars planned (signal: The rumor was wrong. Whoever bought the hype lost money.; concept rumor)"
   },
   {
    "id": "lesson:w2",
    "type": "lesson",
    "title": "Simulated lesson: w2",
-   "href": "/learn",
+   "href": "/",
    "text": "A short simulated market lesson (6 trading days, simulated newswire).\n- Star investor on TV: \"The market could double this year\" (noise: An opinion, not information. Nothing about any company changed.; concept signal-noise)\n- ECB keeps key rate unchanged, as widely expected (priced_in: Everyone expected it. It was already in the price.; concept priced-in)\n- New chip export limits announced, effective immediately (sector: Real new information that hits a whole sector. Worth checking how much tech you own.; concept signal-noise)"
   },
   {
    "id": "lesson:plan",
    "type": "lesson",
    "title": "Simulated lesson: plan",
-   "href": "/learn",
+   "href": "/",
    "text": "A short simulated market lesson (2530 trading days, simulated newswire).\n- Recession fears: stock markets fall for the third month in a row (macro: A bad year. Your savings plan bought more shares while prices were low.; concept savings-plan)"
   },
   {
    "id": "lesson:chips",
    "type": "lesson",
    "title": "Simulated lesson: chips",
-   "href": "/learn",
+   "href": "/",
    "text": "A short simulated market lesson (10 trading days, simulated newswire).\n- Star investor on a podcast: \"Telecom stocks are boring, I sold them all\" (noise: An opinion. Nothing about any telecom company's business changed.; concept signal-noise)\n- Fire at a major chip supplier: deliveries to carmakers stop for months (sector: Real, new information. No chips, no cars: carmakers are hit hardest, although the fire wasn't at a carmaker.; concept signal-noise)\n- Viral post: \"Carmakers will all be bankrupt by Christmas!\" (noise: A loud claim without facts. Nothing new happened to the business.; concept signal-noise)\n- Chip supplier: production restarts weeks earlier than feared (sector: Good new information: part of the drop comes back.; concept signal-noise)"
   },
   {
    "id": "lesson:swing",
    "type": "lesson",
    "title": "Simulated lesson: swing",
-   "href": "/learn",
+   "href": "/",
    "text": "A short simulated market lesson (250 trading days, simulated newswire).\n- Interest rates rise faster than expected; growth stocks slide (macro: Higher rates hit the most expensive, fastest-growing stocks hardest.; concept volatility)\n- Europe extends electric-car subsidies by three years (sector: Good news for carmakers, and the wild ones jump the most.; concept volatility)\n- Price war: electric carmakers cut prices by up to 20 % (sector: Lower prices, lower profits. The jump from spring is gone again.; concept volatility)\n- Inflation cools; stock markets rally (macro: Good news for the whole market.; concept volatility)"
   },
   {
    "id": "company:DTE",
    "type": "company",
    "title": "Deutsche Telekom",
-   "href": "/pro",
+   "href": "/trade",
    "text": "Deutsche Telekom AG Namens-Aktien o.N. (Deutsche Telekom), stock, sector Telecom.\nWKN 555750, ISIN DE0005557508, ticker DTE in the sandbox.\nSandbox start price about 29.84 € (mock value, not live data); typical daily move about 1.1 %."
   },
   {
    "id": "company:SAP",
    "type": "company",
    "title": "SAP",
-   "href": "/pro",
+   "href": "/trade",
    "text": "SAP SE Inhaber-Aktien o.N. (SAP), stock, sector Tech.\nWKN 716460, ISIN DE0007164600, ticker SAP in the sandbox.\nSandbox start price about 228.4 € (mock value, not live data); typical daily move about 1.6 %."
   },
   {
    "id": "company:ADS",
    "type": "company",
    "title": "adidas",
-   "href": "/pro",
+   "href": "/trade",
    "text": "adidas AG Namens-Aktien o.N. (adidas), stock, sector Consumer.\nWKN A1EWWW, ISIN DE000A1EWWW0, ticker ADS in the sandbox.\nSandbox start price about 166.7 € (mock value, not live data); typical daily move about 1.9 %."
   },
   {
    "id": "company:SIE",
    "type": "company",
    "title": "Siemens",
-   "href": "/pro",
+   "href": "/trade",
    "text": "Siemens AG Namens-Aktien o.N. (Siemens), stock, sector Industry.\nWKN 723610, ISIN DE0007236101, ticker SIE in the sandbox.\nSandbox start price about 192.1 € (mock value, not live data); typical daily move about 1.5 %."
   },
   {
    "id": "company:ALV",
    "type": "company",
    "title": "Allianz",
-   "href": "/pro",
+   "href": "/trade",
    "text": "Allianz SE vink. Namens-Aktien o.N. (Allianz), stock, sector Finance.\nWKN 840400, ISIN DE0008404005, ticker ALV in the sandbox.\nSandbox start price about 301.5 € (mock value, not live data); typical daily move about 1.2 %."
   },
   {
    "id": "company:MBG",
    "type": "company",
    "title": "Mercedes-Benz",
-   "href": "/pro",
+   "href": "/trade",
    "text": "Mercedes-Benz Group AG Namens-Aktien o.N. (Mercedes-Benz), stock, sector Auto.\nWKN 710000, ISIN DE0007100000, ticker MBG in the sandbox.\nSandbox start price about 58.92 € (mock value, not live data); typical daily move about 1.7 %."
   },
   {
    "id": "company:VOW3",
    "type": "company",
    "title": "Volkswagen Vz.",
-   "href": "/pro",
+   "href": "/trade",
    "text": "Volkswagen AG Vorzugsaktien o.St. o.N. (Volkswagen Vz.), stock, sector Auto.\nWKN 766403, ISIN DE0007664039, ticker VOW3 in the sandbox.\nSandbox start price about 94.6 € (mock value, not live data); typical daily move about 1.8 %."
   },
   {
    "id": "company:AAPL",
    "type": "company",
    "title": "Apple",
-   "href": "/pro",
+   "href": "/trade",
    "text": "Apple Inc. Registered Shares o.N. (Apple), stock, sector Tech.\nWKN 865985, ISIN US0378331005, ticker AAPL in the sandbox.\nSandbox start price about 208.3 € (mock value, not live data); typical daily move about 1.6 %."
   },
   {
    "id": "company:MSFT",
    "type": "company",
    "title": "Microsoft",
-   "href": "/pro",
+   "href": "/trade",
    "text": "Microsoft Corp. Registered Shares DL-,00000625 (Microsoft), stock, sector Tech.\nWKN 870747, ISIN US5949181045, ticker MSFT in the sandbox.\nSandbox start price about 398.2 € (mock value, not live data); typical daily move about 1.5 %."
   },
   {
    "id": "company:NVDA",
    "type": "company",
    "title": "NVIDIA",
-   "href": "/pro",
+   "href": "/trade",
    "text": "NVIDIA Corp. Registered Shares DL-,001 (NVIDIA), stock, sector Tech.\nWKN 918422, ISIN US67066G1040, ticker NVDA in the sandbox.\nSandbox start price about 121.6 € (mock value, not live data); typical daily move about 2.8 %."
   },
   {
    "id": "company:TSLA",
    "type": "company",
    "title": "Tesla",
-   "href": "/pro",
+   "href": "/trade",
    "text": "Tesla Inc. Registered Shares DL-,001 (Tesla), stock, sector Auto.\nWKN A1CX3T, ISIN US88160R1014, ticker TSLA in the sandbox.\nSandbox start price about 221.4 € (mock value, not live data); typical daily move about 3.3 %."
   },
   {
    "id": "company:MSCIW",
    "type": "company",
    "title": "MSCI World ETF",
-   "href": "/pro",
+   "href": "/trade",
    "text": "iShares Core MSCI World UCITS ETF (MSCI World ETF), ETF, sector ETF.\nWKN A0RPWH, ISIN IE00B4L5Y983, ticker MSCIW in the sandbox.\nSandbox start price about 98.45 € (mock value, not live data); typical daily move about 0.0 %."
   },
   {
    "id": "company:WDI",
    "type": "company",
    "title": "Wirecard",
-   "href": "/pro",
+   "href": "/trade",
    "text": "Wirecard AG Inhaber-Aktien o.N. (Wirecard), stock, sector Payments.\nWKN 747206, ISIN DE0007472060, ticker WDI in the sandbox.\nUsed in historical replays only; prices there are mock values shaped like the real curve."
   },
   {
    "id": "company:GME",
    "type": "company",
    "title": "GameStop",
-   "href": "/pro",
+   "href": "/trade",
    "text": "GameStop Corp. Registered Shares Class A DL-,001 (GameStop), stock, sector Retail.\nWKN A0HGDX, ISIN US36467W1094, ticker GME in the sandbox.\nUsed in historical replays only; prices there are mock values shaped like the real curve."
   },
   {
    "id": "company:LHA",
    "type": "company",
    "title": "Lufthansa",
-   "href": "/pro",
+   "href": "/trade",
    "text": "Deutsche Lufthansa AG vink. Namens-Aktien o.N. (Lufthansa), stock, sector Travel.\nWKN 823212, ISIN DE0008232125, ticker LHA in the sandbox.\nUsed in historical replays only; prices there are mock values shaped like the real curve."
   },
   {
    "id": "company:DAXETF",
    "type": "company",
    "title": "DAX ETF",
-   "href": "/pro",
+   "href": "/trade",
    "text": "iShares Core DAX UCITS ETF (DE) (DAX ETF), ETF, sector ETF.\nWKN 593393, ISIN DE0005933931, ticker DAXETF in the sandbox.\nSandbox start price about 110 € (mock value, not live data); typical daily move about 1.1 %."
   },
   {

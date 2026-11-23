@@ -33,7 +33,7 @@ function chunk(type: ChunkType, id: string, title: string, href: string, text: s
 function concepts(): Chunk[] {
   const worldTitle = (n: number) => CONCEPT_WORLDS.find((w) => w.n === n)?.title ?? `World ${n}`;
   return CONCEPTS.map((c) =>
-    chunk("concept", c.id, c.title, "/learn", lines(
+    chunk("concept", c.id, c.title, "/", lines(
       `${c.title} (learning world ${c.world}: ${worldTitle(c.world)})`,
       c.sentence,
       `Example: ${c.example}`,
@@ -48,7 +48,7 @@ function concepts(): Chunk[] {
 
 function cards(): Chunk[] {
   return CARDS.map((c) =>
-    chunk("card", c.id, c.title, "/learn", lines(
+    chunk("card", c.id, c.title, "/", lines(
       `${c.title} (concept card, world ${c.world})`,
       c.front,
       `Example: ${c.example}`,
@@ -81,7 +81,7 @@ function chapterChunk(ch: Chapter, history: boolean): Chunk {
   const lastIsReveal = history && /reveal/i.test(ch.steps?.at(-1)?.title ?? "");
   const publicBody = lastIsReveal ? steps.slice(0, -1).map((s) => s.text).join("\n") : body;
   const revealText = lastIsReveal ? steps.at(-1)!.text : "";
-  return chunk("chapter", ch.id, `${history ? "Story" : `Module ${ch.n}`}: ${ch.title}`, history ? "/history" : "/learn", lines(
+  return chunk("chapter", ch.id, `${history ? "Story" : `Module ${ch.n}`}: ${ch.title}`, history ? "/history" : "/", lines(
     `${ch.title}: ${kind}${worldTitle ? ` in module ${ch.world} (${worldTitle})` : ""}, on the ${ch.surface === "cabinet" ? "web cabinet" : "trading area / ProTrader"}.`,
     ch.blurb,
     ch.card?.length ? `Teaches concept cards: ${ch.card.join(", ")}` : "",
@@ -94,7 +94,7 @@ function chapterChunk(ch: Chapter, history: boolean): Chunk {
 
 function chapters(): Chunk[] {
   const worlds = TOUR_WORLDS.map((w) =>
-    chunk("module", String(w.n), `Module ${w.n}: ${w.title}`, "/learn", lines(
+    chunk("module", String(w.n), `Module ${w.n}: ${w.title}`, "/", lines(
       `Learning path module ${w.n}: ${w.title}. Played on: ${w.surface}.`,
       w.blurb,
       `Chapters: ${CHAPTERS.filter((c) => c.world === w.n).map((c) => `${c.n} ${c.title}`).join("; ")}`,
@@ -109,7 +109,7 @@ function replays(): Chunk[] {
     const headlines = r.universe.news.map((n) => `- ${n.headline}${n.explain ? ` (${n.kind}: ${n.explain})` : ""}`).join("\n");
     const bots = r.moves.map((m) => `- Bot ${m.bot} (${m.side}): "${m.say}"${m.spot ? ` → mistake: ${m.spot.options[m.spot.answer]}. ${m.spot.why}` : ""}`).join("\n");
     const unlock = historyChapter(r.id) ?? (r.boss ? undefined : undefined);
-    return chunk("replay", r.id, r.sim ? `Simulated round: ${r.cover}` : `Historical replay: ${r.cover}`, r.sim ? "/learn" : "/history", lines(
+    return chunk("replay", r.id, r.sim ? `Simulated round: ${r.cover}` : `Historical replay: ${r.cover}`, r.sim ? "/" : "/history", lines(
       r.sim ? `A simulated boss round on the learning path about "${r.cover}".` : `A real historical market replay. The company is shown as "${r.cover}" until the reveal.`,
       `Concept: ${r.concept}. Rule to win: ${r.win}`,
       `Starting budget: ${r.budget} € play money.`,
@@ -123,7 +123,7 @@ function replays(): Chunk[] {
 
 function lessons(): Chunk[] {
   return Object.entries(SIM_LESSONS).map(([key, u]) =>
-    chunk("lesson", key, `Simulated lesson: ${key}`, "/learn", lines(
+    chunk("lesson", key, `Simulated lesson: ${key}`, "/", lines(
       `A short simulated market lesson (${u.days} trading days, simulated newswire).`,
       ...u.news.filter((n) => n.major || n.explain).map((n) => `- ${n.headline} (${n.kind}: ${n.explain}; concept ${n.concept})`),
     )),
@@ -132,7 +132,7 @@ function lessons(): Chunk[] {
 
 function companies(): Chunk[] {
   return ALL_COMPANIES.map((c) =>
-    chunk("company", c.sym, c.short, "/pro", lines(
+    chunk("company", c.sym, c.short, "/trade", lines(
       `${c.name} (${c.short}), ${c.type === "ETF" ? "ETF" : "stock"}, sector ${c.sector}.`,
       `WKN ${c.wkn}, ISIN ${c.isin}, ticker ${c.sym} in the sandbox.`,
       c.price ? `Sandbox start price about ${c.price} € (mock value, not live data); typical daily move about ${(c.vol * 100).toFixed(1)} %.` : "Used in historical replays only; prices there are mock values shaped like the real curve.",

@@ -338,7 +338,7 @@ export default function McpConnect() {
                   ? t("Load demo depot & try briefing", "Demo-Depot laden & testen")
                   : t("Preview live account update", "Live-Depot-Update testen")}
             </button>
-            <Link href="/pro" className="btn btn-outline-light">
+            <Link href="/trade" className="btn btn-outline-light">
               {t("Open trading area ›", "Handelsbereich öffnen ›")}
             </Link>
           </div>

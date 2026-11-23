@@ -286,7 +286,7 @@ function ProUnlocked({ stars }: { stars: number }) {
   const t = useT();
   const [stay, setStay] = useState(false);
   const enter = (
-    <Link className="btn btn-primary btn-sm" href="/pro" onClick={() => { actions.celebratePro(); actions.start("2.1"); setUi({}); }}>{t("Next: enter the trading area →", "Weiter: in den Handelsbereich →")}</Link>
+    <Link className="btn btn-primary btn-sm" href="/trade" onClick={() => { actions.celebratePro(); actions.start("2.1"); setUi({}); }}>{t("Next: enter the trading area →", "Weiter: in den Handelsbereich →")}</Link>
   );
   if (stay) return <SandboxBar label={t("Mission complete", "Mission abgeschlossen")} next={enter} />;
   return (
@@ -299,7 +299,7 @@ function ProUnlocked({ stars }: { stars: number }) {
         <div className="row" style={{ justifyContent: "center" }}>
           <button className="btn btn-outline-light" onClick={() => { actions.celebratePro(); setStay(true); }}>{t("Keep exploring here", "Hier weiter erkunden")}</button>
           <Link className="btn btn-outline-light" href="/" onClick={() => { actions.celebratePro(); actions.start(null); }}>{t("Back to learning map", "Zurück zum Lernpfad")}</Link>
-          <Link className="btn btn-primary btn-lg" href="/pro" onClick={() => { actions.celebratePro(); actions.start("2.1"); setUi({}); }}>{t("Enter the trading area →", "In den Handelsbereich →")}</Link>
+          <Link className="btn btn-primary btn-lg" href="/trade" onClick={() => { actions.celebratePro(); actions.start("2.1"); setUi({}); }}>{t("Enter the trading area →", "In den Handelsbereich →")}</Link>
         </div>
       </div>
     </div>

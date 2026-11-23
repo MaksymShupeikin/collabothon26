@@ -8,24 +8,20 @@ import {
   MCP_TOOLS,
   SUPPORTED_PROTOCOLS,
 } from "@/features/mcp/server";
-import {
-  DEFAULT_MCP_PLAYER_ID,
-  isValidPlayerId,
-  storageKind,
-} from "@/features/mcp/storage";
+import { isValidPlayerId, storageKind } from "@/features/mcp/storage";
 
 const COOKIE = "cd-edu-id";
 
 const CORS_HEADERS: Record<string, string> = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET, POST, DELETE, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type, Accept, Authorization, Mcp-Session-Id, MCP-Protocol-Version, X-Player-Id, X-MCP-Token",
+  "Access-Control-Allow-Headers": "Content-Type, Accept, Authorization, Mcp-Session-Id, MCP-Protocol-Version, X-Player-Id",
   "Access-Control-Expose-Headers": "Mcp-Session-Id, MCP-Protocol-Version",
 };
 
-async function resolvePlayerId(req: Request): Promise<string> {
+async function resolvePlayerId(req: Request): Promise<string | null> {
   const url = new URL(req.url);
-  const queryToken = url.searchParams.get("token") ?? url.searchParams.get("player");
+  const queryToken = url.searchParams.get("token");
   if (isValidPlayerId(queryToken)) return queryToken;
 
   const auth = req.headers.get("authorization");
@@ -34,7 +30,7 @@ async function resolvePlayerId(req: Request): Promise<string> {
     if (isValidPlayerId(bearer)) return bearer;
   }
 
-  const headerToken = req.headers.get("x-player-id") ?? req.headers.get("x-mcp-token");
+  const headerToken = req.headers.get("x-player-id");
   if (isValidPlayerId(headerToken)) return headerToken;
 
   try {
@@ -45,7 +41,8 @@ async function resolvePlayerId(req: Request): Promise<string> {
     // Non-cookie MCP client request
   }
 
-  return DEFAULT_MCP_PLAYER_ID;
+  // No shared fallback player: anonymous callers would all read and overwrite one save.
+  return null;
 }
 
 export async function OPTIONS() {
@@ -95,7 +92,14 @@ export async function POST(req: Request) {
   }
 
   const playerId = await resolvePlayerId(req);
-  const sessionId = req.headers.get("mcp-session-id") || playerId;
+  if (!playerId) {
+    return Response.json(
+      { jsonrpc: "2.0", id: null, error: { code: -32001, message: "Missing player id: add ?token=<player-uuid> or Authorization: Bearer <player-uuid>." } },
+      { status: 401, headers: CORS_HEADERS },
+    );
+  }
+  // A fresh id, not the player id: the player id is the credential and must not be echoed in headers.
+  const sessionId = req.headers.get("mcp-session-id") || crypto.randomUUID();
   const response = await handleJsonRpcPayload(payload, { playerId });
 
   const headers: Record<string, string> = {

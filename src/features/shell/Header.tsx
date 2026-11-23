@@ -15,7 +15,7 @@ export default function Header() {
   const rank = rankOf(save.xp);
   const t = useT();
   // On the simple trading area after "Simple view", the tab is the way back to ProTrader.
-  const backToPro = path === "/pro" && save.simpleChosen && !simpleOnlyChapter(save.active ? chapterById(save.active) : undefined);
+  const backToPro = path === "/trade" && save.simpleChosen && !simpleOnlyChapter(save.active ? chapterById(save.active) : undefined);
   return (
     <header className="header">
       <div className="header-inner">
@@ -24,12 +24,15 @@ export default function Header() {
           <span className="logo-edu">edu</span>
         </Link>
         <LangSwitch />
-        {save.persona && (backToPro || !["/", "/history", "/invest", "/pro"].includes(path)) && (
+        {save.persona && (backToPro || !["/", "/history", "/invest", "/trade"].includes(path)) && (
           <nav className="hnav" aria-label="comdirect edu">
-            {path === "/real-market" || save.proTrader || save.simpleChosen
-              // Same as "Switch to ProTrader"; an open Module 2 / History chapter would keep /pro on the simple layout, so leave it.
-              ? <Link href="/pro" onClick={() => { if (simpleOnlyChapter(save.active ? chapterById(save.active) : undefined)) actions.start(null); actions.switchToProTrader(); }}>ProTrader</Link>
-              : <Link href="/pro">{t("Trading area", "Handelsbereich")}</Link>}
+            {path === "/real-market"
+              // Real Market has its own ProTrader layout: switch in place instead of leaving for the simulated /trade market.
+              ? <button type="button" onClick={actions.switchToProTrader}>ProTrader</button>
+              : save.proTrader || save.simpleChosen
+              // Same as "Switch to ProTrader"; an open Module 2 / History chapter would keep /trade on the simple layout, so leave it.
+              ? <Link href="/trade" onClick={() => { if (simpleOnlyChapter(save.active ? chapterById(save.active) : undefined)) actions.start(null); actions.switchToProTrader(); }}>ProTrader</Link>
+              : <Link href="/trade">{t("Trading area", "Handelsbereich")}</Link>}
           </nav>
         )}
         <div className="user" aria-label={t(`Your profile: ${USER.name}, level ${rank.level} ${rank.name}, ${save.xp} XP`, `Dein Profil: ${USER.name}, Level ${rank.level} ${t(rank.name)}, ${save.xp} XP`)}>

@@ -142,7 +142,7 @@ function Home({ save, go }: { save: Save; go: (v: View, s?: string) => void }) {
         </table>
         <div className="row acc-actions">
           <button className="pill pill-lg" onClick={() => go("umsaetze")}>{t("All transactions ›", "Alle Umsätze ›")}</button>
-          <Link className="pill pill-lg pill-yellow" href="/pro" onClick={() => { if (simpleOnlyChapter(save.active ? chapterById(save.active) : undefined)) actions.start(null); if (save.simpleChosen) actions.switchToProTrader(); }}>ProTrader ›</Link>
+          <Link className="pill pill-lg pill-yellow" href="/trade" onClick={() => { if (simpleOnlyChapter(save.active ? chapterById(save.active) : undefined)) actions.start(null); if (save.simpleChosen) actions.switchToProTrader(); }}>ProTrader ›</Link>
           <button className="sandbox-btn" data-tour="add-play-money" onClick={() => setAddOpen(true)}><span className="sandbox-tag">Sandbox</span> {t("Add play money", "Spielgeld einzahlen")}</button>
         </div>
       </section>
