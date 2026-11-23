@@ -88,7 +88,15 @@ function RealMarketDesk({ layout }: { layout: Layout }) {
       .catch(() => { if (!controller.signal.aborted) setMarket({ error: "Could not load the local Yahoo Finance quotes." }); });
     return () => controller.abort();
   }, []);
-  if (!market) return <div className="pt-gate" role="status">Loading local market data…</div>;
+  if (!market) return (
+    <div className="skel-page" role="status">
+      <span className="skel" />
+      <span className="skel" style={{ height: 64 }} />
+      <span className="skel" style={{ height: 320 }} />
+      {[0, 1, 2, 3, 4].map((i) => <span key={i} className="skel" style={{ height: 44 }} />)}
+      <span className="sr-only">Loading local market data…</span>
+    </div>
+  );
   if ("error" in market) return <Gate text={market.error} href="/" cta="Learning map" />;
   return <Desk key={`real:${market.start}`} mode={{ kind: "real", id: market.id }} layout={layout} offerSwitch={false} realSim={{ pace, cash: BUDGET, onRewind }} />;
 }
@@ -127,7 +135,7 @@ type Toast = { id: number; text: string };
 function Desk({ mode, chapter, layout, offerSwitch, realSim }: { mode: Mode; chapter?: Chapter; layout: Layout; offerSwitch: boolean; realSim?: RealSim }) {
   const t = useT();
   const router = useRouter();
-  // Free-play "Simple view" leaves for /real-market; flipping the layout only on unmount keeps /trade from flashing its simple desk first.
+  // Free-play "Simple view" leaves for /real-market; flipping the layout only on unmount keeps /pro from flashing its simple desk first.
   const toRealMarket = useRef(false);
   useLayoutEffect(() => () => { if (toRealMarket.current) actions.switchToSimple(); }, []);
   const save = useGame();

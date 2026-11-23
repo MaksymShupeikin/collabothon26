@@ -4,8 +4,10 @@ services:
     build: .
     container_name: comdirect-web
     restart: unless-stopped
-    env_file: .env # DATABASE_URL=postgres://comdirect:...@db-postgres-1:5432/comdirect (the shared Postgres on db_default)
-    networks: [db_default]
+    env_file: .env
+    volumes:
+      - ./.data:/app/.data # progress saves (one JSON file); survives rebuilds
+    networks: [db_default] # kept: the shared network Caddy reaches this container on
 
 networks:
   db_default:

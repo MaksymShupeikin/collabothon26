@@ -3,7 +3,7 @@
  * comdirect edu MCP stdio server (runs with plain Node.js 22+/24, zero build step).
  *
  * Modes:
- *   1. Local shared storage (Postgres via DATABASE_URL or local .data/comdirect-edu-saves.json):
+ *   1. Local shared storage (.data/comdirect-edu-saves.json):
  *        npm run mcp -- --player <uuid>
  *   2. Remote HTTP bridge (connects stdio-only clients like Claude Desktop to a deployed server):
  *        npm run mcp -- --url https://comdirect.vokh.dev/api/mcp?token=<uuid>
@@ -17,7 +17,6 @@ import {
   DEFAULT_MCP_PLAYER_ID,
   isValidPlayerId,
   listSavedPlayerIds,
-  storageKind,
 } from "../src/features/mcp/storage.ts";
 
 function argValue(flag: string): string | undefined {
@@ -90,7 +89,7 @@ async function main() {
   if (remoteUrl) {
     process.stderr.write(`[comdirect-edu-mcp] stdio bridge ready -> ${remoteUrl}\n`);
   } else {
-    process.stderr.write(`[comdirect-edu-mcp] stdio server ready (storage=${storageKind()}, player=${playerId})\n`);
+    process.stderr.write(`[comdirect-edu-mcp] stdio server ready (player=${playerId})\n`);
   }
 
   let buffer = Buffer.alloc(0);

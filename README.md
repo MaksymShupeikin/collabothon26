@@ -5,7 +5,6 @@
 <p align="center">
   <img src="https://img.shields.io/badge/Next.js-16-002E3C?style=flat-square" alt="Next.js 16">
   <img src="https://img.shields.io/badge/React-19-506C74?style=flat-square" alt="React 19">
-  <img src="https://img.shields.io/badge/PostgreSQL-002E3C?style=flat-square" alt="PostgreSQL">
   <img src="https://img.shields.io/badge/Node.js-506C74?style=flat-square" alt="Node.js">
   <img src="https://img.shields.io/badge/money-play_only-FFD700?style=flat-square&labelColor=002E3C" alt="Play money only">
   <img src="https://img.shields.io/badge/Collabothon-2026-83989F?style=flat-square" alt="Collabothon 2026">
@@ -120,7 +119,7 @@ Three onboarding questions pick a persona, and everything is tailored to it: exa
 
 | | |
 |---|---|
-| ✅ **Working** | Onboarding with three personas · all four tutorials end to end, each with a mission and a boss · five History replays (Wirecard, GameStop, VW, NVIDIA, COVID crash) · investor simulator · learning map with XP, ranks, stars and cards · ProTrader replica with the time machine · Real Market with historical quotes and intraday charts · backend progress saving in PostgreSQL · MCP server for your own AI chatbot (12 tools, 5 live resources) · built-in AI study-buddy chat with sources · English and German |
+| ✅ **Working** | Onboarding with three personas · all four tutorials end to end, each with a mission and a boss · five History replays (Wirecard, GameStop, VW, NVIDIA, COVID crash) · investor simulator · learning map with XP, ranks, stars and cards · ProTrader replica with the time machine · Real Market with historical quotes and intraday charts · backend progress saving to a local JSON file · MCP server for your own AI chatbot (12 tools, 5 live resources) · built-in AI study-buddy chat with sources · English and German |
 | 🟡 **Simulated on purpose** | Tutorial prices are scripted; Real Market uses historical quotes · all trades use play money · the photoTAN step is a mock · "Ready for real?" links to comdirect.de |
 | 🔜 **Planned integration** | Customer profile and identity from the bank platform · progress linked to that identity across devices |
 
@@ -132,12 +131,12 @@ Three onboarding questions pick a persona, and everything is tailored to it: exa
 | **Simulation** | Our TypeScript market and game engines | Run play-money trades and check mission actions in the browser; calculate XP, stars and learning progress |
 | **Charts** | TradingView lightweight-charts | Draw candlestick, volume and historical price charts |
 | **Backend** | Node.js, Next.js Route Handlers | Load and save progress through `/api/save`; serve intraday quotes through `/api/real-market/bars` |
-| **Database** | PostgreSQL, Postgres.js (`postgres`) | Store each learner's save as JSONB, with an ID and update timestamp |
+| **Storage** | One JSON file on the server (`.data/comdirect-edu-saves.json`) | Store each learner's save, keyed by an anonymous ID, with an update timestamp |
 | **Market data** | Bundled Yahoo Finance daily quotes; Python, uv, yfinance and exchange-calendars | Supply historical daily data and server-side intraday bars for Real Market; an optional local archive supports older intraday data |
-| **Deployment** | Docker, Docker Compose, Caddy, VPS | Run the app and Python worker in a container, connect to PostgreSQL and serve the app over HTTPS |
+| **Deployment** | Docker, Docker Compose, Caddy, VPS | Run the app and Python worker in a container, keep saves on a mounted volume and serve the app over HTTPS |
 | **Quality** | ESLint, `node:assert` | Check code quality and verify the simulation's money math and scenario rules |
 
-The frontend and backend are part of the same Next.js application. PostgreSQL runs as a separate service. No paid API subscription is required for the prototype.
+The frontend and backend are part of the same Next.js application. There is no separate database service. No paid API subscription is required for the prototype.
 
 ### Platform data and learning progress
 
@@ -148,8 +147,8 @@ Our backend stores what the learner does in edu: onboarding answers and persona,
 The data flow is:
 
 1. **comdirect platform → edu:** provide the signed-in customer identity and relevant profile context through a future bank integration.
-2. **edu frontend → edu backend → PostgreSQL:** save the learning and sandbox state as the customer practises.
-3. **PostgreSQL → edu backend → edu frontend:** restore progress when the customer returns. Linking saves to the platform identity would also allow progress to follow them across devices.
+2. **edu frontend → edu backend → save file:** save the learning and sandbox state as the customer practises.
+3. **save file → edu backend → edu frontend:** restore progress when the customer returns. Linking saves to the platform identity would also allow progress to follow them across devices.
 
 **In the current prototype,** the progress backend is implemented, while the bank connection is still planned. The profile is the fixed "Max Mustermann" placeholder, and an anonymous browser cookie identifies each save. See [Saving progress](#saving-progress) for the current behaviour.
 
@@ -169,11 +168,11 @@ Neither gives personal investment advice. Both work on play money only; real tra
 **Key decisions.**
 - **Deterministic markets.** Prices depend only on the scenario, never on the player, so every demo and every test plays the same way and only the account needs saving.
 - **One tutorial step = one trading day.** Enough to show news, orders and compounding. Real Market separately supports historical daily and intraday charts.
-- **A focused backend.** Next.js handles progress storage in PostgreSQL and intraday market-data requests. The browser runs the learning and simulation logic; the server persists the resulting save.
+- **A focused backend.** Next.js handles progress storage in a local JSON file and intraday market-data requests. The browser runs the learning and simulation logic; the server persists the resulting save.
 - **Reuse the bank identity.** The intended product gets customer details from the signed-in comdirect platform and adds a learning record keyed to that identity. The prototype uses a placeholder profile ([`user.ts`](src/shared/lib/user.ts)) and an anonymous save cookie until that integration is connected.
 - **Code by feature** (`src/features/*`), with thin routes in `src/app/`.
 
-**Built on:** Next.js, React, PostgreSQL, Postgres.js, lightweight-charts and the Python market-data tools listed above.
+**Built on:** Next.js, React, lightweight-charts and the Python market-data tools listed above.
 **Built by us during the hackathon (20–22 Nov 2026):** everything else. The market engine, scenarios, replays and bots, the tour and missions, the game systems, the comdirect replica screens, the investor simulator and the German translation.
 
 ## Challenges and what we learned
@@ -219,7 +218,7 @@ npm run check      # self-check of the money math, scripted markets and bots
 npm run build
 ```
 
-Progress lives in Postgres (`saves` + `mcp_checkpoints` tables, created on first use) when `DATABASE_URL` is set, and automatically falls back to a local `.data/comdirect-edu-saves.json` file when `DATABASE_URL` is absent so both the web app and local MCP server stay synced out of the box. "Reset progress" at the bottom of the hub starts over.
+Progress (saves and MCP checkpoints) lives in one local file, `.data/comdirect-edu-saves.json` (override with `COMDIRECT_MCP_DATA_FILE`), so the web app and the local MCP server share it with no database setup. "Reset progress" at the bottom of the hub starts over.
 
 Real Market's intraday charts (5m to 4h) run `scripts/read-intraday.py` through [uv](https://docs.astral.sh/uv/) (`brew install uv`). Without it, `npm run dev` logs `[intraday] warm-up failed: spawn uv ENOENT` and those charts show "temporarily unavailable"; daily and weekly charts still work. The first run downloads about 20 MB of Python packages. Set `REAL_MARKET_UV` if uv is not on your `PATH`. The Docker image installs uv and the packages at build time.
 
@@ -238,7 +237,7 @@ What that means:
 - Progress from the old `localStorage` version is uploaded once on first load.
 - The "Max Mustermann" in the header is a fixed mock profile ([`user.ts`](src/shared/lib/user.ts)), not tied to the cookie. The intended bank integration would use the existing platform session and customer ID to identify saves, with profile data supplied by the platform.
 
-On the VPS, `DATABASE_URL` sits in `~/collabothon26/.env` (read by `docker-compose.yml`) and points at the shared Postgres container on the `db_default` network.
+On the VPS, `docker-compose.yml` mounts `~/collabothon26/.data` into the container, so saves survive rebuilds. One server process writes the file; running several instances would need a real database.
 
 ## AI Agent Integration (MCP)
 
@@ -247,7 +246,7 @@ Open **`/mcp`** in the app to copy your personal pre-filled configuration or run
 - **Streamable HTTP endpoint:** `POST /api/mcp?token=<player-uuid>` (or `Authorization: Bearer <player-uuid>`, `X-Player-Id`, or the `cd-edu-id` browser cookie). A request without a player id gets `401`; there is no shared fallback player.
 - **Stdio CLI / remote bridge (zero extra dependencies, runs with plain `node`):**
   ```bash
-  # Local shared storage (Postgres or .data/comdirect-edu-saves.json)
+  # Local shared storage (.data/comdirect-edu-saves.json)
   npm run mcp -- --player <player-uuid>
 
   # Bridge a stdio client (e.g. Claude Desktop) to a deployed instance
@@ -278,9 +277,9 @@ The built-in chat answers from comdirect edu's own content. It is an AI agent on
 | Path | What |
 |---|---|
 | `src/app/` | App Router pages that render feature screens, plus backend API routes |
-| `src/app/api/save/` | Backend API for loading and saving learning progress in PostgreSQL |
+| `src/app/api/save/` | Backend API for loading and saving learning progress |
 | `src/app/api/real-market/bars/` | Backend API for historical intraday market data |
-| `src/features/mcp/` | MCP JSON-RPC 2.0 server, portfolio P/L & checkpoint delta engine, shared Postgres/file storage, `/mcp` UI and self-checks |
+| `src/features/mcp/` | MCP JSON-RPC 2.0 server, portfolio P/L & checkpoint delta engine, shared file storage, `/mcp` UI and self-checks |
 | `scripts/mcp-server.ts` | Zero-dependency MCP stdio server & remote HTTP bridge |
 | `src/features/market/` | Deterministic market and account (`engine.ts`), scripted lessons and historical replays, bots, news, companies. Runs under plain `node` for `npm run check` |
 | `src/features/game/` | The save (XP, cards, stars, persona), personas and the tour UI bus |

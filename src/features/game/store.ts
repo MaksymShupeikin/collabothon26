@@ -18,16 +18,15 @@ import { dict } from "../../shared/lib/i18n.ts";
 
 export { RANKS, rankOf, type Save, type Tx };
 
-// Progress lives on the server (/api/save, Postgres or local file fallback), keyed by an anonymous browser cookie.
+// Progress lives on the server (/api/save, a local JSON file), keyed by an anonymous browser cookie.
 
 export type PlayerMeta = {
   playerId: string | null;
-  storage: "postgres" | "file" | null;
 };
 
 const LEGACY_KEY = "cd-edu-v3", LEGACY_BEST = "cd-edu-invsim-best";
 const EMPTY = EMPTY_SAVE;
-const EMPTY_META: PlayerMeta = { playerId: null, storage: null };
+const EMPTY_META: PlayerMeta = { playerId: null };
 
 let cache: Save = EMPTY;
 let meta: PlayerMeta = EMPTY_META;
@@ -74,13 +73,12 @@ export async function reloadFromServer(force = false): Promise<boolean> {
   try {
     const r = await fetch("/api/save", { cache: "no-store" });
     if (!r.ok) return false;
-    const body = (await r.json()) as { save: Save | null; playerId?: string; storage?: "postgres" | "file" };
+    const body = (await r.json()) as { save: Save | null; playerId?: string };
     synced = true;
     const nextMeta: PlayerMeta = {
       playerId: body.playerId ?? meta.playerId,
-      storage: body.storage ?? meta.storage,
     };
-    const metaChanged = nextMeta.playerId !== meta.playerId || nextMeta.storage !== meta.storage;
+    const metaChanged = nextMeta.playerId !== meta.playerId;
     if (metaChanged) meta = nextMeta;
 
     let saveChanged = false;
@@ -111,9 +109,9 @@ function legacy(): Save | null {
 if (typeof window !== "undefined") {
   fetch("/api/save", { cache: "no-store" })
     .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`))))
-    .then(({ save, playerId, storage }: { save: Save | null; playerId?: string; storage?: "postgres" | "file" }) => {
+    .then(({ save, playerId }: { save: Save | null; playerId?: string }) => {
       synced = true;
-      meta = { playerId: playerId ?? null, storage: storage ?? null };
+      meta = { playerId: playerId ?? null };
       const old = legacy();
       if (save?.v === 3) cache = { ...EMPTY, ...save };
       else if (old) {
@@ -138,7 +136,7 @@ export const getSave = read;
 export const onSave = (l: (prev: Save, next: Save) => void) => { savers.add(l); return () => { savers.delete(l); }; };
 /** True once the save has arrived from the server (or failed to). */
 export const useLoaded = () => useSyncExternalStore(subscribe, () => loaded, () => false);
-/** Current browser session UUID and server storage backend for MCP setup. */
+/** Current browser session UUID for MCP setup. */
 export const usePlayerMeta = () => useSyncExternalStore(subscribe, readMeta, () => EMPTY_META);
 /** Renders its children only once the save is loaded, so nothing reads or writes the empty placeholder. */
 export const SaveGate = ({ children }: { children: ReactNode }) => (useLoaded() ? children : null);

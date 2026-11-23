@@ -7,3 +7,4 @@ docs
 .impeccable
 .claude
 .env*
+.data

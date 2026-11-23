@@ -351,9 +351,7 @@ export default function McpConnect() {
               {t("Ready to connect", "Bereit zum Verbinden")}
             </span>
             <span className={s.hudBadge}>
-              {meta.storage === "postgres"
-                ? t("Synced · Postgres", "Synchron · Postgres")
-                : t("Synced · Local", "Synchron · Lokal")}
+              {t("Synced · Local", "Synchron · Lokal")}
             </span>
           </div>
 

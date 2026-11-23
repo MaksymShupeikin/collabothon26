@@ -179,7 +179,7 @@ function ConnectSheet({ onClose, onDone }: { onClose: () => void; onDone: () => 
               <span>{t("It is personal: it opens your depot only.", "Er ist persönlich: Er öffnet nur dein Depot.")}</span>
             </div>
             <button type="button" className={copied ? s.quietBtn : s.primary} onClick={copyLink} disabled={!ready} aria-live="polite">
-              {!ready ? t("Loading…", "Lädt…") : copied ? t("Copied", "Kopiert") : t("Copy", "Kopieren")}
+              {!ready ? <><span className="skel skel-inline" style={{ width: 44 }} /><span className="sr-only">{t("Loading…", "Lädt…")}</span></> : copied ? t("Copied", "Kopiert") : t("Copy", "Kopieren")}
             </button>
           </li>
           <li className={opened ? s.done : undefined}>

@@ -1,12 +1,13 @@
 import assert from "node:assert/strict";
-import { rm } from "node:fs/promises";
+import { readFile, rm, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
+import { EMPTY_SAVE } from "../game/save.ts";
+import { loadSave, writeSave } from "./storage.ts";
 import { handleJsonRpcMessage, handleJsonRpcPayload, MCP_PROMPTS, MCP_RESOURCES, MCP_TOOLS } from "./server.ts";
 
 const tmpFile = path.join(os.tmpdir(), `comdirect-edu-mcp-check-${process.pid}-${Date.now()}.json`);
 process.env.COMDIRECT_MCP_DATA_FILE = tmpFile;
-delete process.env.DATABASE_URL;
 
 const playerId = "11111111-2222-4333-8444-555555555555";
 const ctx = { playerId };
@@ -176,6 +177,12 @@ async function run() {
 
     const promptBriefing = await call("prompts/get", { name: "account-briefing", arguments: { lang: "en" } });
     assert.ok(Array.isArray((promptBriefing.result as { messages: unknown[] }).messages));
+
+    // A corrupt save file must fail loudly, never be treated as empty and overwritten.
+    await writeFile(tmpFile, "{ not json", "utf8");
+    await assert.rejects(loadSave(playerId));
+    await assert.rejects(writeSave(playerId, EMPTY_SAVE));
+    assert.equal(await readFile(tmpFile, "utf8"), "{ not json");
 
     console.log("mcp.check: all good (12 tools, 5 resources, 4 prompts, delta tracking & honesty guard verified)");
   } finally {

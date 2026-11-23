@@ -1,0 +1,41 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "low-contrast",
+        "value": "*",
+        "files": [
+          "docs/pitch/index.html"
+        ],
+        "createdAt": "2026-11-21T19:09:01.166Z",
+        "reason": "Claude: yellow .hl text sits on petrol panels drawn by ::before; detector reads the white slide base. Verified in render."
+      },
+      {
+        "rule": "overused-font",
+        "value": "montserrat",
+        "createdAt": "2026-11-21T19:09:30.325Z",
+        "reason": "Claude: free stand-in for the app's Gotham (idea.md §14); self-hosted so the PDF embeds it"
+      },
+      {
+        "rule": "side-tab",
+        "value": "*",
+        "files": [
+          "docs/pitch/pitch.css"
+        ],
+        "createdAt": "2026-11-21T19:09:30.336Z",
+        "reason": "Claude: L130 is the comdirect nav active-tab underline (bottom inset), copied from the app header, not a side bar"
+      },
+      {
+        "rule": "cramped-padding",
+        "value": "*",
+        "files": [
+          "docs/pitch/index.html"
+        ],
+        "createdAt": "2026-11-21T19:09:30.347Z",
+        "reason": "Claude: flagged .wh/.tm are fixed-height mock bars whose full-height nav tab is intentional; render checked"
+      }
+    ]
+  }
+}

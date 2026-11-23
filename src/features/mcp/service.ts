@@ -52,7 +52,6 @@ import {
   clearCheckpoint,
   loadCheckpoint,
   loadSave,
-  storageKind,
   writeCheckpoint,
   writeSave,
   type McpCheckpoint,
@@ -310,7 +309,6 @@ export async function getAccountUpdate(
       data: {
         hasAccount: false,
         playerId,
-        storage: storageKind(),
         nextAction: "Open comdirect edu in the browser or call seed_demo_portfolio.",
         marketContext: {
           liveNewsAvailable: false,
@@ -527,7 +525,6 @@ export async function getAccountUpdate(
       sandbox: true,
       currency: "EUR",
       playerId,
-      storage: storageKind(),
       simDay: sim.day,
       simDate: isoDate(simDate),
       persona: persona ? { id: persona.id, label: tr(persona.label, lang), horizon: tr(persona.horizon, lang) } : null,

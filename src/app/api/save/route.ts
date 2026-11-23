@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { normalizeSave } from "@/features/game/save";
-import { isValidPlayerId, loadSave, storageKind, writeSave } from "@/features/mcp/storage";
+import { isValidPlayerId, loadSave, writeSave } from "@/features/mcp/storage";
 
 // shortcut: anonymous player id in a cookie, so progress follows the browser, not a person; key it on the comdirect login once one exists.
 const COOKIE = "cd-edu-id";
@@ -30,7 +30,7 @@ export async function GET() {
   try {
     const id = await playerId();
     const save = await loadSave(id);
-    return Response.json({ save, playerId: id, storage: storageKind() });
+    return Response.json({ save, playerId: id });
   } catch (e) {
     return fail(e);
   }

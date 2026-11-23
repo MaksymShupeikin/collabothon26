@@ -8,7 +8,7 @@ import {
   MCP_TOOLS,
   SUPPORTED_PROTOCOLS,
 } from "@/features/mcp/server";
-import { isValidPlayerId, storageKind } from "@/features/mcp/storage";
+import { isValidPlayerId } from "@/features/mcp/storage";
 
 const COOKIE = "cd-edu-id";
 
@@ -64,7 +64,6 @@ export async function GET(req: Request) {
       ...MCP_SERVER_INFO,
       transport: "streamable-http",
       protocolVersions: SUPPORTED_PROTOCOLS,
-      storage: storageKind(),
       capabilities: {
         tools: MCP_TOOLS.length,
         resources: MCP_RESOURCES.length,

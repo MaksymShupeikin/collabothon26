@@ -346,7 +346,12 @@ export default function SimpleDesk(p: SimpleProps) {
           )}
         </div>
       </div>
-      {btLoading && <p className="xs muted bt-status" role="status">Loading {btTf} quotes…</p>}
+      {btLoading && (
+        <div className="skel-chart" role="status">
+          <span className="skel" style={{ height: 240 }} />
+          <span className="sr-only">Loading {btTf} quotes…</span>
+        </div>
+      )}
       {btError && (
         <div className="xs bt-status" role="status">
           {btError} <button type="button" className="btn btn-outline btn-sm" onClick={() => setIntraRetry((n) => n + 1)}>Retry</button>
@@ -495,7 +500,7 @@ export default function SimpleDesk(p: SimpleProps) {
               <div className="clock clock-bt" data-tour="time-machine" role="group" aria-label="Backtest controls">
                 <div className="bt-head">
                   <div className="bt-when">
-                    <strong className="bt-date num">{btDate}</strong>
+                    <strong className="bt-date num">{series ? btDate : <><span className="skel skel-inline" style={{ width: 160 }} /><span className="sr-only">{btDate}</span></>}</strong>
                     <span className="bt-sub num">
                       <span className="bt-mode-pill">Backtest</span>
                       {bt.picking

@@ -110,20 +110,26 @@ function IntradayHistory({ symbol, interval, asOf, firstMonth, onJumpRecent }: {
     };
   }, [symbol]);
 
-  if (!history) return <p className="xs muted" role="status">Loading {interval} quotes…</p>;
+  if (!history) return (
+    <div className="skel-chart" role="status">
+      <span className="skel" style={{ height: 240 }} />
+      <span className="skel" style={{ height: 12, width: "40%" }} />
+      <span className="sr-only">Loading {interval} quotes…</span>
+    </div>
+  );
   if (history.error) return <div className="xs" role="status">{history.error} <button className="btn btn-outline" onClick={() => { setHistory(undefined); setRetry(retry + 1); }}>Retry</button></div>;
   return (
     <>
       {visible.length ? (
         <p className="xs muted" role="status">{sources} · EUR · {visible[0][1]} to {lastDay}{history.partial ? " · Partial coverage" : ""}
-          {loadingOlder ? " · Loading earlier quotes…" : olderError ? ` · ${olderError}` : !canLoadOlder ? " · Start of available history" : ""}
+          {loadingOlder ? <> · <span className="skel skel-inline" style={{ width: 90 }} /><span className="sr-only">Loading earlier quotes…</span></> : olderError ? ` · ${olderError}` : !canLoadOlder ? " · Start of available history" : ""}
         </p>
       ) : (
         <div className="xs" role="status">
           <p>No {interval} quotes near {asOf} for {symbol}.</p>
           {onJumpRecent && <button className="btn btn-outline" onClick={onJumpRecent}>Jump to recent sessions</button>}
           {canLoadOlder && <button className="btn btn-outline" disabled={loadingOlder} onClick={loadOlder}>← Earlier</button>}
-          {loadingOlder ? <p>Loading earlier quotes…</p> : olderError && <p>{olderError}</p>}
+          {loadingOlder ? <p><span className="skel skel-inline" style={{ width: 140 }} /><span className="sr-only">Loading earlier quotes…</span></p> : olderError && <p>{olderError}</p>}
         </div>
       )}
       {!!visible.length && <CandleChart sym={symbol} prices={bars.map((bar) => bar.close)} replayBars={bars}
